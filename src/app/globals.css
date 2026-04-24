@@ -157,3 +157,56 @@ footer .logo span{margin-top:4px;}
 .placeholder-title{font-family:'Inter Tight',sans-serif;font-size:clamp(28px,4vw,40px);font-weight:700;margin-bottom:16px;letter-spacing:-0.02em;color:var(--text);}
 .placeholder-body{font-size:15px;line-height:1.7;color:var(--text-muted);margin-bottom:36px;font-weight:300;}
 .placeholder-actions{display:flex;align-items:center;justify-content:center;gap:20px;flex-wrap:wrap;}
+
+/* --- Auth pages (signup wizard + signin) --------------------------------- */
+.auth-page{min-height:100vh;background:var(--black);display:flex;flex-direction:column;padding:32px 24px 64px;}
+.auth-header{display:flex;justify-content:space-between;align-items:center;max-width:960px;width:100%;margin:0 auto 48px;}
+.auth-header .logo{text-decoration:none;}
+.auth-stepper{display:flex;gap:8px;}
+.step-dot{width:24px;height:3px;background:var(--surface-3);display:block;border-radius:2px;transition:background 0.2s;}
+.step-dot.on{background:var(--gold);}
+
+.auth-panel{max-width:720px;width:100%;margin:0 auto;background:var(--off-black);border:1px solid var(--border);padding:56px 56px 48px;}
+@media(max-width:720px){.auth-panel{padding:40px 28px;}}
+
+.auth-title{font-family:'Inter Tight',sans-serif;font-size:clamp(28px,4vw,42px);font-weight:700;letter-spacing:-0.02em;color:var(--text);margin-bottom:12px;line-height:1.05;}
+.auth-sub{font-size:15px;line-height:1.6;color:var(--text-muted);margin-bottom:40px;font-weight:300;}
+.auth-sub strong{color:var(--text);font-weight:500;}
+
+.role-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:28px;}
+@media(max-width:720px){.role-grid{grid-template-columns:1fr;}}
+
+.role-card{background:var(--black);border:1px solid var(--border-soft);padding:28px 22px;text-align:left;color:var(--text);font-family:inherit;cursor:pointer;transition:border-color 0.15s,background 0.15s,transform 0.15s;display:flex;flex-direction:column;gap:10px;}
+.role-card:hover{border-color:var(--border);background:var(--surface);}
+.role-card.selected{border-color:var(--gold);background:var(--surface);box-shadow:inset 0 0 0 1px var(--gold);}
+.role-card .role-icon{width:36px;height:36px;color:var(--gold);display:flex;align-items:center;justify-content:flex-start;}
+.role-card .role-icon svg{width:28px;height:28px;}
+.role-card h3{font-family:'Inter Tight',sans-serif;font-size:17px;font-weight:700;letter-spacing:-0.01em;color:var(--text);margin-bottom:4px;}
+.role-card p{font-size:13px;line-height:1.5;color:var(--text-muted);font-weight:300;margin:0;}
+
+.auth-form{display:flex;flex-direction:column;gap:22px;}
+.auth-field{display:flex;flex-direction:column;gap:8px;}
+.auth-field>span{font-size:12px;letter-spacing:0.08em;text-transform:uppercase;color:var(--text-muted);font-weight:500;}
+
+.auth-input{background:var(--black);border:1px solid var(--border-soft);color:var(--text);padding:14px 16px;font-size:15px;font-family:inherit;font-weight:400;letter-spacing:0.005em;outline:none;transition:border-color 0.15s,background 0.15s;}
+.auth-input::placeholder{color:var(--text-sub);font-weight:300;}
+.auth-input:focus{border-color:var(--gold);background:var(--surface);}
+
+.auth-otp{font-family:'Inter Tight',monospace;font-size:28px;letter-spacing:0.6em;text-align:center;padding:18px 16px;font-weight:600;}
+.auth-otp::placeholder{letter-spacing:0.4em;color:var(--text-sub);}
+
+.auth-actions{display:flex;align-items:center;gap:20px;flex-wrap:wrap;margin-top:4px;}
+.auth-actions .btn-primary{background:var(--gold);color:var(--black);padding:14px 28px;font-size:13px;font-weight:600;letter-spacing:0.08em;cursor:pointer;border:none;text-transform:uppercase;text-decoration:none;display:inline-block;transition:background 0.15s,opacity 0.15s;font-family:inherit;}
+.auth-actions .btn-primary:hover:not(:disabled){background:var(--gold-light);}
+.auth-actions .btn-primary:disabled{opacity:0.35;cursor:not-allowed;}
+.auth-actions .btn-ghost{background:transparent;color:var(--text-muted);padding:14px 20px;font-size:13px;font-weight:500;letter-spacing:0.04em;cursor:pointer;border:1px solid var(--border-soft);text-decoration:none;display:inline-block;transition:color 0.15s,border-color 0.15s;font-family:inherit;}
+.auth-actions .btn-ghost:hover{color:var(--text);border-color:var(--border);}
+
+.auth-error{background:rgba(232,160,160,0.08);border:1px solid rgba(232,160,160,0.3);color:var(--coral);padding:12px 16px;font-size:13px;line-height:1.5;font-weight:400;}
+.auth-note{background:rgba(201,168,76,0.08);border:1px solid var(--border);color:var(--text);padding:12px 16px;font-size:13px;line-height:1.5;font-weight:400;}
+.auth-legal{font-size:12px;line-height:1.6;color:var(--text-sub);margin-top:20px;font-weight:300;}
+.auth-legal-link{color:var(--text-muted);text-decoration:underline;background:none;border:none;padding:0;font:inherit;cursor:pointer;}
+.auth-legal-link:hover{color:var(--text);}
+
+/* Placeholder pages keep .btn-primary inheriting their own defaults; the
+   auth-actions selectors above only scope inside the signup/signin flow. */

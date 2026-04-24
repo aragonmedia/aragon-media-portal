@@ -6,6 +6,12 @@ import { useState } from "react";
 
 const BUNDLE_PRICES: Record<number, number> = { 1: 103.72, 2: 225, 3: 350, 4: 475 };
 const INCREMENTAL_TOTALS: Record<number, number> = { 1: 103.72, 2: 228.72, 3: 378.72, 4: 553.72 };
+const SQUARE_LINKS: Record<number, string> = {
+  1: "https://square.link/u/2rfvqrD1",
+  2: "https://square.link/u/qidSjIek",
+  3: "https://square.link/u/uiffueYK",
+  4: "https://square.link/u/oU70xlPo",
+};
 
 const BADGES: Record<number, { label: string; className: string }> = {
   1: { label: "Starter", className: "bundle-badge" },
@@ -199,10 +205,15 @@ export default function Home() {
               </div>
             </div>
 
-            <Link href="/signup" className="bundle-cta">
-              Get started &mdash; {formatPrice(price)}
-            </Link>
-            <p className="bundle-note">Create your account first &middot; Payment completes after signup &middot; Secured by Square</p>
+            <a
+              href={SQUARE_LINKS[accounts]}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="bundle-cta"
+            >
+              PURCHASE &mdash; {formatPrice(price)}
+            </a>
+            <p className="bundle-note">Direct Square checkout &middot; No account required to pay &middot; Secured by Square</p>
           </div>
         </div>
 
