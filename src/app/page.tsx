@@ -1,5 +1,7 @@
 "use client";
 
+import Link from "next/link";
+
 import { useState } from "react";
 
 const BUNDLE_PRICES: Record<number, number> = { 1: 103.72, 2: 225, 3: 350, 4: 475 };
@@ -47,9 +49,9 @@ export default function Home() {
       <nav>
         <div className="logo">Aragon Media<span>Creator Partner Program</span></div>
         <div className="nav-right">
-          <a href="/signup" className="nav-link">Sign up</a>
-          <a href="/signin" className="nav-link">Sign in</a>
-          <a href="/book-a-demo" className="nav-cta">Book a Demo</a>
+          <Link href="/signup" className="nav-link">Sign up</Link>
+          <Link href="/signin" className="nav-link">Sign in</Link>
+          <Link href="/book-a-demo" className="nav-cta">Book a Demo</Link>
         </div>
       </nav>
 
@@ -60,7 +62,7 @@ export default function Home() {
           We activate your creator account, track your GMV, and move your commissions into your bank &mdash; so you can earn USD income from anywhere in the world while we handle the ops.
         </p>
         <div className="hero-actions">
-          <a href="/signup" className="btn-primary">Get started</a>
+          <Link href="/signup" className="btn-primary">Get started</Link>
           <a href="#journey" className="btn-ghost">&darr; See how it works</a>
         </div>
         <div className="hero-stats">
@@ -197,9 +199,9 @@ export default function Home() {
               </div>
             </div>
 
-            <a href="/signup" className="bundle-cta">
+            <Link href="/signup" className="bundle-cta">
               Get started &mdash; {formatPrice(price)}
-            </a>
+            </Link>
             <p className="bundle-note">Create your account first &middot; Payment completes after signup &middot; Secured by Square</p>
           </div>
         </div>

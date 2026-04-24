@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 export default function SigninPage() {
   return (
     <main className="placeholder-page">
@@ -9,7 +11,7 @@ export default function SigninPage() {
           creators. If your account is live, we&apos;ll email you a direct login link.
         </p>
         <div className="placeholder-actions">
-          <a href="/" className="btn-primary">Back to home</a>
+          <Link href="/" className="btn-primary">Back to home</Link>
         </div>
       </div>
     </main>

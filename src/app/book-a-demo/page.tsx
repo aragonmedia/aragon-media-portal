@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 export default function BookDemoPage() {
   return (
     <main className="placeholder-page">
@@ -17,7 +19,7 @@ export default function BookDemoPage() {
           >
             Pick a time on Calendly
           </a>
-          <a href="/" className="btn-ghost">&larr; Back to home</a>
+          <Link href="/" className="btn-ghost">&larr; Back to home</Link>
         </div>
       </div>
     </main>
