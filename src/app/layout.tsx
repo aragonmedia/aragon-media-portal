@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Aragon Media Portal",
-  description: "Creator verification, commission tracking, and payouts — all in one place.",
+  title: "Aragon Media · Creator Partner Program",
+  description: "Your TikTok business, professionally managed. We activate your creator account, track your GMV, and move your commissions into your bank — USD income from anywhere in the world.",
 };
 
 export default function RootLayout({
@@ -13,9 +13,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className="antialiased bg-[#0a0a0a] text-white font-sans">
-        {children}
-      </body>
+      <body>{children}</body>
     </html>
   );
 }
