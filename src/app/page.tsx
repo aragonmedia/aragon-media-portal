@@ -45,6 +45,7 @@ function formatPrice(n: number) {
 
 export default function Home() {
   const [accounts, setAccounts] = useState(1);
+  const [menuOpen, setMenuOpen] = useState(false);
   const price = BUNDLE_PRICES[accounts];
   const savings = +(INCREMENTAL_TOTALS[accounts] - price).toFixed(2);
   const badge = BADGES[accounts];
@@ -52,30 +53,127 @@ export default function Home() {
 
   return (
     <>
-      <nav>
-        <div className="logo">Aragon Media<span>Creator Partner Program</span></div>
+      <nav className={menuOpen ? "nav-open" : ""}>
+        <Link href="/" className="logo-block" onClick={() => setMenuOpen(false)}>
+          <span className="logo-mark" aria-hidden="true">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/logo-am.svg" alt="" width={36} height={36} />
+          </span>
+          <span className="logo-text">
+            Aragon Media<span>Creator Partner Program</span>
+          </span>
+        </Link>
+
         <div className="nav-right">
           <Link href="/signup" className="nav-link">Sign up</Link>
           <Link href="/signin" className="nav-link">Sign in</Link>
           <Link href="/book-a-demo" className="nav-cta">Book a Demo</Link>
         </div>
+
+        <button
+          type="button"
+          className="nav-toggle"
+          aria-label={menuOpen ? "Close menu" : "Open menu"}
+          aria-expanded={menuOpen}
+          onClick={() => setMenuOpen((v) => !v)}
+        >
+          <span /><span /><span />
+        </button>
+
+        <div className="nav-mobile-panel" role="menu">
+          <Link href="/signup" className="nav-link" onClick={() => setMenuOpen(false)}>Sign up</Link>
+          <Link href="/signin" className="nav-link" onClick={() => setMenuOpen(false)}>Sign in</Link>
+          <Link href="/book-a-demo" className="nav-cta" onClick={() => setMenuOpen(false)}>Book a Demo</Link>
+        </div>
       </nav>
 
       <section className="hero">
-        <p className="eyebrow">Aragon Media Partner Program</p>
-        <h1>Your TikTok business,<br /><em>professionally managed.</em></h1>
-        <p className="hero-sub">
-          We activate your creator account, track your GMV, and move your commissions into your bank &mdash; so you can earn USD income from anywhere in the world while we handle the ops.
-        </p>
-        <div className="hero-actions">
-          <Link href="/signup" className="btn-primary">Get started</Link>
-          <a href="#journey" className="btn-ghost">&darr; See how it works</a>
-        </div>
-        <div className="hero-stats">
-          <div className="hero-stat"><strong>24hr</strong>Activation guarantee</div>
-          <div className="hero-stat"><strong>100%</strong>Completion success rate</div>
-          <div className="hero-stat"><strong>USD</strong>Paid anywhere in the world</div>
-          <div className="hero-stat"><strong>TAP</strong>Official TikTok Partner</div>
+        <div className="hero-grid">
+          <div className="hero-copy">
+            <p className="eyebrow">Aragon Media Partner Program</p>
+            <h1>Your TikTok business,<br /><em>professionally managed.</em></h1>
+            <p className="hero-sub">
+              We activate your creator account, track your GMV, and move your commissions into your bank &mdash; so you can earn USD income from anywhere in the world while we handle the ops.
+            </p>
+            <div className="hero-actions">
+              <Link href="/signup" className="btn-primary">Get started</Link>
+              <a href="#journey" className="btn-ghost">&darr; See how it works</a>
+            </div>
+            <div className="hero-stats">
+              <div className="hero-stat"><strong>24hr</strong>Activation guarantee</div>
+              <div className="hero-stat"><strong>100%</strong>Completion success rate</div>
+              <div className="hero-stat"><strong>USD</strong>Paid anywhere in the world</div>
+              <div className="hero-stat"><strong>TAP</strong>Official TikTok Partner</div>
+            </div>
+          </div>
+
+          <div className="hero-visual" aria-hidden="true">
+            <div className="phone-mock">
+              <div className="phone-notch" />
+              <div className="phone-screen">
+                <div className="phone-pill">Aragon Dashboard</div>
+
+                <div className="phone-stat-card">
+                  <div className="phone-stat-label">Total GMV</div>
+                  <div className="phone-stat-value">$48,200</div>
+                  <div className="phone-trend up">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                      <polyline points="3 17 10 10 14 14 21 7" />
+                      <polyline points="14 7 21 7 21 14" />
+                    </svg>
+                    +$15,900 this month
+                  </div>
+                </div>
+
+                <div className="phone-stat-card">
+                  <div className="phone-stat-label">Conversion Rate</div>
+                  <div className="phone-stat-value sm">4.8%</div>
+                  <div className="phone-bars">
+                    <span style={{ height: "30%" }} />
+                    <span style={{ height: "55%" }} />
+                    <span style={{ height: "42%" }} />
+                    <span style={{ height: "78%" }} />
+                    <span style={{ height: "62%" }} />
+                    <span style={{ height: "92%" }} />
+                  </div>
+                </div>
+
+                <div className="phone-stat-card">
+                  <div className="phone-stat-label">Campaign Revenue</div>
+                  <div className="phone-stat-value sm green">$12,300</div>
+                  <div className="phone-trend up">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                      <polyline points="3 17 10 10 14 14 21 7" />
+                      <polyline points="14 7 21 7 21 14" />
+                    </svg>
+                    +24% vs last month
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="float-card float-card--reports">
+              <div className="float-card-title">Our Reports</div>
+              <div className="float-card-sub">Your analytics view</div>
+              <svg className="float-spark" viewBox="0 0 120 50" preserveAspectRatio="none">
+                <polyline points="0,40 20,30 40,32 60,18 80,22 100,12 120,8" fill="none" stroke="#3DCF82" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+              <div className="float-card-meta">+1.17% increased</div>
+            </div>
+
+            <div className="float-card float-card--conversion">
+              <div className="float-card-title">Conversion Rates</div>
+              <div className="float-bar">
+                <span style={{ width: "72%" }} />
+              </div>
+              <div className="float-card-sub">95.5%</div>
+            </div>
+
+            <div className="float-card float-card--increase">
+              <div className="float-card-pill">+$15,900</div>
+              <div className="float-card-sub">monthly delta</div>
+            </div>
+          </div>
         </div>
       </section>
 
