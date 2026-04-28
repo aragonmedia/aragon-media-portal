@@ -41,14 +41,14 @@ const TESTIMONIALS = [
   { name: "Teep",  role: "Verified Creator", src: "/media/testimonials/teep.mp4" },
 ];
 const SHOTS: { label: string; blurb: string; img?: string }[] = [
-  { label: "$486K GMV in Nov 2024",       blurb: "One creator, one cycle, six-figure month on TikTok Shop." },
-  { label: "$15,801 withdrawal",                blurb: "USD landing in their bank, paid Mon to Fri, no regional friction." },
-  { label: "$125K week",                        blurb: "Weekly GMV recap from an active multi-account creator." },
-  { label: "$89K in Dec 2024",             blurb: "Steady close to the year, all running through the AM dashboard." },
-  { label: "Kyvo 216K in 30 days",       blurb: "Cross-niche commission stack; one of our top brand partnerships." },
-  { label: "$27K Goli payout",                  blurb: "Single-brand payout, processed and reconciled by the AM team." },
-  { label: "Creator: \u201cHeaven sent\u201d",         blurb: "Creator DM after their first AM-managed payout cleared." },
-  { label: "$137K in July",                blurb: "Mid-summer surge. Fully tracked, fully paid, no surprises." },
+  { label: "$486.4K GMV \u00b7 Nov 2024",     blurb: "One creator, one cycle, $152K in commissions cleared on TikTok Shop.", img: "/media/proof/proof-486k-nov.png" },
+  { label: "$125.6K \u00b7 last 7 days",      blurb: "Weekly GMV from an active AM-managed account: $36.8K commission, 4.8M views.", img: "/media/proof/proof-125k-week.png" },
+  { label: "$89.2K \u00b7 Dec 2024",          blurb: "Steady close to the year. $10.5K commission, 5K items sold, 3.7M views.", img: "/media/proof/proof-89k-dec.png" },
+  { label: "$27,000 Goli payout",              blurb: "Single-brand campaign payout, processed and reconciled by the AM team.", img: "/media/proof/proof-27k-goli.png" },
+  { label: "First $200 day \u00b7 94K views", blurb: "Creator DM after their first viral video lands inside the portal.", img: "/media/proof/proof-94k-viral.png" },
+  { label: "$33K withdrawal in motion",        blurb: "Colton Alpha Partner pulling out $33K and submitting the AM withdrawal form.", img: "/media/proof/proof-33k-pulled.png" },
+  { label: "Kyvo \u00b7 join the program",    blurb: "For the creator, by creators. Kyvo is one of our top commission partners.", img: "/media/proof/proof-kyvo-card.png" },
+  { label: "Viral content reel",               blurb: "Snapshot of recent AM-managed videos crossing 1M+ views across niches.", img: "/media/proof/proof-views.png" },
 ];
 
 function formatPrice(n: number) {
