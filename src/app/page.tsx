@@ -41,10 +41,10 @@ const TESTIMONIALS = [
   { name: "Teep",  role: "Verified Creator", src: "/media/testimonials/teep.mp4" },
 ];
 const SHOTS: { label: string; blurb: string; img?: string }[] = [
-  { label: "$486.4K GMV \u00b7 Nov 2024",     blurb: "One creator, one single month, $152K in commissions cleared on TikTok Shop.", img: "/media/proof/proof-486k-nov.png" },
-  { label: "$125.6K \u00b7 last 7 days",      blurb: "Weekly GMV from an active AM-managed account: $36.8K commission, 4.8M views.", img: "/media/proof/proof-125k-week.png" },
+  { label: "$486.4K GMV \u00b7 Nov 2024",     blurb: "One creator, in 30 days, $152K PROFIT on TikTok Shop.", img: "/media/proof/proof-486k-nov.png" },
+  { label: "$125.6K \u00b7 last 7 days",      blurb: "Weekly GMV from an active AM-Member: $36.8K commission.", img: "/media/proof/proof-125k-week.png" },
   { label: "$89.2K \u00b7 Dec 2024",          blurb: "Steady close to the year. $10.5K profit, 5K items sold, 3.7M views.", img: "/media/proof/proof-89k-dec.png" },
-  { label: "$27,000 Goli payout",              blurb: "Single-brand campaign payout, what it looks like to scale with the AM team.", img: "/media/proof/proof-27k-goli.png" },
+  { label: "$27,000 Goli payout",              blurb: "Single-brand campaign payout, what it looks to scale with the AM team.", img: "/media/proof/proof-27k-goli.png" },
   { label: "First $200 day \u00b7 94K views", blurb: "Creator DM after their first viral video lands inside the portal.", img: "/media/proof/proof-94k-viral.png" },
   { label: "$33K withdrawal in motion",        blurb: "Colton Alpha Partner withdrawing $33,000+ and notifying us.", img: "/media/proof/proof-33k-pulled.png" },
   { label: "Kyvo \u00b7 join the program",    blurb: "For the creator, by creators. Kyvo is one of our Top-Commission Partners. Where you can earn 2x Profit!", img: "/media/proof/proof-kyvo-card.png" },
