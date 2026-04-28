@@ -11,7 +11,8 @@
 }
 html,body{background:var(--black);color:var(--text);font-family:'Poppins',sans-serif;font-weight:300;overflow-x:hidden;letter-spacing:0.005em;min-height:100vh;}
 
-nav{display:flex;justify-content:space-between;align-items:center;padding:18px 48px;border-bottom:1px solid var(--border);position:relative;}
+nav{display:flex;justify-content:space-between;align-items:center;padding:18px 48px;border-bottom:1px solid transparent;position:sticky;top:0;z-index:50;background:var(--black);transition:background 0.25s ease, backdrop-filter 0.25s ease, border-color 0.25s ease;}
+nav.nav-scrolled{background:rgba(15,15,15,0.62);backdrop-filter:saturate(160%) blur(14px);-webkit-backdrop-filter:saturate(160%) blur(14px);border-bottom:1px solid var(--border-soft);}
 .logo-block{display:flex;align-items:center;gap:12px;text-decoration:none;}
 .logo-mark{display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px;flex-shrink:0;}
 .logo-mark img{display:block;width:100%;height:100%;}
@@ -411,4 +412,61 @@ footer .logo span{margin-top:4px;}
   .ladder-price{font-size:22px;}
   .bundle-card{padding:24px 18px;}
   .bundle-price{font-size:38px;}
+}
+
+
+/* ===== Path A purchase CTA ===== */
+.ladder-cta{display:block;width:100%;text-align:center;margin-top:18px;padding:14px 18px;background:var(--gold);color:var(--black);font-family:'Inter Tight',sans-serif;font-weight:800;font-size:14px;letter-spacing:0.08em;text-transform:uppercase;text-decoration:none;border:none;border-radius:6px;transition:transform 0.15s ease, box-shadow 0.15s ease;}
+.ladder-cta:hover{transform:translateY(-1px);box-shadow:0 10px 30px -12px rgba(201,168,76,0.5);}
+.ladder-cta-note{margin-top:10px;font-size:11px;line-height:1.5;color:var(--text-sub);text-align:center;}
+.ladder-row.first-row{position:relative;}
+.ladder-row.first-row .ladder-price{color:var(--gold);}
+
+/* ===== Paths footnote (sits between pricing-grid and why-wrap) ===== */
+.paths-note{max-width:780px;margin:32px auto 0;padding:18px 22px;border:1px solid var(--border-soft);border-left:3px solid var(--gold);background:var(--surface);border-radius:6px;font-size:13px;line-height:1.6;color:var(--text-muted);text-align:center;}
+.paths-note strong{color:var(--gold);font-weight:700;}
+
+/* ===== Receipts (formerly Proof in screenshots) ===== */
+.shots-title{font-family:'Inter Tight',sans-serif;font-size:clamp(24px,3vw,34px);font-weight:700;line-height:1.1;letter-spacing:-0.02em;margin:8px 0 12px;color:var(--text);max-width:780px;}
+.shots-intro{max-width:780px;color:var(--text-muted);margin-bottom:32px;line-height:1.6;}
+.shot-tile{background:var(--surface);border:1px solid var(--border-soft);border-radius:8px;overflow:hidden;display:flex;flex-direction:column;transition:transform 0.2s ease, border-color 0.2s ease;}
+.shot-tile:hover{transform:translateY(-2px);border-color:var(--border);}
+.shot-img-wrap{aspect-ratio:4/5;background:var(--off-black);display:flex;align-items:stretch;justify-content:stretch;}
+.shot-img-wrap img{width:100%;height:100%;object-fit:cover;display:block;}
+.shot-img-wrap .shot-placeholder{flex:1;border:none;background:transparent;}
+.shot-tile figcaption{padding:14px 16px;border-top:1px solid var(--border-soft);}
+.shot-headline{font-family:'Inter Tight',sans-serif;font-size:13px;font-weight:700;color:var(--gold);letter-spacing:0.02em;margin-bottom:4px;}
+.shot-blurb{font-size:12px;line-height:1.5;color:var(--text-muted);}
+
+/* ===== Footer (sign in / sign up / book a demo + AM mark) ===== */
+footer{position:relative;align-items:center;}
+.footer-brand{display:flex;flex-direction:column;gap:14px;}
+.footer-nav{display:flex;align-items:center;gap:10px;font-size:13px;}
+.footer-nav a{color:var(--text-muted);text-decoration:none;transition:color 0.15s ease;font-weight:500;}
+.footer-nav a:hover{color:var(--gold);}
+.footer-nav span{color:var(--border);}
+.footer-mark{display:flex;align-items:center;}
+.footer-mark img{display:block;border-radius:8px;}
+
+/* ===== Partner marquee with logos ===== */
+.partner-chip{display:inline-flex;align-items:center;justify-content:center;height:54px;padding:0 18px;}
+.partner-chip img{height:44px;width:auto;max-width:160px;object-fit:contain;filter:grayscale(100%) brightness(1.1);opacity:0.78;transition:opacity 0.25s ease, filter 0.25s ease;}
+.partner-chip:hover img{filter:grayscale(0%) brightness(1);opacity:1;}
+
+/* ===== Testimonial swipe — fix mobile overflow / out-of-order text ===== */
+@media(max-width:880px){
+  .testi-section{padding:60px 24px;}
+  .testi-grid{display:flex;grid-template-columns:none;gap:16px;overflow-x:auto;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;padding:4px 4px 18px;margin-left:-24px;margin-right:-24px;padding-left:24px;padding-right:24px;}
+  .testi-grid::-webkit-scrollbar{height:4px;}
+  .testi-grid::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px;}
+  .testi-card{flex:0 0 78%;scroll-snap-align:start;min-width:260px;}
+  .testi-section .section-intro{font-size:14px;line-height:1.5;}
+}
+
+/* Mobile-specific footer layout — AM mark right-bottom on small screens */
+@media(max-width:720px){
+  footer{flex-direction:column;align-items:flex-start;gap:18px;padding:32px 24px;}
+  .footer-mark{position:absolute;right:24px;bottom:24px;}
+  .footer-nav{flex-wrap:wrap;}
+  .paths-note{margin:24px 16px 0;font-size:12px;}
 }

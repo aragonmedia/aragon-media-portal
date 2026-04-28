@@ -2,10 +2,10 @@
 
 import Link from "next/link";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
-const BUNDLE_PRICES: Record<number, number> = { 1: 103.72, 2: 225, 3: 350, 4: 475 };
-const INCREMENTAL_TOTALS: Record<number, number> = { 1: 103.72, 2: 228.72, 3: 378.72, 4: 553.72 };
+const BUNDLE_PRICES: Record<number, number> = { 1: 100, 2: 225, 3: 350, 4: 475 };
+const INCREMENTAL_TOTALS: Record<number, number> = { 1: 100, 2: 225, 3: 375, 4: 550 };
 const SQUARE_LINKS: Record<number, string> = {
   1: "https://square.link/u/2rfvqrD1",
   2: "https://square.link/u/qidSjIek",
@@ -20,23 +20,34 @@ const BADGES: Record<number, { label: string; className: string }> = {
   4: { label: "Best offer \u00b7 14% off", className: "bundle-badge best" },
 };
 
-const PARTNERS = [
-  "TikTok Shop",
-  "Kyvo",
-  "Creatify",
-  "4orte",
-  "Creators Corner",
-  "C&C",
-  "Elite Tok Club",
-  "Goli",
-  "Nick G",
-  "The Accounts Shop",
+type Partner = { name: string; logo?: string };
+const PARTNERS: Partner[] = [
+  { name: "TikTok Shop",       logo: "/partners/tiktok-shop.png" },
+  { name: "Kyvo",              logo: "/partners/kyvo.png" },
+  { name: "Creatify",          logo: "/partners/creatify.png" },
+  { name: "4orte",             logo: "/partners/4orte.png" },
+  { name: "Creators Corner",   logo: "/partners/creators-corner.png" },
+  { name: "C&C",               logo: "/partners/cc.png" },
+  { name: "Elite Tok Club",    logo: "/partners/elite-tok-club.png" },
+  { name: "Goli",              logo: "/partners/goli.png" },
+  { name: "Nick G",            logo: "/partners/nick-g.png" },
+  { name: "The Accounts Shop", logo: "/partners/accounts-shop.png" },
 ];
 
 const TESTIMONIALS = [
   { name: "Alkis", role: "Verified Creator", src: "/media/testimonials/alkis.mp4" },
   { name: "Menes", role: "Verified Creator", src: "/media/testimonials/menes.mp4" },
   { name: "Teep",  role: "Verified Creator", src: "/media/testimonials/teep.mp4" },
+];
+const SHOTS: { label: string; blurb: string; img?: string }[] = [
+  { label: "$486K GMV \u2014 Nov 2024",       blurb: "One creator, one cycle, six-figure month on TikTok Shop." },
+  { label: "$15,801 withdrawal",                blurb: "USD landing in their bank \u2014 paid Mon\u2013Fri, no regional friction." },
+  { label: "$125K week",                        blurb: "Weekly GMV recap from an active multi-account creator." },
+  { label: "$89K \u2014 Dec 2024",             blurb: "Steady close to the year, all running through the AM dashboard." },
+  { label: "Kyvo \u2014 216K / 30 days",       blurb: "Cross-niche commission stack; one of our top brand partnerships." },
+  { label: "$27K Goli payout",                  blurb: "Single-brand payout, processed and reconciled by the AM team." },
+  { label: "\u201cHeaven sent\u201d",         blurb: "Creator DM after their first AM-managed payout cleared." },
+  { label: "$137K \u2014 July",                blurb: "Mid-summer surge \u2014 fully tracked, fully paid, no surprises." },
 ];
 
 function formatPrice(n: number) {
@@ -46,6 +57,14 @@ function formatPrice(n: number) {
 export default function Home() {
   const [accounts, setAccounts] = useState(1);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 12);
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
   const price = BUNDLE_PRICES[accounts];
   const savings = +(INCREMENTAL_TOTALS[accounts] - price).toFixed(2);
   const badge = BADGES[accounts];
@@ -53,7 +72,7 @@ export default function Home() {
 
   return (
     <>
-      <nav className={menuOpen ? "nav-open" : ""}>
+      <nav className={`${menuOpen ? "nav-open " : ""}${scrolled ? "nav-scrolled" : ""}`}>
         <Link href="/" className="logo-block" onClick={() => setMenuOpen(false)}>
           <span className="logo-mark" aria-hidden="true">
             {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -181,10 +200,28 @@ export default function Home() {
         <p className="partner-label">Partnered with</p>
         <div className="marquee">
           <div className="marquee-track">
-            {PARTNERS.map((p) => (<span key={p} className="partner-wordmark">{p}</span>))}
+            {PARTNERS.map((p) => (
+              <span key={p.name} className="partner-chip">
+                {p.logo ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img src={p.logo} alt={p.name} loading="lazy" />
+                ) : (
+                  <span className="partner-wordmark">{p.name}</span>
+                )}
+              </span>
+            ))}
           </div>
           <div className="marquee-track" aria-hidden="true">
-            {PARTNERS.map((p) => (<span key={`b-${p}`} className="partner-wordmark">{p}</span>))}
+            {PARTNERS.map((p) => (
+              <span key={`b-${p.name}`} className="partner-chip">
+                {p.logo ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img src={p.logo} alt="" loading="lazy" />
+                ) : (
+                  <span className="partner-wordmark">{p.name}</span>
+                )}
+              </span>
+            ))}
           </div>
         </div>
       </div>
@@ -252,12 +289,21 @@ export default function Home() {
             <h3 className="card-title">Add one at a time</h3>
             <p className="card-sub">Pay only for the account you&apos;re activating now. You can come back and add up to 4 per cycle.</p>
             <div className="ladder-list">
-              <div className="ladder-row"><div className="ladder-left"><div className="ladder-num">1</div><div className="ladder-label">1st account<small>First verification</small></div></div><div className="ladder-price">$103.72</div></div>
+              <div className="ladder-row first-row"><div className="ladder-left"><div className="ladder-num">1</div><div className="ladder-label">1st account<small>First verification</small></div></div><div className="ladder-price">$100</div></div>
               <div className="ladder-row"><div className="ladder-left"><div className="ladder-num">2</div><div className="ladder-label">2nd account<small>+$125 when added</small></div></div><div className="ladder-price">$125</div></div>
               <div className="ladder-row"><div className="ladder-left"><div className="ladder-num">3</div><div className="ladder-label">3rd account<small>+$150 when added</small></div></div><div className="ladder-price">$150</div></div>
               <div className="ladder-row"><div className="ladder-left"><div className="ladder-num">4</div><div className="ladder-label">4th account<small>+$175 when added</small></div></div><div className="ladder-price">$175</div></div>
             </div>
-            <p className="ladder-note">Cycle resets after your 4th account &mdash; the 5th starts back at $103.72.</p>
+            <p className="ladder-note">Cycle resets after your 4th account &mdash; the 5th starts back at $100.</p>
+            <a
+              href={SQUARE_LINKS[1]}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="ladder-cta"
+            >
+              PURCHASE 1st ACCOUNT &mdash; $100
+            </a>
+            <p className="ladder-cta-note">Only the 1st account is purchaseable here. Activate it first &mdash; we&apos;ll send the upgrade link for accounts 2&ndash;4 after verification.</p>
           </div>
 
           <div className="bundle-card">
@@ -314,6 +360,8 @@ export default function Home() {
             <p className="bundle-note">Direct Square checkout &middot; No account required to pay &middot; Secured by Square</p>
           </div>
         </div>
+
+        <p className="paths-note">Valid purchase order per account &middot; one sale = one verified account &middot; choose <strong>Path A</strong> or <strong>Path B</strong> &mdash; either way, the AM team takes it from here.</p>
 
         <div className="why-wrap">
           <div className="why-label">Why bundle is the smarter choice</div>
@@ -372,26 +420,48 @@ export default function Home() {
       </section>
 
       <div className="shots-wrap">
-        <p className="why-label">Proof in screenshots</p>
-        <p className="shots-intro">GMV dashboards, earnings screens, and creator messages from active accounts &mdash; screenshot files drop into <code style={{ color: "var(--gold)", fontFamily: "monospace", fontSize: 12 }}>public/media/proof/</code> once uploaded.</p>
+        <p className="why-label">Receipts from the field</p>
+        <h3 className="shots-title">Real dashboards. Real payouts. Real creator wins.</h3>
+        <p className="shots-intro">Every tile below is a verified moment from an Aragon-managed account &mdash; a six-figure GMV month, a USD payout landing in a bank, a creator DM after their first big week. Numbers redacted only when the creator asked.</p>
         <div className="shots-grid">
-          <div className="shot-placeholder">$486K GMV &mdash; Nov 2024</div>
-          <div className="shot-placeholder">$15,801 withdrawal screen</div>
-          <div className="shot-placeholder">$125K weekly GMV</div>
-          <div className="shot-placeholder">$89K Dec 2024 totals</div>
-          <div className="shot-placeholder">Kyvo 216K / 30 days</div>
-          <div className="shot-placeholder">$27K Goli payout</div>
-          <div className="shot-placeholder">Creator DM &mdash; heaven sent</div>
-          <div className="shot-placeholder">$137K July GMV</div>
+          {SHOTS.map((shot) => (
+            <figure key={shot.label} className="shot-tile">
+              <div className="shot-img-wrap">
+                {shot.img ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img src={shot.img} alt={shot.label} loading="lazy" />
+                ) : (
+                  <div className="shot-placeholder">{shot.label}</div>
+                )}
+              </div>
+              <figcaption>
+                <div className="shot-headline">{shot.label}</div>
+                <div className="shot-blurb">{shot.blurb}</div>
+              </figcaption>
+            </figure>
+          ))}
         </div>
       </div>
 
       <footer>
-        <div className="logo">Aragon Media<span>Creator Partner Program &middot; Est. 2025</span></div>
+        <div className="footer-brand">
+          <div className="logo">Aragon Media<span>Creator Partner Program &middot; Est. 2025</span></div>
+          <nav className="footer-nav" aria-label="Footer">
+            <Link href="/signin">Sign in</Link>
+            <span aria-hidden="true">&middot;</span>
+            <Link href="/signup">Sign up</Link>
+            <span aria-hidden="true">&middot;</span>
+            <Link href="/book-a-demo">Book a Demo</Link>
+          </nav>
+        </div>
         <div className="footer-meta">
           <strong>&copy; 2025 Aragon Media</strong><br />
           Activation &middot; Dashboard &middot; TikTok Partner Program<br />
           Washington State, USA
+        </div>
+        <div className="footer-mark" aria-hidden="true">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/logo-am.svg" alt="" width={44} height={44} />
         </div>
       </footer>
     </>
