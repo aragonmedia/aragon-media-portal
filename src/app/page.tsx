@@ -41,14 +41,14 @@ const TESTIMONIALS = [
   { name: "Teep",  role: "Verified Creator", src: "/media/testimonials/teep.mp4" },
 ];
 const SHOTS: { label: string; blurb: string; img?: string }[] = [
-  { label: "$486.4K GMV \u00b7 Nov 2024",     blurb: "One creator, one cycle, $152K in commissions cleared on TikTok Shop.", img: "/media/proof/proof-486k-nov.png" },
+  { label: "$486.4K GMV \u00b7 Nov 2024",     blurb: "One creator, one single month, $152K in commissions cleared on TikTok Shop.", img: "/media/proof/proof-486k-nov.png" },
   { label: "$125.6K \u00b7 last 7 days",      blurb: "Weekly GMV from an active AM-managed account: $36.8K commission, 4.8M views.", img: "/media/proof/proof-125k-week.png" },
-  { label: "$89.2K \u00b7 Dec 2024",          blurb: "Steady close to the year. $10.5K commission, 5K items sold, 3.7M views.", img: "/media/proof/proof-89k-dec.png" },
-  { label: "$27,000 Goli payout",              blurb: "Single-brand campaign payout, processed and reconciled by the AM team.", img: "/media/proof/proof-27k-goli.png" },
+  { label: "$89.2K \u00b7 Dec 2024",          blurb: "Steady close to the year. $10.5K profit, 5K items sold, 3.7M views.", img: "/media/proof/proof-89k-dec.png" },
+  { label: "$27,000 Goli payout",              blurb: "Single-brand campaign payout, what it looks like to scale with the AM team.", img: "/media/proof/proof-27k-goli.png" },
   { label: "First $200 day \u00b7 94K views", blurb: "Creator DM after their first viral video lands inside the portal.", img: "/media/proof/proof-94k-viral.png" },
-  { label: "$33K withdrawal in motion",        blurb: "Colton Alpha Partner pulling out $33K and submitting the AM withdrawal form.", img: "/media/proof/proof-33k-pulled.png" },
-  { label: "Kyvo \u00b7 join the program",    blurb: "For the creator, by creators. Kyvo is one of our top commission partners.", img: "/media/proof/proof-kyvo-card.png" },
-  { label: "Viral content reel",               blurb: "Snapshot of recent AM-managed videos crossing 1M+ views across niches.", img: "/media/proof/proof-views.png" },
+  { label: "$33K withdrawal in motion",        blurb: "Colton Alpha Partner withdrawing $33,000+ and notifying us.", img: "/media/proof/proof-33k-pulled.png" },
+  { label: "Kyvo \u00b7 join the program",    blurb: "For the creator, by creators. Kyvo is one of our Top-Commission Partners. Where you can earn 2x Profit!", img: "/media/proof/proof-kyvo-card.png" },
+  { label: "Viral content reel",               blurb: "Snapshot of recent AM-Managed videos crossing 100M+ views", img: "/media/proof/proof-views.png" },
 ];
 
 function formatPrice(n: number) {
@@ -113,7 +113,7 @@ export default function Home() {
             <p className="eyebrow">Aragon Media Partner Program</p>
             <h1>Your TikTok business,<br /><em>professionally managed.</em></h1>
             <p className="hero-sub">
-              We activate your creator account, track your GMV, and move your commissions into your bank, so you can earn USD income from anywhere in the world while we handle the ops.
+              We activate your TikTok Account, track GMV, and move commissions into your bank, so you can earn USD income from anywhere in the world while we handle the ops.
             </p>
             <div className="hero-actions">
               <Link href="/signup" className="btn-primary">Get started</Link>
@@ -372,7 +372,7 @@ export default function Home() {
           <div className="why-grid">
             <div className="why-card"><div className="why-num">01</div><h4>Multiple niches, multiple income streams</h4><p>Different accounts let you test different audiences, products, and content styles. Each one earns commissions independently.</p></div>
             <div className="why-card"><div className="why-num">02</div><h4>Protect your primary account</h4><p>If one account hits a restriction or review, your others stay active and earning while the AM team resolves it on your behalf.</p></div>
-            <div className="why-card"><div className="why-num">03</div><h4>All managed in one place</h4><p>Every verified account lives in this portal. Separate dashboards, one login, one AM team backing all of them.</p></div>
+            <div className="why-card"><div className="why-num">03</div><h4>All managed in one place</h4><p>Every verified account lives in portal. Separate dashboards, one login, one AM team backing all of them.</p></div>
           </div>
         </div>
       </div>
@@ -395,7 +395,7 @@ export default function Home() {
             <ul className="compare-list theirs">
               <li><span className="compare-mark cross">❌</span>Weeks of waiting and downtime</li>
               <li><span className="compare-mark cross">❌</span>Unreliable tracking and miscommunication</li>
-              <li><span className="compare-mark cross">❌</span>TikTok payout limits, regional friction, 1% fees</li>
+              <li><span className="compare-mark cross">❌</span>TikTok limits, regional friction, 1% method</li>
               <li><span className="compare-mark cross">❌</span>Cold support tickets, DMs, and groupchats</li>
               <li><span className="compare-mark cross">❌</span>Stacked percentages, surprise deductions</li>
             </ul>
@@ -406,7 +406,7 @@ export default function Home() {
       <section className="testi-section">
         <p className="section-label">From the creators we work with</p>
         <h2>Hear it <em>from them.</em></h2>
-        <p className="section-intro">Real creators, real activations, real payouts. Swipe through their stories.</p>
+        <p className="section-intro">Real Creators, Real Activations, Real Payouts.<br />Swipe through their experience.</p>
         <div className="testi-grid">
           {TESTIMONIALS.map((t) => (
             <div key={t.name} className="testi-card">
