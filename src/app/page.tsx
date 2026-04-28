@@ -28,6 +28,7 @@ const PARTNERS: Partner[] = [
   { name: "4orte",             logo: "/partners/4orte.png" },
   { name: "Creators Corner",   logo: "/partners/creators-corner.png" },
   { name: "C&C",               logo: "/partners/cc.png" },
+  { name: "Commission Club",   logo: "/partners/commission-club.png" },
   { name: "Elite Tok Club",    logo: "/partners/elite-tok-club.png" },
   { name: "Goli",              logo: "/partners/goli.png" },
   { name: "Nick G",            logo: "/partners/nick-g.png" },
