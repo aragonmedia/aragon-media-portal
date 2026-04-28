@@ -41,14 +41,14 @@ const TESTIMONIALS = [
   { name: "Teep",  role: "Verified Creator", src: "/media/testimonials/teep.mp4" },
 ];
 const SHOTS: { label: string; blurb: string; img?: string }[] = [
-  { label: "$486K GMV \u2014 Nov 2024",       blurb: "One creator, one cycle, six-figure month on TikTok Shop." },
-  { label: "$15,801 withdrawal",                blurb: "USD landing in their bank \u2014 paid Mon\u2013Fri, no regional friction." },
+  { label: "$486K GMV in Nov 2024",       blurb: "One creator, one cycle, six-figure month on TikTok Shop." },
+  { label: "$15,801 withdrawal",                blurb: "USD landing in their bank, paid Mon to Fri, no regional friction." },
   { label: "$125K week",                        blurb: "Weekly GMV recap from an active multi-account creator." },
-  { label: "$89K \u2014 Dec 2024",             blurb: "Steady close to the year, all running through the AM dashboard." },
-  { label: "Kyvo \u2014 216K / 30 days",       blurb: "Cross-niche commission stack; one of our top brand partnerships." },
+  { label: "$89K in Dec 2024",             blurb: "Steady close to the year, all running through the AM dashboard." },
+  { label: "Kyvo 216K in 30 days",       blurb: "Cross-niche commission stack; one of our top brand partnerships." },
   { label: "$27K Goli payout",                  blurb: "Single-brand payout, processed and reconciled by the AM team." },
-  { label: "\u201cHeaven sent\u201d",         blurb: "Creator DM after their first AM-managed payout cleared." },
-  { label: "$137K \u2014 July",                blurb: "Mid-summer surge \u2014 fully tracked, fully paid, no surprises." },
+  { label: "Creator: \u201cHeaven sent\u201d",         blurb: "Creator DM after their first AM-managed payout cleared." },
+  { label: "$137K in July",                blurb: "Mid-summer surge. Fully tracked, fully paid, no surprises." },
 ];
 
 function formatPrice(n: number) {
@@ -113,7 +113,7 @@ export default function Home() {
             <p className="eyebrow">Aragon Media Partner Program</p>
             <h1>Your TikTok business,<br /><em>professionally managed.</em></h1>
             <p className="hero-sub">
-              We activate your creator account, track your GMV, and move your commissions into your bank &mdash; so you can earn USD income from anywhere in the world while we handle the ops.
+              We activate your creator account, track your GMV, and move your commissions into your bank, so you can earn USD income from anywhere in the world while we handle the ops.
             </p>
             <div className="hero-actions">
               <Link href="/signup" className="btn-primary">Get started</Link>
@@ -231,7 +231,7 @@ export default function Home() {
         <p className="section-label">Your journey with Aragon Media</p>
         <h2>Four steps from signup to <em>earning commissions.</em></h2>
         <p className="section-intro">
-          Every stage is handled inside one portal. No scattered DMs, no manual spreadsheets, no guessing what happens next &mdash; here&apos;s the whole flow, with what you unlock at each step.
+          Every stage is handled inside one portal. No scattered DMs, no manual spreadsheets, no guessing what happens next. Here&apos;s the whole flow, with what you unlock at each step.
         </p>
         <div className="journey-grid">
           <div className="journey-card">
@@ -242,10 +242,11 @@ export default function Home() {
               <li>Personal creator profile</li>
               <li>Zero commitment until activation</li>
             </ul>
+            <Link href="/signup" className="journey-cta">SIGN UP HERE</Link>
           </div>
           <div className="journey-card">
             <div className="journey-step"><div className="journey-num">2</div><div className="journey-title">Choose your path</div></div>
-            <p className="journey-desc">Add accounts one at a time or bundle up front. Pay securely via Square &mdash; one-time fee.</p>
+            <p className="journey-desc">Add accounts one at a time or bundle up front. Pay securely via Square as a one-time fee.</p>
             <ul className="journey-features">
               <li>Incremental or bundle pricing</li>
               <li>Up to 4 accounts per cycle</li>
@@ -279,7 +280,7 @@ export default function Home() {
         <p className="section-label">Pricing</p>
         <h2>Activate one account, or <em>bundle and save.</em></h2>
         <p className="section-intro">
-          Every account within a 4-account cycle gets the same premium service. Add them one at a time at the incremental rate &mdash; or bundle up front and pay less overall.
+          Every account within a 4-account cycle gets the same premium service. Add them one at a time at the incremental rate, or bundle up front and pay less overall.
         </p>
       </section>
 
@@ -295,7 +296,7 @@ export default function Home() {
               <div className="ladder-row"><div className="ladder-left"><div className="ladder-num">3</div><div className="ladder-label">3rd account<small>+$150 when added</small></div></div><div className="ladder-price">$150</div></div>
               <div className="ladder-row"><div className="ladder-left"><div className="ladder-num">4</div><div className="ladder-label">4th account<small>+$175 when added</small></div></div><div className="ladder-price">$175</div></div>
             </div>
-            <p className="ladder-note">Cycle resets after your 4th account &mdash; the 5th starts back at $100.</p>
+            <p className="ladder-note">Cycle resets after your 4th account. The 5th starts back at $100.</p>
             <a
               href={SQUARE_LINKS[1]}
               target="_blank"
@@ -304,7 +305,7 @@ export default function Home() {
             >
               PURCHASE 1st ACCOUNT &mdash; $100
             </a>
-            <p className="ladder-cta-note">Only the 1st account is purchaseable here. Activate it first &mdash; we&apos;ll send the upgrade link for accounts 2&ndash;4 after verification.</p>
+            <p className="ladder-cta-note">Only the 1st account is purchaseable here. Activate it first. We&apos;ll send the upgrade link for accounts 2 to 4 after verification.</p>
           </div>
 
           <div className="bundle-card">
@@ -362,14 +363,14 @@ export default function Home() {
           </div>
         </div>
 
-        <p className="paths-note">Valid purchase order per account &middot; one sale = one verified account &middot; choose <strong>Path A</strong> or <strong>Path B</strong> &mdash; either way, the AM team takes it from here.</p>
+        <p className="paths-note">Valid purchase order per account &middot; one sale equals one verified account &middot; choose <strong>Path A</strong> or <strong>Path B</strong>. Either way, the AM team takes it from here.</p>
 
         <div className="why-wrap">
           <div className="why-label">Why bundle is the smarter choice</div>
           <div className="why-grid">
-            <div className="why-card"><div className="why-num">01</div><h4>Multiple niches, multiple income streams</h4><p>Different accounts let you test different audiences, products, and content styles &mdash; each earning commissions independently.</p></div>
+            <div className="why-card"><div className="why-num">01</div><h4>Multiple niches, multiple income streams</h4><p>Different accounts let you test different audiences, products, and content styles. Each one earns commissions independently.</p></div>
             <div className="why-card"><div className="why-num">02</div><h4>Protect your primary account</h4><p>If one account hits a restriction or review, your others stay active and earning while the AM team resolves it on your behalf.</p></div>
-            <div className="why-card"><div className="why-num">03</div><h4>All managed in one place</h4><p>Every verified account lives in this portal &mdash; separate dashboards, one login, one AM team backing all of them.</p></div>
+            <div className="why-card"><div className="why-num">03</div><h4>All managed in one place</h4><p>Every verified account lives in this portal. Separate dashboards, one login, one AM team backing all of them.</p></div>
           </div>
         </div>
       </div>
@@ -392,7 +393,7 @@ export default function Home() {
             <ul className="compare-list theirs">
               <li><span className="compare-mark cross">❌</span>Weeks of waiting and downtime</li>
               <li><span className="compare-mark cross">❌</span>Unreliable tracking and miscommunication</li>
-              <li><span className="compare-mark cross">❌</span>TikTok payout limits, regional friction with 1%</li>
+              <li><span className="compare-mark cross">❌</span>TikTok payout limits, regional friction, 1% fees</li>
               <li><span className="compare-mark cross">❌</span>Cold support tickets, DMs, and groupchats</li>
               <li><span className="compare-mark cross">❌</span>Stacked percentages, surprise deductions</li>
             </ul>
@@ -423,7 +424,7 @@ export default function Home() {
       <div className="shots-wrap">
         <p className="why-label">Receipts from the field</p>
         <h3 className="shots-title">Real dashboards. Real payouts. Real creator wins.</h3>
-        <p className="shots-intro">Every tile below is a verified moment from an Aragon-managed account &mdash; a six-figure GMV month, a USD payout landing in a bank, a creator DM after their first big week. Numbers redacted only when the creator asked.</p>
+        <p className="shots-intro">Every tile below is a verified moment from an Aragon-managed account: a six-figure GMV month, a USD payout landing in a bank, a creator DM after their first big week. Numbers redacted only when the creator asked.</p>
         <div className="shots-grid">
           {SHOTS.map((shot) => (
             <figure key={shot.label} className="shot-tile">
@@ -445,24 +446,24 @@ export default function Home() {
       </div>
 
       <footer>
-        <div className="footer-brand">
+        <div className="footer-left">
           <div className="logo">Aragon Media<span>Creator Partner Program &middot; Est. 2025</span></div>
           <nav className="footer-nav" aria-label="Footer">
             <Link href="/signin">Sign in</Link>
-            <span aria-hidden="true">&middot;</span>
             <Link href="/signup">Sign up</Link>
-            <span aria-hidden="true">&middot;</span>
             <Link href="/book-a-demo">Book a Demo</Link>
           </nav>
         </div>
-        <div className="footer-meta">
-          <strong>&copy; 2025 Aragon Media</strong><br />
-          Activation &middot; Dashboard &middot; TikTok Partner Program<br />
-          Washington State, USA
-        </div>
-        <div className="footer-mark" aria-hidden="true">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/logo-am.svg" alt="" width={44} height={44} />
+        <div className="footer-right">
+          <div className="footer-mark" aria-hidden="true">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/logo-am.svg" alt="" width={48} height={48} />
+          </div>
+          <div className="footer-meta">
+            <strong>&copy; 2025 Aragon Media</strong>
+            <span>Activation &middot; Dashboard &middot; TikTok Partner Program</span>
+            <span>Washington State, USA</span>
+          </div>
         </div>
       </footer>
     </>
