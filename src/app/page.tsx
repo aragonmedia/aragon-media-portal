@@ -291,21 +291,23 @@ export default function Home() {
             <h3 className="card-title">Add one at a time</h3>
             <p className="card-sub">Pay only for the account you&apos;re activating now. You can come back and add up to 4 per cycle.</p>
             <div className="ladder-list">
-              <div className="ladder-row first-row"><div className="ladder-left"><div className="ladder-num">1</div><div className="ladder-label">1st account<small>First verification</small></div></div><div className="ladder-price">$100</div></div>
+              <div className="ladder-row first-row">
+                <div className="ladder-left"><div className="ladder-num">1</div><div className="ladder-label">1st account<small>First verification</small></div></div>
+                <div className="ladder-price">$100</div>
+              </div>
+              <a
+                href={SQUARE_LINKS[1]}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="ladder-cta-inline"
+              >
+                PURCHASE &mdash; $100
+              </a>
               <div className="ladder-row"><div className="ladder-left"><div className="ladder-num">2</div><div className="ladder-label">2nd account<small>+$125 when added</small></div></div><div className="ladder-price">$125</div></div>
               <div className="ladder-row"><div className="ladder-left"><div className="ladder-num">3</div><div className="ladder-label">3rd account<small>+$150 when added</small></div></div><div className="ladder-price">$150</div></div>
               <div className="ladder-row"><div className="ladder-left"><div className="ladder-num">4</div><div className="ladder-label">4th account<small>+$175 when added</small></div></div><div className="ladder-price">$175</div></div>
             </div>
-            <p className="ladder-note">Cycle resets after your 4th account. The 5th starts back at $100.</p>
-            <a
-              href={SQUARE_LINKS[1]}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="ladder-cta"
-            >
-              PURCHASE 1st ACCOUNT &mdash; $100
-            </a>
-            <p className="ladder-cta-note">Only the 1st account is purchaseable here. Activate it first. We&apos;ll send the upgrade link for accounts 2 to 4 after verification.</p>
+            <p className="ladder-note">Only the 1st account is purchaseable here. Accounts 2 to 4 unlock after verification. Cycle resets after your 4th. The 5th starts back at $100.</p>
           </div>
 
           <div className="bundle-card">
@@ -446,24 +448,20 @@ export default function Home() {
       </div>
 
       <footer>
-        <div className="footer-left">
+        <div className="footer-brand">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/logo-am.svg" alt="Aragon Media" width={40} height={40} className="footer-logo" />
           <div className="logo">Aragon Media<span>Creator Partner Program &middot; Est. 2025</span></div>
-          <nav className="footer-nav" aria-label="Footer">
-            <Link href="/signin">Sign in</Link>
-            <Link href="/signup">Sign up</Link>
-            <Link href="/book-a-demo">Book a Demo</Link>
-          </nav>
         </div>
-        <div className="footer-right">
-          <div className="footer-mark" aria-hidden="true">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/logo-am.svg" alt="" width={48} height={48} />
-          </div>
-          <div className="footer-meta">
-            <strong>&copy; 2025 Aragon Media</strong>
-            <span>Activation &middot; Dashboard &middot; TikTok Partner Program</span>
-            <span>Washington State, USA</span>
-          </div>
+        <nav className="footer-nav" aria-label="Footer">
+          <Link href="/signin">Sign in</Link>
+          <Link href="/signup">Sign up</Link>
+          <Link href="/book-a-demo">Book a Demo</Link>
+        </nav>
+        <div className="footer-meta">
+          <strong>&copy; 2025 Aragon Media</strong>
+          <span>131 Continental Drive, Newark, DE 19713</span>
+          <span>Activation &middot; Dashboard &middot; TikTok Partner Program</span>
         </div>
       </footer>
     </>
