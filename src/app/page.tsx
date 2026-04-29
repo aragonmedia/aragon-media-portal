@@ -460,7 +460,7 @@ export default function Home() {
         </nav>
         <div className="footer-meta">
           <strong>&copy; 2025 Aragon Media</strong>
-          <span>131 Continental Drive, Newark, DE 19713</span>
+          <span>1309 Coffeen Ave, Sheridan, WY 82801</span>
           <span>Activation &middot; Dashboard &middot; TikTok Partner Program</span>
         </div>
       </footer>
