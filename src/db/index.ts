@@ -31,7 +31,7 @@ function getDb(): Db {
 
 // Lazy proxy — only instantiates on first property access (e.g. db.select(...))
 export const db = new Proxy({} as Db, {
-  get(_t, prop, recv) {
+  get(_t, prop) {
     const real = getDb() as unknown as Record<string | symbol, unknown>;
     const v = real[prop as string];
     return typeof v === "function" ? (v as (...a: unknown[]) => unknown).bind(real) : v;

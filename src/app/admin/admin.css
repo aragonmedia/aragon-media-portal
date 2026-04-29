@@ -1,0 +1,59 @@
+.admin-shell{min-height:100vh;background:#0F0F0F;color:#F5F1E6;font-family:'Inter Tight',Helvetica,Arial,sans-serif;padding:32px 40px 64px;}
+.admin-header{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:32px;border-bottom:1px solid #2A2A2A;padding-bottom:24px;}
+.admin-eyebrow{font-size:11px;color:#9A9590;letter-spacing:0.18em;text-transform:uppercase;margin-bottom:6px;}
+.admin-shell h1{font-size:32px;font-weight:700;letter-spacing:-0.02em;margin:0;color:#F5F1E6;}
+.admin-shell h2{font-size:16px;font-weight:700;letter-spacing:0.02em;margin:0;color:#F5F1E6;text-transform:uppercase;}
+.admin-meta{font-size:12px;color:#5C5750;}
+.admin-logout{background:transparent;border:1px solid #2A2A2A;color:#9A9590;font-family:inherit;font-size:13px;padding:8px 14px;border-radius:6px;cursor:pointer;transition:border 0.15s ease, color 0.15s ease;}
+.admin-logout:hover{border-color:#C9A84C;color:#C9A84C;}
+
+/* Stats row */
+.admin-stats{display:grid;grid-template-columns:repeat(5,1fr);gap:14px;margin-bottom:36px;}
+.admin-stat{background:#141414;border:1px solid #2A2A2A;border-radius:10px;padding:18px 20px;}
+.admin-stat-label{font-size:11px;color:#9A9590;letter-spacing:0.12em;text-transform:uppercase;margin-bottom:8px;}
+.admin-stat-value{font-size:28px;font-weight:700;letter-spacing:-0.02em;color:#F5F1E6;}
+.admin-stat.tone-green .admin-stat-value{color:#2BA567;}
+.admin-stat.tone-gold .admin-stat-value{color:#C9A84C;}
+
+/* Section + table */
+.admin-section{background:#141414;border:1px solid #2A2A2A;border-radius:12px;overflow:hidden;}
+.admin-section-head{display:flex;justify-content:space-between;align-items:center;padding:18px 22px;border-bottom:1px solid #2A2A2A;}
+.admin-table-wrap{overflow-x:auto;}
+.admin-table{width:100%;border-collapse:collapse;font-size:13px;}
+.admin-table th{text-align:left;padding:12px 22px;font-size:11px;color:#9A9590;letter-spacing:0.1em;text-transform:uppercase;font-weight:600;border-bottom:1px solid #2A2A2A;background:#0F0F0F;}
+.admin-table td{padding:14px 22px;border-bottom:1px solid #1F1F1F;color:#F5F1E6;}
+.admin-table tr:last-child td{border-bottom:none;}
+.admin-table tr:hover td{background:#181818;}
+.admin-table .mono{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px;}
+.admin-table .dim{color:#9A9590;}
+.admin-empty{padding:36px;text-align:center;color:#5C5750;font-size:13px;}
+
+.role-pill{display:inline-block;padding:3px 10px;border-radius:4px;font-size:11px;letter-spacing:0.06em;text-transform:uppercase;font-weight:600;}
+.role-creator{background:rgba(201,168,76,0.15);color:#C9A84C;}
+.role-brand{background:rgba(43,165,103,0.15);color:#2BA567;}
+.role-other{background:#2A2A2A;color:#9A9590;}
+
+.admin-footer{margin-top:24px;text-align:center;color:#5C5750;font-size:11px;}
+
+/* Login gate */
+.admin-gate{min-height:80vh;display:flex;align-items:center;justify-content:center;}
+.admin-gate-card{background:#141414;border:1px solid #2A2A2A;border-radius:14px;padding:36px 36px 32px;max-width:380px;width:100%;}
+.admin-gate-card h1{font-size:24px;margin:4px 0 4px;}
+.admin-gate-sub{color:#9A9590;font-size:13px;line-height:1.55;margin:0 0 22px;}
+.admin-input{width:100%;background:#0F0F0F;border:1px solid #2A2A2A;color:#F5F1E6;padding:11px 14px;border-radius:6px;font-family:inherit;font-size:14px;outline:none;transition:border 0.15s ease;}
+.admin-input:focus{border-color:#C9A84C;}
+.admin-error{margin-top:10px;font-size:12px;color:#E07A6E;}
+.admin-submit{width:100%;margin-top:18px;background:#C9A84C;color:#0F0F0F;border:none;border-radius:6px;padding:11px;font-family:inherit;font-weight:700;font-size:13px;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer;transition:transform 0.15s ease, opacity 0.15s ease;}
+.admin-submit:hover:not(:disabled){transform:translateY(-1px);}
+.admin-submit:disabled{opacity:0.5;cursor:not-allowed;}
+
+/* Mobile */
+@media(max-width:880px){
+  .admin-shell{padding:24px 18px 48px;}
+  .admin-stats{grid-template-columns:repeat(2,1fr);}
+  .admin-shell h1{font-size:24px;}
+  .admin-table th, .admin-table td{padding:10px 14px;}
+}
+@media(max-width:520px){
+  .admin-stats{grid-template-columns:1fr;}
+}
