@@ -23,7 +23,7 @@ export default async function AccountsPage() {
           <h1>Your TikTok accounts</h1>
           <p className="dash-page-sub">Each cycle holds up to 4 accounts. Once you hit 4, the cycle resets and pricing starts back at $100.</p>
         </div>
-        <Link href="/#pricing" className="dash-cta">Activate next account</Link>
+        <Link href="/dashboard/add-account" className="dash-cta">Activate next account</Link>
       </header>
 
       {my.length === 0 ? (
@@ -31,7 +31,7 @@ export default async function AccountsPage() {
           <div className="dash-empty-large">
             <div className="dash-empty-title">No accounts in your cycle yet</div>
             <div className="dash-empty-body">Pick a tier from the home page to activate your first account. The AM team takes it from there inside 24 hours.</div>
-            <Link href="/#pricing" className="dash-cta">See pricing</Link>
+            <Link href="/dashboard/add-account" className="dash-cta">See pricing</Link>
           </div>
         </div>
       ) : (

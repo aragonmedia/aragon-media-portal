@@ -67,7 +67,7 @@ export default async function DashboardLanding() {
             <EmptyState
               title="No accounts yet"
               body="Activation starts the moment you complete your first checkout. The AM team handles the rest within 24 hours."
-              cta={{ href: "/#pricing", label: "Activate your first account" }}
+              cta={{ href: "/dashboard/add-account", label: "Activate your first account" }}
             />
           ) : (
             <ul className="dash-account-list">
@@ -90,7 +90,7 @@ export default async function DashboardLanding() {
           </div>
           <div className="dash-actions">
             <ActionTile
-              href="/#pricing"
+              href="/dashboard/add-account"
               title="Add an account"
               body="Activate the next account in your cycle."
               icon="+"
