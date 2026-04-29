@@ -63,7 +63,7 @@ export default function SignupPage() {
       const res = await fetch("/api/verify", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: email.trim().toLowerCase(), code }),
+        body: JSON.stringify({ email: email.trim().toLowerCase(), code, purpose: "signup" }),
       });
       const data = (await res.json()) as { ok: boolean; pending?: boolean; message?: string; error?: string };
       if (data.ok) {
