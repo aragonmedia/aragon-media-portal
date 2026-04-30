@@ -42,6 +42,7 @@ export default async function DashboardLanding() {
   if (hasActive) currentStep = 5;
   if (hasActive && hasContract) currentStep = 6;
   if (hasActive && hasContract && hasContract) currentStep = 7;
+  // Step 8 = first withdrawal paid; we'll wire this off withdrawals.status='paid' once that flow lands
 
   const firstName = user.name.split(/\s+/)[0] || user.name;
   const activationFeeCents = myPurchases

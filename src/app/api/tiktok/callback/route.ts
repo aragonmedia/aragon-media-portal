@@ -1,65 +1,64 @@
 /**
- * GET /api/tiktok/callback?code=...&state=...
- * - Verifies CSRF state cookie matches.
- * - Exchanges code for access + refresh tokens.
- * - Stores them on the user row (first cut — proper encrypted vault next round).
- * - Redirects to /dashboard/tiktok-account.
+ * GET /api/tiktok/callback?code=...
+ *
+ * TikTok Shop Partner Center auth flow callback. Exchanges auth_code for
+ * access_token + refresh_token via:
+ *   GET https://auth.tiktok-shops.com/api/v2/token/get
+ *     ?app_key=...&app_secret=...&auth_code=...&grant_type=authorized_code
+ *
+ * Stores tokens (first cut: logs them; encrypted vault wired in next round
+ * with a tiktok_oauth_tokens table migration).
  *
  * Env vars required:
- *   TIKTOK_CLIENT_KEY
- *   TIKTOK_CLIENT_SECRET
- *   TIKTOK_REDIRECT_URI
+ *   TIKTOK_CLIENT_KEY     - app_key from Partner Center
+ *   TIKTOK_CLIENT_SECRET  - app_secret from Partner Center
  */
 
-import { cookies } from "next/headers";
 import { NextRequest } from "next/server";
+import { getCurrentUser } from "@/lib/auth/session";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
-const TIKTOK_TOKEN_URL = "https://open.tiktokapis.com/v2/oauth/token/";
+const TIKTOK_TOKEN_URL = "https://auth.tiktok-shops.com/api/v2/token/get";
 
 export async function GET(req: NextRequest) {
   const url = new URL(req.url);
   const code = url.searchParams.get("code");
-  const state = url.searchParams.get("state");
   const error = url.searchParams.get("error");
 
-  const store = await cookies();
-  const cookieState = store.get("tt_state")?.value;
-  const cookieUserId = store.get("tt_user")?.value;
-  store.delete("tt_state");
-  store.delete("tt_user");
-
   if (error) {
-    return Response.redirect(`https://aragon-media-portal.vercel.app/dashboard/tiktok-account?error=${encodeURIComponent(error)}`, 302);
+    return Response.redirect(
+      `https://aragon-media-portal.vercel.app/dashboard/tiktok-account?error=${encodeURIComponent(error)}`,
+      302
+    );
   }
-  if (!code || !state || !cookieState || state !== cookieState) {
-    return Response.json({ ok: false, error: "state mismatch or missing code" }, { status: 400 });
-  }
-  if (!cookieUserId) {
-    return Response.json({ ok: false, error: "user session lost during oauth" }, { status: 400 });
+  if (!code) {
+    return Response.json({ ok: false, error: "missing code" }, { status: 400 });
   }
 
-  const clientKey = process.env.TIKTOK_CLIENT_KEY;
-  const clientSecret = process.env.TIKTOK_CLIENT_SECRET;
-  const redirectUri = process.env.TIKTOK_REDIRECT_URI ?? "https://aragon-media-portal.vercel.app/api/tiktok/callback";
-  if (!clientKey || !clientSecret) {
-    return Response.json({ ok: false, error: "TikTok env vars not set" }, { status: 500 });
+  const user = await getCurrentUser();
+  if (!user) {
+    return Response.redirect("https://aragon-media-portal.vercel.app/signin", 302);
+  }
+
+  const appKey = process.env.TIKTOK_CLIENT_KEY;
+  const appSecret = process.env.TIKTOK_CLIENT_SECRET;
+  if (!appKey || !appSecret) {
+    return Response.json(
+      { ok: false, error: "TIKTOK_CLIENT_KEY / TIKTOK_CLIENT_SECRET not set" },
+      { status: 500 }
+    );
   }
 
   try {
-    const res = await fetch(TIKTOK_TOKEN_URL, {
-      method: "POST",
-      headers: { "Content-Type": "application/x-www-form-urlencoded" },
-      body: new URLSearchParams({
-        client_key: clientKey,
-        client_secret: clientSecret,
-        code,
-        grant_type: "authorization_code",
-        redirect_uri: redirectUri,
-      }),
-    });
+    const tokenUrl = new URL(TIKTOK_TOKEN_URL);
+    tokenUrl.searchParams.set("app_key", appKey);
+    tokenUrl.searchParams.set("app_secret", appSecret);
+    tokenUrl.searchParams.set("auth_code", code);
+    tokenUrl.searchParams.set("grant_type", "authorized_code");
+
+    const res = await fetch(tokenUrl.toString(), { method: "GET" });
 
     if (!res.ok) {
       const text = await res.text();
@@ -67,24 +66,41 @@ export async function GET(req: NextRequest) {
       return Response.json({ ok: false, error: "token exchange failed", detail: text }, { status: 502 });
     }
 
-    const data = (await res.json()) as {
-      access_token: string;
-      refresh_token: string;
-      open_id: string;
-      expires_in: number;
-      token_type: string;
-      scope?: string;
+    type TikTokTokenResponse = {
+      code: number;
+      message: string;
+      data?: {
+        access_token: string;
+        refresh_token: string;
+        access_token_expire_in: number;
+        refresh_token_expire_in: number;
+        seller_name?: string;
+        seller_base_region?: string;
+        open_id?: string;
+        granted_scopes?: string[];
+      };
     };
 
-    // First cut: log success and redirect with a flag. Token persistence
-    // (encrypted vault tied to accounts row) lands in the next migration.
-    console.log("[tiktok callback] success for portal user", cookieUserId, {
-      open_id: data.open_id,
-      expires_in: data.expires_in,
-      scope: data.scope,
+    const data = (await res.json()) as TikTokTokenResponse;
+
+    if (data.code !== 0 || !data.data) {
+      console.error("[tiktok callback] non-zero code:", data);
+      return Response.json({ ok: false, error: data.message || "tiktok rejected exchange" }, { status: 502 });
+    }
+
+    // First cut: log success. Token persistence (encrypted, tied to the
+    // creator's accounts row) lands in the next migration.
+    console.log("[tiktok callback] success for portal user", user.id, {
+      seller_name: data.data.seller_name,
+      open_id: data.data.open_id,
+      access_expires_in: data.data.access_token_expire_in,
+      scopes: data.data.granted_scopes,
     });
 
-    return Response.redirect(`https://aragon-media-portal.vercel.app/dashboard/tiktok-account?connected=1`, 302);
+    return Response.redirect(
+      `https://aragon-media-portal.vercel.app/dashboard/tiktok-account?connected=1`,
+      302
+    );
   } catch (err) {
     console.error("[tiktok callback] exception:", err);
     return Response.json(

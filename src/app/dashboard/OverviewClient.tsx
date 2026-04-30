@@ -26,7 +26,7 @@ const STEP_STATUSES = [
   "Step 7 of 7 — Withdrawal form is now live. Submit anytime Mon–Fri",
 ];
 
-const PCTS = [0, 14, 28, 42, 57, 71, 85, 100];
+const PCTS = [0, 12, 25, 37, 50, 62, 75, 87, 100];
 
 const CHECKLIST = [
   { id: 1, title: "Pay $100 activation fee", sub: "Square · Confirmed" },
@@ -150,11 +150,11 @@ export default function OverviewClient({
             <h1>Welcome back, {firstName}.</h1>
             <p className="dash-greeting-sub">Account {step >= 5 ? "active" : "activating"} · Track your verification progress in real time below.</p>
           </div>
-          <span className="banner-badge" id="activeBadge">{step >= 5 ? "Verified" : `Step ${step} of 7`}</span>
+          <span className="banner-badge" id="activeBadge">{step >= 5 ? "Verified" : `Step ${step} of 8`}</span>
         </div>
 
         <div className="prog-steps">
-          {[1, 2, 3, 4, 5, 6, 7].map((n) => {
+          {[1, 2, 3, 4, 5, 6, 7, 8].map((n) => {
             const done = n < step;
             const active = n === step;
             const dotClass = done ? "prog-dot done" : active ? "prog-dot active" : "prog-dot pending";
@@ -162,14 +162,14 @@ export default function OverviewClient({
             return (
               <div key={`step-${n}`} className="prog-step-wrap">
                 <div className="prog-step">
-                  <div className={dotClass}>{done ? "✓" : n === 7 ? "✦" : n}</div>
+                  <div className={dotClass}>{done ? "✓" : n === 8 ? "✦" : n}</div>
                   <div className={lblClass}>
                     {STEP_LABELS[n].split("\n").map((l, i) => (
                       <span key={i}>{i > 0 && <br />}{l}</span>
                     ))}
                   </div>
                 </div>
-                {n < 7 && (
+                {n < 8 && (
                   <div className={`prog-connector${n < step ? " done" : " pending"}`} />
                 )}
               </div>
