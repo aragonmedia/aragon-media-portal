@@ -87,15 +87,11 @@ export default function WithdrawalFormClient({
 
       <div className="example-block">
         <div className="example-label">Example — what your TikTok withdrawal screenshot looks like</div>
-        <div className="example-grid">
-          {[1, 2, 3].map((n) => (
-            <div key={n} className="example-tile">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={`/media/withdrawal-examples/example-${n}-${["details","history","progress"][n-1]}.png`} alt={`Withdrawal example ${n}`} loading="lazy" />
-            </div>
-          ))}
+        <div className="example-single">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/media/withdrawal-examples/example-1-details.png" alt="Example TikTok withdrawal screenshot" loading="lazy" />
         </div>
-        <div className="example-note">Capture the exact screen showing the withdrawal amount + status. AM uses this to verify the payout request.</div>
+        <div className="example-note">Capture the screen showing the withdrawal amount + status. AM uses this to verify the payout request.</div>
       </div>
 
       <label className="upload-block">

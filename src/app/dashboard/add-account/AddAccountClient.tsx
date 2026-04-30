@@ -196,9 +196,7 @@ export default function AddAccountClient({
         <div className="why-wrap-inner">
           <div className="sect-label">Both paths include</div>
           <div className="includes-list">
-            <div className="inc-item">Full AM team activation per account, within 24 hours each</div>
-            <div className="inc-item">One AM team chat hub for all your accounts — no scattered threads</div>
-            <div className="inc-item">Individual GMV and revenue tracking per account on the GMV tab</div>
+            <div className="inc-item">Individual GMV and revenue tracking per account</div>
             <div className="inc-item">Separate progress tracker and withdrawal form per account</div>
           </div>
         </div>
