@@ -73,16 +73,10 @@ export default function ReceiptPreviewPage() {
           <span className="rcpt-pill rcpt-pill-pending">Pending review</span>
         </div>
 
-        <div className="rcpt-amount-row">
+        <div className="rcpt-amount-row rcpt-amount-row-2col">
           <div className="rcpt-amount-block">
             <div className="rcpt-amt-label">Withdrawal amount</div>
             <div className="rcpt-amt-value">{fmtCents(sample.grossCents)}</div>
-          </div>
-          <div className="rcpt-amount-block">
-            <div className="rcpt-amt-label">AM fee (20%)</div>
-            <div className="rcpt-amt-value rcpt-amt-fee">
-              − {fmtCents(sample.feeCents)}
-            </div>
           </div>
           <div className="rcpt-amount-block">
             <div className="rcpt-amt-label">You receive</div>

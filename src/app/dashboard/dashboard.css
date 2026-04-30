@@ -741,3 +741,24 @@
   .rcpt-grid{grid-template-columns:1fr;}
   .rcpt-num{font-size:22px;}
 }
+/* Receipt amount row — 2-col variant when AM fee column is hidden */
+.rcpt-amount-row-2col{grid-template-columns:repeat(2,1fr) !important;}
+
+/* ===== Withdrawal history list (card menu) ===== */
+.wdr-history{display:flex;flex-direction:column;gap:12px;margin-top:8px;}
+.wdr-history-empty{padding:36px 24px;text-align:center;color:var(--text-sub);font-size:13px;background:var(--bg-deep);border:1px dashed var(--border);}
+.wdr-card{display:block;padding:18px 22px;background:var(--bg-2);border:1px solid var(--border);text-decoration:none;color:inherit;transition:border-color 0.15s ease, transform 0.15s ease, box-shadow 0.15s ease;}
+.wdr-card:hover{border-color:var(--gold);transform:translateY(-1px);box-shadow:0 8px 22px -14px rgba(201,168,76,0.45);}
+.wdr-card-top{display:flex;justify-content:space-between;align-items:center;gap:14px;margin-bottom:12px;}
+.wdr-card-rcpt{font-family:'Inter Tight',sans-serif;font-size:14px;font-weight:700;letter-spacing:0.06em;color:var(--gold);}
+.wdr-card-amounts{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;}
+.wdr-card-net{font-family:'Inter Tight',sans-serif;font-size:22px;font-weight:700;color:var(--green);letter-spacing:-0.01em;}
+.wdr-card-net-label{font-size:11px;letter-spacing:0.18em;text-transform:uppercase;color:var(--text-sub);font-weight:600;margin-left:6px;}
+.wdr-card-meta{margin-top:8px;font-size:12px;color:var(--text-sub);display:flex;gap:14px;flex-wrap:wrap;}
+.wdr-card-meta strong{color:var(--text-muted);font-weight:500;}
+.wdr-card-arrow{display:inline-flex;align-items:center;color:var(--text-sub);font-size:13px;margin-left:6px;}
+.wdr-card:hover .wdr-card-arrow{color:var(--gold);}
+@media(max-width:600px){
+  .wdr-card{padding:16px 18px;}
+  .wdr-card-net{font-size:19px;}
+}

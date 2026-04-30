@@ -86,16 +86,10 @@ export default async function ReceiptPage({
           <span className={`rcpt-pill ${pill.className}`}>{pill.label}</span>
         </div>
 
-        <div className="rcpt-amount-row">
+        <div className="rcpt-amount-row rcpt-amount-row-2col">
           <div className="rcpt-amount-block">
             <div className="rcpt-amt-label">Withdrawal amount</div>
             <div className="rcpt-amt-value">{fmtCents(r.grossCents)}</div>
-          </div>
-          <div className="rcpt-amount-block">
-            <div className="rcpt-amt-label">AM fee (20%)</div>
-            <div className="rcpt-amt-value rcpt-amt-fee">
-              − {fmtCents(r.feeCents)}
-            </div>
           </div>
           <div className="rcpt-amount-block">
             <div className="rcpt-amt-label">You receive</div>

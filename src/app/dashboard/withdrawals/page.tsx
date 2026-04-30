@@ -7,7 +7,21 @@ import { withdrawals } from "@/db/schema";
 export const dynamic = "force-dynamic";
 
 function fmtUsd(cents: number): string {
-  return `$${(cents / 100).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+  return `$${(cents / 100).toLocaleString(undefined, {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  })}`;
+}
+
+function statusPill(status: string) {
+  if (status === "paid") return { label: "Paid", className: "rcpt-pill-paid" };
+  if (status === "late_retained")
+    return { label: "Late · retained", className: "rcpt-pill-late" };
+  if (status === "approved")
+    return { label: "Approved", className: "rcpt-pill-approved" };
+  if (status === "rejected")
+    return { label: "Rejected", className: "rcpt-pill-rejected" };
+  return { label: "Pending review", className: "rcpt-pill-pending" };
 }
 
 export default async function WithdrawalsPage() {
@@ -27,41 +41,66 @@ export default async function WithdrawalsPage() {
         <div>
           <p className="dash-eyebrow">Withdrawals</p>
           <h1>Move money to your bank</h1>
-          <p className="dash-page-sub">Aragon Media keeps a 20% operating fee. The rest is yours, paid Mon to Fri in USD.</p>
+          <p className="dash-page-sub">
+            Submit every time you have earnings ready · AM processes payouts
+            Monday through Friday in USD.
+          </p>
         </div>
       </header>
 
-      {/* Withdrawal gateway: must talk to AM + sign contract before form opens */}
+      {/* Gateway: must talk to AM + sign contract before form opens */}
       <div className="dash-card">
         <div className="dash-card-head">
           <h2>Unlock the withdrawal form</h2>
-          <span className={`mini-tag ${contractSigned ? "available" : "locked"}`}>{contractSigned ? "Contract signed" : "Locked"}</span>
+          <span className={`mini-tag ${contractSigned ? "available" : "locked"}`}>
+            {contractSigned ? "Contract signed" : "Locked"}
+          </span>
         </div>
         <div className="withdraw-gate">
           <div className="withdraw-gate-step">
             <div className="withdraw-gate-num">1</div>
             <div>
               <div className="withdraw-gate-title">Open a chat with AM</div>
-              <div className="withdraw-gate-sub">Let the team know you have commissions ready to withdraw. They&apos;ll send the contract.</div>
+              <div className="withdraw-gate-sub">
+                Let the team know you have commissions ready to withdraw.
+                They&apos;ll send the contract.
+              </div>
             </div>
-            <Link href="/dashboard/chat" className="dash-cta">Open chat with AM →</Link>
+            <Link href="/dashboard/chat" className="dash-cta">
+              Open chat with AM →
+            </Link>
           </div>
           <div className="withdraw-gate-step">
             <div className="withdraw-gate-num locked">2</div>
             <div>
-              <div className="withdraw-gate-title">Earn your first commission sale</div>
-              <div className="withdraw-gate-sub">Great — when your account is verified you can begin promoting on TikTok Shop. On your 1st sale, message the AM team here for the next step.</div>
+              <div className="withdraw-gate-title">
+                Earn your first commission sale
+              </div>
+              <div className="withdraw-gate-sub">
+                Great — when your account is verified you can begin promoting on
+                TikTok Shop. On your 1st sale, message the AM team here for the
+                next step.
+              </div>
             </div>
             <span className="mini-tag locked">Locked</span>
           </div>
           <div className="withdraw-gate-step">
-            <div className={`withdraw-gate-num${contractSigned ? "" : " locked"}`}>3</div>
+            <div
+              className={`withdraw-gate-num${contractSigned ? "" : " locked"}`}
+            >
+              3
+            </div>
             <div>
               <div className="withdraw-gate-title">Submit the withdrawal form</div>
-              <div className="withdraw-gate-sub">Upload your TikTok withdrawal screenshot, choose a payout method, and AM moves the money Mon to Fri.</div>
+              <div className="withdraw-gate-sub">
+                Upload your TikTok withdrawal screenshot, choose a payout method,
+                and AM moves the money Mon to Fri.
+              </div>
             </div>
             {contractSigned ? (
-              <Link href="/dashboard/withdrawals/new" className="dash-cta">Submit a withdrawal →</Link>
+              <Link href="/dashboard/withdrawals/new" className="dash-cta">
+                Submit a withdrawal →
+              </Link>
             ) : (
               <span className="mini-tag locked">Locked</span>
             )}
@@ -71,29 +110,64 @@ export default async function WithdrawalsPage() {
 
       <div className="dash-card" style={{ marginTop: 16 }}>
         <div className="dash-card-head">
-          <h2>History</h2>
-          <span className="dash-meta">Every payout request lives here for your records.</span>
+          <h2>Your receipts</h2>
+          <span className="dash-meta">
+            {list.length === 0
+              ? "Every payout request lives here for your records."
+              : `${list.length} submission${list.length === 1 ? "" : "s"} · most recent first`}
+          </span>
         </div>
+
         {list.length === 0 ? (
-          <div className="dash-empty"><div className="dash-empty-body">No withdrawals yet. Once your form is submitted it shows up here in real time.</div></div>
+          <div className="wdr-history-empty">
+            No withdrawals yet. Once you submit the form, every receipt shows up
+            here as a card you can click into.
+          </div>
         ) : (
-          <table className="dash-table">
-            <thead>
-              <tr><th>Requested</th><th>Gross</th><th>AM fee</th><th>Net to you</th><th>Status</th><th>Paid</th></tr>
-            </thead>
-            <tbody>
-              {list.map((w) => (
-                <tr key={w.id}>
-                  <td className="dim">{new Date(w.requestedAt).toLocaleString()}</td>
-                  <td>{fmtUsd(w.grossCents)}</td>
-                  <td className="dim">{fmtUsd(w.feeCents)}</td>
-                  <td className="ok">{fmtUsd(w.netCents)}</td>
-                  <td><span className={`status-pill status-${w.status}`}>{w.status}</span></td>
-                  <td className="dim">{w.paidAt ? new Date(w.paidAt).toLocaleDateString() : "—"}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+          <div className="wdr-history">
+            {list.map((w) => {
+              const pill = statusPill(w.status);
+              return (
+                <Link
+                  key={w.id}
+                  href={`/dashboard/withdrawals/receipt/${w.id}`}
+                  className="wdr-card"
+                >
+                  <div className="wdr-card-top">
+                    <span className="wdr-card-rcpt">{w.receiptNumber}</span>
+                    <span className={`rcpt-pill ${pill.className}`}>
+                      {pill.label}
+                    </span>
+                  </div>
+                  <div className="wdr-card-amounts">
+                    <span className="wdr-card-net">{fmtUsd(w.netCents)}</span>
+                    <span className="wdr-card-net-label">to you</span>
+                    <span className="wdr-card-arrow">→</span>
+                  </div>
+                  <div className="wdr-card-meta">
+                    <span>
+                      Submitted from <strong>{fmtUsd(w.grossCents)}</strong>
+                    </span>
+                    <span>
+                      {new Date(w.requestedAt).toLocaleString("en-US", {
+                        dateStyle: "medium",
+                        timeStyle: "short",
+                      })}
+                    </span>
+                    {w.paidAt && (
+                      <span>
+                        Paid{" "}
+                        {new Date(w.paidAt).toLocaleDateString("en-US", {
+                          month: "short",
+                          day: "numeric",
+                        })}
+                      </span>
+                    )}
+                  </div>
+                </Link>
+              );
+            })}
+          </div>
         )}
       </div>
     </main>
