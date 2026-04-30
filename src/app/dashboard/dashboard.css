@@ -407,3 +407,91 @@
   .settings-row{grid-template-columns:1fr;}
   .settings-meta{grid-template-columns:1fr;}
 }
+
+/* ===== Stat card with CTA buttons (Activation Fee replacement when unpaid) ===== */
+.dash-stat-cta{display:flex;flex-direction:column;gap:8px;}
+.dash-stat-cta-row{display:flex;flex-direction:column;gap:6px;margin-top:2px;}
+.dash-stat-btn{display:block;background:#C9A84C;color:#0F0F0F;font-family:'Inter Tight',sans-serif;font-weight:700;font-size:11px;letter-spacing:0.08em;text-transform:uppercase;padding:8px 10px;border-radius:5px;text-decoration:none;text-align:center;transition:transform 0.15s ease;}
+.dash-stat-btn:hover{transform:translateY(-1px);}
+.dash-stat-btn-ghost{background:transparent;color:#C9A84C;border:1px solid rgba(201,168,76,0.3);}
+
+/* ===== Cred form locked / done states ===== */
+.cred-form-locked{opacity:0.7;}
+.cred-form-locked .cred-input{background:#1A1A1A;cursor:not-allowed;}
+.cred-form-locked .cred-submit{background:#1F1F1F;color:#5C5750;cursor:not-allowed;}
+.cred-form-done{opacity:0.85;}
+.cred-form-done .cred-submit{background:#2BA567;color:#0F0F0F;cursor:default;}
+.cred-submit:disabled{opacity:0.6;cursor:not-allowed;}
+
+/* ===== Add Accounts dual paths ===== */
+.paths-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px;}
+.path-card{background:#141414;border:1px solid #2A2A2A;border-radius:14px;padding:24px;display:flex;flex-direction:column;}
+.path-card-feature{border-color:rgba(201,168,76,0.4);background:linear-gradient(180deg,rgba(201,168,76,0.04) 0%,#141414 60%);}
+.path-head{margin-bottom:18px;}
+.path-eyebrow{font-size:11px;color:#C9A84C;letter-spacing:0.16em;text-transform:uppercase;font-weight:700;margin-bottom:6px;}
+.path-card h2{font-family:'Inter Tight',sans-serif;font-size:22px;font-weight:700;margin:2px 0 6px;color:#F5F1E6;letter-spacing:-0.01em;}
+.path-sub{color:#9A9590;font-size:13px;line-height:1.5;margin:0;}
+
+.path-ladder{display:flex;flex-direction:column;gap:6px;margin-bottom:16px;}
+.path-ladder-row{display:grid;grid-template-columns:32px 1fr auto;gap:12px;align-items:center;padding:11px 14px;background:#0F0F0F;border:1px solid #2A2A2A;border-radius:8px;}
+.path-ladder-row.first{border-color:rgba(201,168,76,0.4);background:rgba(201,168,76,0.05);}
+.path-ladder-num{width:24px;height:24px;border-radius:50%;background:#1F1F1F;color:#9A9590;display:flex;align-items:center;justify-content:center;font-family:'Inter Tight',sans-serif;font-weight:700;font-size:12px;}
+.path-ladder-row.first .path-ladder-num{background:#C9A84C;color:#0F0F0F;}
+.path-ladder-title{font-size:13px;color:#F5F1E6;font-weight:500;}
+.path-ladder-sub{font-size:11px;color:#9A9590;margin-top:1px;}
+.path-ladder-price{font-family:'Inter Tight',sans-serif;font-weight:700;font-size:16px;color:#F5F1E6;}
+.path-ladder-row.first .path-ladder-price{color:#C9A84C;}
+
+.bundle-summary{display:flex;justify-content:space-between;align-items:flex-start;gap:18px;margin-bottom:16px;}
+.bundle-price-block{text-align:right;}
+.bundle-savings{margin-top:6px;font-size:11px;color:#2BA567;font-weight:600;letter-spacing:0.04em;}
+
+.tier-mark-btn{background:transparent;border:none;cursor:pointer;text-align:center;font-size:10px;color:#5C5750;padding:4px 0;font-family:inherit;transition:color 0.15s ease;}
+.tier-mark-btn strong{display:block;color:#9A9590;font-size:11px;font-weight:500;margin-bottom:1px;}
+.tier-mark-btn:hover{color:#C9A84C;}
+.tier-mark-btn:hover strong{color:#C9A84C;}
+.tier-mark-btn.active{color:#C9A84C;}
+.tier-mark-btn.active strong{color:#C9A84C;}
+
+.path-cta{display:block;width:100%;text-align:center;background:#C9A84C;color:#0F0F0F;font-family:'Inter Tight',sans-serif;font-weight:800;font-size:13px;letter-spacing:0.1em;text-transform:uppercase;padding:13px;border-radius:8px;text-decoration:none;margin-top:auto;transition:transform 0.15s ease, box-shadow 0.15s ease;}
+.path-cta:hover{transform:translateY(-1px);box-shadow:0 12px 30px -12px rgba(201,168,76,0.55);}
+.path-cta-feature{background:linear-gradient(135deg,#C9A84C 0%,#E0C474 100%);}
+.path-note{font-size:11px;color:#5C5750;text-align:center;margin-top:10px;line-height:1.55;}
+
+@media(max-width:1080px){
+  .paths-grid{grid-template-columns:1fr;}
+}
+
+/* ===== Settings: account list + add ===== */
+.settings-account-list{padding:8px 0 14px;display:flex;flex-direction:column;gap:8px;}
+.settings-account-row{display:grid;grid-template-columns:1fr auto;gap:14px;align-items:center;padding:14px 16px;background:#0F0F0F;border:1px solid #2A2A2A;border-radius:8px;}
+.settings-account-handle{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:14px;color:#F5F1E6;font-weight:600;}
+.settings-account-meta{font-size:11px;color:#9A9590;margin-top:2px;}
+.settings-add-account{padding:14px 0 4px;border-top:1px solid #2A2A2A;margin-top:8px;}
+.settings-add-account label{display:flex;flex-direction:column;gap:8px;}
+.settings-add-row{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:stretch;}
+.settings-add-row .dash-cta{align-self:stretch;}
+.settings-hint{margin-top:10px;font-size:11px;color:#5C5750;line-height:1.55;}
+
+/* ===== Withdrawal form ===== */
+.preview-banner{border-color:rgba(201,168,76,0.35);background:rgba(201,168,76,0.04);margin-bottom:14px;padding:18px 22px;}
+.preview-banner-pill{display:inline-block;background:rgba(201,168,76,0.16);color:#C9A84C;font-size:10px;letter-spacing:0.14em;text-transform:uppercase;font-weight:700;padding:5px 10px;border-radius:5px;margin-bottom:10px;}
+.preview-banner-body{font-size:13px;line-height:1.55;color:#9A9590;}
+
+.withdraw-form{padding:24px;display:flex;flex-direction:column;gap:14px;}
+.withdraw-form-gated{opacity:0.94;}
+.withdraw-form .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+.withdraw-form label{display:flex;flex-direction:column;gap:6px;}
+.withdraw-form label>span{font-size:11px;color:#9A9590;letter-spacing:0.08em;text-transform:uppercase;font-weight:600;}
+.field-note{font-size:11px;color:#5C5750;margin-top:4px;}
+.form-divider{height:1px;background:#2A2A2A;margin:6px 0;}
+.upload-drop{position:relative;border:1px dashed #2A2A2A;background:#0F0F0F;border-radius:8px;padding:24px;text-align:center;color:#9A9590;font-size:13px;cursor:pointer;transition:border-color 0.15s ease;}
+.upload-drop:hover{border-color:#C9A84C;}
+.upload-input{position:absolute;inset:0;opacity:0;cursor:pointer;}
+.upload-cta{pointer-events:none;}
+
+@media(max-width:880px){
+  .withdraw-form .form-grid{grid-template-columns:1fr;}
+  .settings-add-row{grid-template-columns:1fr;}
+  .settings-account-row{grid-template-columns:1fr;align-items:flex-start;}
+}

@@ -20,7 +20,7 @@ export default async function ChatPage() {
         <div>
           <p className="dash-eyebrow">Chat</p>
           <h1>AM team thread</h1>
-          <p className="dash-page-sub">Direct line to your dedicated AM operator. Replaces Discord, WhatsApp, email, and groupchats.</p>
+          <p className="dash-page-sub">All communications for this service hosted here.</p>
         </div>
       </header>
 

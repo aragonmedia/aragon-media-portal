@@ -98,18 +98,40 @@ export default function OverviewClient({
     }, 900);
   }
 
-  function submitCreds() {
-    if (!credUser || !credPass) return;
+  async function submitCreds() {
+    if (!credUser || !credPass || submittedCreds) return;
     setSubmittedCreds(true);
     setMsgs((m) => [
       ...m,
       { who: "me", name: "You", text: "🔒 Credentials submitted via secure form." },
-      {
-        who: "am",
-        name: "Aragon Media",
-        text: "Got them. We'll begin verification within 24 hours and ping you here when the 6-digit code is needed.",
-      },
     ]);
+    try {
+      const res = await fetch("/api/accounts/credentials", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username: credUser, password: credPass, code: credCode }),
+      });
+      const data = (await res.json()) as { ok: boolean; error?: string };
+      setMsgs((m) => [
+        ...m,
+        {
+          who: "am",
+          name: "Aragon Media",
+          text: data.ok
+            ? "Got them. We'll begin verification within 24 hours and ping you here when the 6-digit code is needed."
+            : `Couldn't accept credentials: ${data.error || "unknown error"}. Try again or message us in chat.`,
+        },
+      ]);
+      if (data.ok) {
+        // Refresh after a beat so the roadmap step updates and the cred form locks
+        setTimeout(() => window.location.reload(), 1600);
+      } else {
+        setSubmittedCreds(false);
+      }
+    } catch (err) {
+      setSubmittedCreds(false);
+      setMsgs((m) => [...m, { who: "am", name: "Aragon Media", text: `Network error: ${err instanceof Error ? err.message : String(err)}` }]);
+    }
   }
 
   const initials =
@@ -169,7 +191,20 @@ export default function OverviewClient({
         <Stat label="Account Status" value={step >= 5 ? "Active" : "Activating"} hint={step >= 5 ? "Verified by AM" : "Pending AM fulfillment"} tone={step >= 5 ? "green" : "gold"} small />
         <Stat label="Total GMV" value="—" hint="Connect TikTok to unlock" tone="green" />
         <Stat label="Revenue Earned" value="—" hint="Connect TikTok to unlock" tone="green" />
-        <Stat label="Activation Fee" value={hasPaid ? `$${(activationFeeCents / 100).toFixed(0)}` : "$100"} hint={hasPaid ? "✓ Confirmed via Square" : "Pending payment"} small />
+        <div className="dash-stat dash-stat-cta">
+          <div className="dash-stat-label">{hasPaid ? "Activation Fee" : "Get Started"}</div>
+          {hasPaid ? (
+            <>
+              <div className="dash-stat-value sm">${(activationFeeCents / 100).toFixed(0)}</div>
+              <div className="dash-stat-hint">✓ Confirmed via Square</div>
+            </>
+          ) : (
+            <div className="dash-stat-cta-row">
+              <a href={SQUARE_FIRST_ACCOUNT} target="_blank" rel="noopener noreferrer" className="dash-stat-btn">Verify 1st Account</a>
+              <Link href="/dashboard/add-account" className="dash-stat-btn dash-stat-btn-ghost">Add Accounts →</Link>
+            </div>
+          )}
+        </div>
       </section>
 
       {/* === CHAT + CHECKLIST === */}
@@ -194,19 +229,25 @@ export default function OverviewClient({
             })}
           </div>
 
-          {step === 3 && !submittedCreds && (
-            <div className="cred-form">
-              <div className="cred-title">🔒 Submit Account Login for Verification</div>
-              <div className="cred-sub">Used only by the AM team to complete TikTok account verification. Never shared externally.</div>
-              <div className="cred-row">
-                <input className="cred-input" placeholder="TikTok username or email" value={credUser} onChange={(e) => setCredUser(e.target.value)} />
-                <input className="cred-input" type="password" placeholder="Account password" value={credPass} onChange={(e) => setCredPass(e.target.value)} />
-                <input className="cred-input" placeholder="6-digit email code (when requested)" value={credCode} onChange={(e) => setCredCode(e.target.value)} maxLength={6} />
-              </div>
-              <div className="cred-note">Credentials stored encrypted and deleted after verification is complete.</div>
-              <button className="cred-submit" onClick={submitCreds}>Submit Credentials to AM Team →</button>
+          <div className={`cred-form${step < 3 ? " cred-form-locked" : ""}${submittedCreds ? " cred-form-done" : ""}`}>
+            <div className="cred-title">🔒 Submit TikTok Account Login Credentials for Verification</div>
+            <div className="cred-sub">
+              {step < 3
+                ? "Unlocks once your activation fee is paid. Use this form to send your TikTok login to the AM team — never share it in chat."
+                : submittedCreds
+                ? "Credentials received. The AM team is verifying — they'll ping you in chat if a 2FA code is needed."
+                : "Used only by the AM team to complete TikTok account verification. Never shared externally."}
             </div>
-          )}
+            <div className="cred-row">
+              <input className="cred-input" placeholder="TikTok username or email" value={credUser} onChange={(e) => setCredUser(e.target.value)} disabled={step < 3 || submittedCreds} />
+              <input className="cred-input" type="password" placeholder="Account password" value={credPass} onChange={(e) => setCredPass(e.target.value)} disabled={step < 3 || submittedCreds} />
+              <input className="cred-input" placeholder="6-digit email code (when requested)" value={credCode} onChange={(e) => setCredCode(e.target.value)} maxLength={6} disabled={step < 3 || submittedCreds} />
+            </div>
+            <div className="cred-note">Credentials encrypted at rest, used only to complete verification.</div>
+            <button className="cred-submit" onClick={submitCreds} disabled={step < 3 || submittedCreds || !credUser || !credPass}>
+              {step < 3 ? "Locked — pay activation fee first" : submittedCreds ? "Sent to AM team" : "Submit Credentials to AM Team →"}
+            </button>
+          </div>
 
           <div className="chat-input-row">
             <input className="chat-input" placeholder="Message the AM team…" value={chatInput} onChange={(e) => setChatInput(e.target.value)} onKeyDown={(e) => e.key === "Enter" && sendMsg()} />
@@ -238,7 +279,7 @@ export default function OverviewClient({
                   </div>
                   {active && item.id === 1 ? (
                     <a href={SQUARE_FIRST_ACCOUNT} target="_blank" rel="noopener noreferrer" className="ns-cta">
-                      Activate now →
+                      Verify your first account!
                     </a>
                   ) : (
                     <span className={`ns-tag ${done ? "done" : active ? "active" : "locked"}`}>

@@ -21,7 +21,7 @@ export default async function AccountsPage() {
         <div>
           <p className="dash-eyebrow">Accounts</p>
           <h1>Your TikTok accounts</h1>
-          <p className="dash-page-sub">Each cycle holds up to 4 accounts. Once you hit 4, the cycle resets and pricing starts back at $100.</p>
+          <p className="dash-page-sub">Every TikTok account verified by AM lives here with its own status, GMV, and earnings.</p>
         </div>
         <Link href="/dashboard/add-account" className="dash-cta">Activate next account</Link>
       </header>

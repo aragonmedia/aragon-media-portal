@@ -47,16 +47,12 @@ export default async function WithdrawalsPage() {
             <Link href="/dashboard/chat" className="dash-cta">Open chat with AM →</Link>
           </div>
           <div className="withdraw-gate-step">
-            <div className={`withdraw-gate-num${contractSigned ? " done" : ""}`}>{contractSigned ? "✓" : "2"}</div>
+            <div className="withdraw-gate-num locked">2</div>
             <div>
-              <div className="withdraw-gate-title">Sign the operations agreement</div>
-              <div className="withdraw-gate-sub">{contractSigned ? "Signed and on file." : "AM sends the contract once your earnings are verified. Sign once per account."}</div>
+              <div className="withdraw-gate-title">Earn your first commission sale</div>
+              <div className="withdraw-gate-sub">Great — when your account is verified you can begin promoting on TikTok Shop. On your 1st sale, message the AM team here for the next step.</div>
             </div>
-            {contractSigned ? (
-              <span className="status-pill status-paid">Done</span>
-            ) : (
-              <Link href="/dashboard/contract" className="dash-cta ghost">Preview agreement →</Link>
-            )}
+            <span className="mini-tag locked">Locked</span>
           </div>
           <div className="withdraw-gate-step">
             <div className={`withdraw-gate-num${contractSigned ? "" : " locked"}`}>3</div>
