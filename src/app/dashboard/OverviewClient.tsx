@@ -3,7 +3,6 @@
 import Link from "next/link";
 import { useState, useRef, useEffect } from "react";
 
-const SQUARE_FIRST_ACCOUNT = "https://square.link/u/2rfvqrD1";
 
 const STEP_LABELS = [
   "", // 0 unused
@@ -200,8 +199,8 @@ export default function OverviewClient({
             </>
           ) : (
             <div className="dash-stat-cta-row">
-              <a href={SQUARE_FIRST_ACCOUNT} target="_blank" rel="noopener noreferrer" className="dash-stat-btn">Verify 1st Account</a>
-              <Link href="/dashboard/add-account" className="dash-stat-btn dash-stat-btn-ghost">Add Accounts →</Link>
+              <Link href="/dashboard/add-account" className="dash-stat-btn">Verify 1st Account →</Link>
+              
             </div>
           )}
         </div>
@@ -278,9 +277,9 @@ export default function OverviewClient({
                     <div className="ns-sub">{item.sub}</div>
                   </div>
                   {active && item.id === 1 ? (
-                    <a href={SQUARE_FIRST_ACCOUNT} target="_blank" rel="noopener noreferrer" className="ns-cta">
-                      Verify your first account!
-                    </a>
+                    <Link href="/dashboard/add-account" className="ns-cta">
+                      Verify your first account! →
+                    </Link>
                   ) : (
                     <span className={`ns-tag ${done ? "done" : active ? "active" : "locked"}`}>
                       {done ? "Done" : active ? "Active" : "Locked"}

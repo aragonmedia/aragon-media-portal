@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useState } from "react";
 
 type ProfileShape = {
@@ -32,10 +33,6 @@ export default function SettingsClient({
   const [savingName, setSavingName] = useState(false);
   const [nameMsg, setNameMsg] = useState<{ kind: "ok" | "err"; text: string } | null>(null);
 
-  const [newHandle, setNewHandle] = useState("");
-  const [addingHandle, setAddingHandle] = useState(false);
-  const [addMsg, setAddMsg] = useState<{ kind: "ok" | "err"; text: string } | null>(null);
-
   const dirtyName = name.trim() !== initial.name;
 
   async function saveName(e: React.FormEvent) {
@@ -63,39 +60,13 @@ export default function SettingsClient({
     }
   }
 
-  async function addAccount(e: React.FormEvent) {
-    e.preventDefault();
-    if (!newHandle.trim() || addingHandle) return;
-    setAddingHandle(true);
-    setAddMsg(null);
-    try {
-      const res = await fetch("/api/accounts", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ tiktokHandle: newHandle.trim() }),
-      });
-      const data = (await res.json()) as { ok: boolean; error?: string };
-      if (data.ok) {
-        setAddMsg({ kind: "ok", text: "Account added — AM team notified." });
-        setNewHandle("");
-        setTimeout(() => window.location.reload(), 700);
-      } else {
-        setAddMsg({ kind: "err", text: data.error || "Couldn't add" });
-      }
-    } catch (err) {
-      setAddMsg({ kind: "err", text: err instanceof Error ? err.message : "Couldn't add" });
-    } finally {
-      setAddingHandle(false);
-    }
-  }
-
   return (
     <main className="dash-content">
       <header className="dash-page-head">
         <div>
           <p className="dash-eyebrow">Account</p>
           <h1>Settings</h1>
-          <p className="dash-page-sub">Update your profile and manage every TikTok account linked to your portal. Email + role are locked. Need them changed? Message AM team in chat.</p>
+          <p className="dash-page-sub">Update your profile and view every TikTok account linked to your portal. Email + role are locked. Need them changed? Message AM team in chat.</p>
         </div>
       </header>
 
@@ -139,16 +110,19 @@ export default function SettingsClient({
         </form>
       </div>
 
-      {/* TikTok accounts */}
+      {/* TikTok accounts (read-only) */}
       <div className="dash-card" style={{ marginTop: 16 }}>
         <div className="dash-card-head">
           <h2>Your TikTok accounts</h2>
-          <span className="dash-meta">{tiktokAccounts.length} of 4 in current cycle</span>
+          <span className="dash-meta">{tiktokAccounts.length} verified or in progress</span>
         </div>
 
         {tiktokAccounts.length === 0 ? (
           <div className="dash-empty">
-            <div className="dash-empty-body">No TikTok accounts linked yet. Add one below and the AM team will start verification within 24 hours.</div>
+            <div className="dash-empty-body">
+              No TikTok accounts linked yet. New accounts are added via the Add Accounts page after activation payment is received and the AM team begins verification.
+            </div>
+            <Link href="/dashboard/add-account" className="dash-cta">Go to Add Accounts →</Link>
           </div>
         ) : (
           <div className="settings-account-list">
@@ -158,32 +132,18 @@ export default function SettingsClient({
                   <div className="settings-account-handle">@{a.handle}</div>
                   <div className="settings-account-meta">{a.cycleLabel} · added {a.createdAt}{a.verifiedAt ? ` · verified ${a.verifiedAt}` : ""}</div>
                 </div>
-                <span className={`account-pill account-${a.status}`}>{a.status.replace("_", " ")}</span>
+                <div className="settings-account-actions">
+                  <span className={`account-pill account-${a.status}`}>{a.status.replace("_", " ")}</span>
+                  <button type="button" className="mini-btn ghost" disabled title="TikTok OAuth coming next session">
+                    Connect via TikTok OAuth
+                  </button>
+                </div>
               </div>
             ))}
           </div>
         )}
 
-        <form onSubmit={addAccount} className="settings-add-account">
-          <label>
-            <span>Add another TikTok account</span>
-            <div className="settings-add-row">
-              <input
-                className="settings-input"
-                type="text"
-                value={newHandle}
-                onChange={(e) => setNewHandle(e.target.value)}
-                placeholder="@yourhandle (no @ needed)"
-                maxLength={200}
-              />
-              <button type="submit" className="dash-cta" disabled={!newHandle.trim() || addingHandle}>
-                {addingHandle ? "Adding…" : "Add account"}
-              </button>
-            </div>
-          </label>
-          {addMsg && <span className={`settings-msg ${addMsg.kind === "ok" ? "ok" : "err"}`}>{addMsg.text}</span>}
-          <p className="settings-hint">Up to 4 accounts per cycle. After 4, the next account starts a new cycle. Activation fees apply per account from the Add Accounts page.</p>
-        </form>
+        <p className="settings-hint">To add another TikTok account, visit Add Accounts and complete activation. Once paid + verified, it will appear here automatically.</p>
       </div>
 
       {/* Account history */}
