@@ -9,23 +9,13 @@ type NavSection = { label: string; items: NavItem[] };
 
 const SECTIONS: NavSection[] = [
   {
-    label: "Main",
+    label: "Dashboard",
     items: [
       { href: "/dashboard", label: "Overview", icon: <DashIcon /> },
       { href: "/dashboard/tiktok-account", label: "TikTok Account & Revenue", icon: <TikTokIcon /> },
       { href: "/dashboard/withdrawals", label: "Withdrawals", icon: <PayoutIcon /> },
-    ],
-  },
-  {
-    label: "Support",
-    items: [
       { href: "/dashboard/chat", label: "Chat with AM Team", icon: <ChatIcon /> },
       { href: "/dashboard/settings", label: "Settings", icon: <SettingsIcon /> },
-    ],
-  },
-  {
-    label: "Accounts",
-    items: [
       { href: "/dashboard/accounts", label: "My Accounts", icon: <AccountsIcon /> },
       { href: "/dashboard/add-account", label: "Add Accounts", icon: <PlusIcon /> },
     ],
