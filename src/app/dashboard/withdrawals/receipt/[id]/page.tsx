@@ -104,16 +104,18 @@ export default async function ReceiptPage({
         </div>
 
         <div className="rcpt-grid">
-          <div className="rcpt-field">
-            <div className="rcpt-field-label">Withdrawn from TikTok on</div>
-            <div className="rcpt-field-value">
-              {r.withdrawalDate ?? "—"}
+          {r.withdrawalDate && (
+            <div className="rcpt-field">
+              <div className="rcpt-field-label">Withdrawn from TikTok on</div>
+              <div className="rcpt-field-value">{r.withdrawalDate}</div>
             </div>
-          </div>
-          <div className="rcpt-field">
-            <div className="rcpt-field-label">Source account (Aragon)</div>
-            <div className="rcpt-field-value">{r.sourceAccount ?? "—"}</div>
-          </div>
+          )}
+          {r.sourceAccount && (
+            <div className="rcpt-field">
+              <div className="rcpt-field-label">Source account (Aragon)</div>
+              <div className="rcpt-field-value">{r.sourceAccount}</div>
+            </div>
+          )}
           <div className="rcpt-field">
             <div className="rcpt-field-label">TikTok account</div>
             <div className="rcpt-field-value">

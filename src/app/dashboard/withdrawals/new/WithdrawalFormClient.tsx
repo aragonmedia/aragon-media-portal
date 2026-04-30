@@ -26,8 +26,6 @@ export default function WithdrawalFormClient({
   const [name, setName] = useState(userName);
   const [accountId, setAccountId] = useState(accounts[0]?.id ?? "");
   const [amount, setAmount] = useState("");
-  const [withdrawalDate, setWithdrawalDate] = useState("");
-  const [sourceAccount, setSourceAccount] = useState("");
   const [payoutMethod, setPayoutMethod] = useState("");
   const [bankDetails, setBankDetails] = useState("");
   const [notes, setNotes] = useState("");
@@ -56,8 +54,6 @@ export default function WithdrawalFormClient({
         body: JSON.stringify({
           accountId,
           amount,
-          withdrawalDate,
-          sourceAccount,
           payoutMethod,
           bankDetails,
           notes,
@@ -74,8 +70,6 @@ export default function WithdrawalFormClient({
         const errMap: Record<string, string> = {
           unauthorized: "Your session expired. Please sign in again.",
           invalid_amount: "Enter a withdrawal amount greater than $0.",
-          invalid_withdrawal_date: "Pick the date you withdrew from TikTok.",
-          missing_source_account: "Tell us which Aragon account it came from.",
           missing_payout_method: "Choose a payout method.",
         };
         setMsg({ kind: "err", text: errMap[json.error ?? ""] ?? `Submission failed${json.error ? ` (${json.error})` : ""}.` });
@@ -120,21 +114,6 @@ export default function WithdrawalFormClient({
           <span className="field-note">Exact amount shown on your TikTok withdrawal screen</span>
         </label>
       </div>
-
-      <div className="form-grid">
-        <label>
-          <span>Date Withdrawn from TikTok *</span>
-          <input className="settings-input" type="date" value={withdrawalDate} onChange={(e) => setWithdrawalDate(e.target.value)} required />
-          <span className="field-note">The date you initiated the withdrawal in TikTok Shop. Required to enforce the 48-hour window.</span>
-        </label>
-        <label>
-          <span>Aragon Source Account *</span>
-          <input className="settings-input" type="text" value={sourceAccount} onChange={(e) => setSourceAccount(e.target.value)} placeholder="Which Aragon Media account it landed in" required />
-          <span className="field-note">If unsure, name the bank or write the last 4 digits the AM team shared with you.</span>
-        </label>
-      </div>
-
-      <div className="form-divider" />
 
       <div className="example-block">
         <div className="example-label">Example — what your TikTok withdrawal screenshot looks like</div>

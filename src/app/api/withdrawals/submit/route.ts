@@ -44,12 +44,6 @@ export async function POST(req: NextRequest) {
   if (grossCents === null) {
     return Response.json({ ok: false, error: "invalid_amount" }, { status: 400 });
   }
-  if (!body.withdrawalDate || !/^\d{4}-\d{2}-\d{2}$/.test(body.withdrawalDate)) {
-    return Response.json({ ok: false, error: "invalid_withdrawal_date" }, { status: 400 });
-  }
-  if (!body.sourceAccount || body.sourceAccount.trim().length < 2) {
-    return Response.json({ ok: false, error: "missing_source_account" }, { status: 400 });
-  }
   if (!body.payoutMethod || body.payoutMethod.trim().length < 2) {
     return Response.json({ ok: false, error: "missing_payout_method" }, { status: 400 });
   }
@@ -81,8 +75,6 @@ export async function POST(req: NextRequest) {
       feeCents,
       netCents,
       status: "requested",
-      withdrawalDate: body.withdrawalDate,
-      sourceAccount: body.sourceAccount.trim().slice(0, 200),
       payoutMethod: body.payoutMethod.trim().slice(0, 50),
       notes: noteLines.slice(0, 4000),
     })
