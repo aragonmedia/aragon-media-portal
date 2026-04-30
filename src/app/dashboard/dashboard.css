@@ -637,13 +637,13 @@
 }
 
 /* ===== Sidebar (Aragon reference layout) — flush, profile-on-top ===== */
-.dash-sidebar{width:240px;background:var(--bg);border-right:1px solid var(--border);display:flex;flex-direction:column;flex-shrink:0;position:sticky;top:0;align-self:flex-start;max-height:100vh;overflow-y:auto;}
-.dash-brand{display:flex;align-items:center;gap:10px;padding:18px 16px 14px;border-bottom:1px solid var(--border);}
+.dash-sidebar{width:240px;background:var(--bg);border-right:1px solid var(--border);display:flex;flex-direction:column;flex-shrink:0;position:sticky;top:0;height:100vh;overflow-y:auto;}
+.dash-brand{display:flex;align-items:center;gap:10px;padding:18px 16px 14px;border-bottom:1px solid var(--border);background:var(--bg);}
 .dash-brand-name{font-family:'Inter Tight',sans-serif;font-weight:700;font-size:14px;color:var(--gold);letter-spacing:0.04em;}
 .dash-brand-sub{font-size:9px;color:var(--text-sub);letter-spacing:0.18em;text-transform:uppercase;margin-top:2px;}
 
 /* Profile chip — at TOP under brand */
-.dash-profile-chip{display:flex;align-items:center;gap:10px;padding:14px 16px;border-bottom:1px solid var(--border);text-decoration:none;color:inherit;transition:background 0.15s ease;}
+.dash-profile-chip{display:flex;align-items:center;gap:10px;padding:14px 16px;border-bottom:1px solid var(--border);text-decoration:none;color:inherit;transition:background 0.15s ease;background:var(--bg);}
 .dash-profile-chip:hover{background:rgba(201,168,76,0.05);}
 .dash-profile-avatar{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,var(--gold) 0%,var(--gold-dim) 100%);color:var(--bg);display:flex;align-items:center;justify-content:center;font-family:'Inter Tight',sans-serif;font-weight:800;font-size:13px;letter-spacing:-0.02em;flex-shrink:0;}
 .dash-profile-meta{flex:1;min-width:0;}
@@ -652,7 +652,7 @@
 .dash-profile-dot{width:6px;height:6px;border-radius:50%;background:var(--green-bright);animation:livePulse 1.6s ease-in-out infinite;}
 
 /* Nav — flush, no gaps between sections, no item border-radius */
-.dash-nav{flex:1 1 auto;overflow-y:auto;padding:6px 0;}
+.dash-nav{flex:1 1 auto;overflow-y:auto;padding:6px 0;background:var(--bg);}
 .dash-nav-section{margin:0;}
 .dash-nav-section-label{padding:14px 16px 4px;font-size:9px;color:var(--text-sub);letter-spacing:0.18em;text-transform:uppercase;font-weight:600;}
 .dash-nav-item{display:flex;align-items:center;gap:11px;padding:9px 16px;text-decoration:none;color:var(--text-muted);font-size:13px;font-weight:500;border-left:2px solid transparent;transition:background 0.12s ease, color 0.12s ease;border-radius:0;}
@@ -696,3 +696,14 @@
 .theme-card.active .theme-card-sub{color:var(--gold-dim);}
 
 @media(max-width:520px){.theme-toggle{grid-template-columns:1fr;}}
+
+/* ===== Mobile sidebar drawer ===== */
+@media(max-width:880px){
+  .dash-sidebar{position:fixed;left:0;top:0;height:100vh;width:280px;z-index:60;transform:translateX(-100%);transition:transform 0.25s ease;box-shadow:0 0 40px rgba(0,0,0,0.4);}
+  .dash-sidebar.open{transform:translateX(0);}
+  .dash-mobile-toggle{display:flex;flex-direction:column;justify-content:center;gap:4px;position:fixed;top:18px;right:18px;width:42px;height:42px;background:var(--bg-2);border:1px solid var(--border);border-radius:8px;z-index:50;cursor:pointer;padding:0 11px;}
+  .dash-mobile-toggle span{display:block;width:18px;height:2px;background:var(--text);border-radius:1px;}
+  .dash-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.5);opacity:0;pointer-events:none;transition:opacity 0.2s;z-index:55;}
+  .dash-overlay.visible{opacity:1;pointer-events:auto;}
+  .dash-main{padding-top:72px;}
+}
