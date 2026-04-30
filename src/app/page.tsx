@@ -58,6 +58,16 @@ function formatPrice(n: number) {
 export default function Home() {
   const [accounts, setAccounts] = useState(1);
   const [menuOpen, setMenuOpen] = useState(false);
+
+  // If user is already signed in, bounce them to the dashboard so they
+  // can't accidentally re-use the public pricing slider (loophole guard)
+  useEffect(() => {
+    if (typeof document === "undefined") return;
+    const hasSession = document.cookie.split(";").some((c) => c.trim().startsWith("am_session="));
+    if (hasSession) {
+      window.location.href = "/dashboard";
+    }
+  }, []);
   const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {

@@ -42,32 +42,9 @@
 .dash-main{flex:1;min-width:0;padding:32px 40px 64px;}
 
 /* ===== Sidebar ===== */
-.dash-sidebar{width:240px;background:var(--bg-deep);border-right:1px solid var(--border-soft);display:flex;flex-direction:column;padding:22px 14px;position:sticky;top:0;height:100vh;flex-shrink:0;}
-.dash-brand{display:flex;align-items:center;gap:12px;padding:0 8px 22px;border-bottom:1px solid var(--border-soft);margin-bottom:14px;}
-.dash-brand img{display:block;border-radius:8px;}
-.dash-brand-name{font-weight:700;letter-spacing:-0.01em;font-size:15px;color:var(--text);}
-.dash-brand-sub{font-size:11px;color:var(--text-muted);letter-spacing:0.06em;text-transform:uppercase;margin-top:2px;}
-.dash-nav{display:flex;flex-direction:column;gap:2px;flex:1;}
-.dash-nav-item{display:flex;align-items:center;gap:12px;padding:9px 12px;border-radius:7px;color:var(--text-muted);font-size:13.5px;font-weight:500;text-decoration:none;transition:background 0.12s ease, color 0.12s ease;}
-.dash-nav-item:hover{background:var(--bg-2);color:var(--text);}
-.dash-nav-item.active{background:rgba(201,168,76,0.12);color:var(--gold);}
-.dash-nav-item.active .dash-nav-icon{color:var(--gold);}
-.dash-nav-icon{display:inline-flex;color:var(--text-sub);}
-.dash-nav-item:hover .dash-nav-icon{color:var(--text-muted);}
-.dash-nav-admin{margin-top:14px;border-top:1px solid var(--border-soft);padding-top:14px;}
 
-.dash-user{margin-top:auto;padding:14px 8px;border-top:1px solid var(--border-soft);display:flex;align-items:center;gap:10px;}
-.dash-user-avatar{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--gold),#7A6532);color:var(--bg);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;flex-shrink:0;}
-.dash-user-meta{flex:1;min-width:0;}
-.dash-user-name{font-size:13px;font-weight:600;color:var(--text);line-height:1.2;}
-.dash-user-sub{display:flex;align-items:center;gap:6px;margin-top:3px;font-size:11px;color:var(--text-muted);}
-.dash-user-email{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:120px;}
-.dash-logout{background:transparent;border:1px solid var(--border-soft);color:var(--text-muted);padding:7px;border-radius:6px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:border 0.15s ease, color 0.15s ease;}
-.dash-logout:hover{border-color:var(--gold);color:var(--gold);}
 
 /* mobile */
-.dash-mobile-toggle{display:none;}
-.dash-overlay{display:none;}
 
 /* ===== Main content ===== */
 .dash-content{max-width:1280px;margin:0 auto;}
@@ -177,12 +154,6 @@
 
 @media(max-width:768px){
   .dash-shell{flex-direction:column;}
-  .dash-sidebar{position:fixed;left:0;top:0;height:100vh;width:280px;z-index:60;transform:translateX(-100%);transition:transform 0.25s ease;box-shadow:0 0 40px rgba(0,0,0,0.6);}
-  .dash-sidebar.open{transform:translateX(0);}
-  .dash-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.55);opacity:0;pointer-events:none;transition:opacity 0.2s ease;z-index:55;}
-  .dash-overlay.visible{opacity:1;pointer-events:auto;display:block;}
-  .dash-mobile-toggle{display:flex;flex-direction:column;justify-content:center;gap:4px;position:fixed;top:18px;right:18px;width:42px;height:42px;background:var(--bg-2);border:1px solid var(--border);border-radius:8px;z-index:50;cursor:pointer;padding:0 11px;}
-  .dash-mobile-toggle span{display:block;width:18px;height:2px;background:var(--text);border-radius:1px;}
   .dash-main{padding:62px 20px 48px;}
   .dash-page-head{flex-direction:column;}
   .dash-page-head .dash-cta{align-self:flex-start;}
@@ -197,9 +168,6 @@
 }
 
 /* ===== Sidebar nav sections ===== */
-.dash-nav-section{margin-bottom:14px;}
-.dash-nav-section:last-child{margin-bottom:0;}
-.dash-nav-section-label{font-size:10px;letter-spacing:0.18em;text-transform:uppercase;color:var(--text-sub);padding:8px 12px 4px;font-weight:600;}
 
 /* ===== Add Accounts page (slider + tiers + includes) ===== */
 .slider-card{padding:28px 28px 24px;}
@@ -407,8 +375,6 @@
 .ns-cta:hover{transform:translateY(-1px);}
 
 /* ===== Sidebar profile chip = clickable link to /dashboard/settings ===== */
-.dash-user-link{display:flex;align-items:center;gap:10px;flex:1;min-width:0;text-decoration:none;color:inherit;padding:6px;border-radius:8px;transition:background 0.15s ease;}
-.dash-user-link:hover{background:rgba(201,168,76,0.08);}
 
 /* ===== Add Accounts: clickable tier boxes + green savings highlight ===== */
 .tier-box-clickable{cursor:pointer;border:1px solid var(--border);background:var(--bg);text-align:left;font-family:inherit;color:inherit;width:100%;padding:14px;border-radius:6px;transition:border-color 0.2s ease, background 0.2s ease, transform 0.15s ease;}
@@ -671,7 +637,7 @@
 }
 
 /* ===== Sidebar (Aragon reference layout) — flush, profile-on-top ===== */
-.dash-sidebar{display:flex;flex-direction:column;}
+.dash-sidebar{width:240px;background:var(--bg);border-right:1px solid var(--border);display:flex;flex-direction:column;flex-shrink:0;position:sticky;top:0;align-self:flex-start;max-height:100vh;overflow-y:auto;}
 .dash-brand{display:flex;align-items:center;gap:10px;padding:18px 16px 14px;border-bottom:1px solid var(--border);}
 .dash-brand-name{font-family:'Inter Tight',sans-serif;font-weight:700;font-size:14px;color:var(--gold);letter-spacing:0.04em;}
 .dash-brand-sub{font-size:9px;color:var(--text-sub);letter-spacing:0.18em;text-transform:uppercase;margin-top:2px;}
