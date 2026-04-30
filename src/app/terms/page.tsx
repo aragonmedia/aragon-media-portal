@@ -148,11 +148,17 @@ export default function TermsPage() {
           <p>
             After the AM team confirms verification, you will be prompted to click-to-sign
             the Operations Agreement inside the Portal. Until you sign, your Withdrawal
-            Form remains locked. The signed agreement records the timestamp, your IP
-            address, browser/device fingerprint, and the contract version, and is the
-            controlling document for the commercial relationship. These Terms continue to
-            apply alongside the Operations Agreement; if there is a conflict, the
-            Operations Agreement controls.
+            Form remains locked. The signed agreement records your signature, the
+            timestamp, and the contract version, and is the controlling document for the
+            commercial relationship.
+          </p>
+          <p>
+            The Operations Agreement is <strong>mutually binding</strong>: it secures
+            your right to be paid out the commission balance owed to you (after the
+            agreed fee), and it secures Aragon Media&apos;s right to collect that fee on
+            commissions earned through accounts we have verified. Both parties&apos;
+            obligations live in this document. These Terms continue to apply alongside it;
+            if there is a conflict, the Operations Agreement controls.
           </p>
         </section>
 

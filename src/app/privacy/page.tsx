@@ -45,7 +45,7 @@ export default function PrivacyPage() {
             <li><strong>TikTok login credentials</strong> (when you submit them on an order): email/phone, password. Encrypted at rest in our database.</li>
             <li><strong>Payment references:</strong> Square payment ID, amount, tier, fee snapshot. We never see your full card number — Square handles that on their hosted checkout.</li>
             <li><strong>Withdrawal-form submissions:</strong> withdrawal amount, date, source account, screenshot proof, your bank or payout details (so we can pay you).</li>
-            <li><strong>Contract audit log:</strong> when you click-to-sign the operations agreement, we record the timestamp, your IP address, browser/device fingerprint, and the contract version you signed. This is required to make the contract legally enforceable.</li>
+            <li><strong>Contract audit log:</strong> when you click-to-sign the operations agreement, we record your signature, the timestamp, and the contract version. This is required to make the agreement legally enforceable for both parties.</li>
             <li><strong>Chat messages</strong> between you and the Aragon Media team inside the Portal.</li>
             <li><strong>Operational metadata:</strong> session tokens (hashed), one-time verification codes (hashed, 15-minute TTL), basic request logs from Vercel.</li>
           </ul>
@@ -62,15 +62,16 @@ export default function PrivacyPage() {
 
         <section className="legal-section">
           <h2 className="legal-h2"><span className="legal-h2-num">03</span>Where it lives</h2>
-          <p>Creator data is stored across a small set of trusted infrastructure providers:</p>
+          <p>Creator data is stored on infrastructure operated and overseen by Aragon Media:</p>
           <ul>
-            <li><strong>Database:</strong> Postgres on Neon (US East). All TikTok credentials are encrypted at rest.</li>
-            <li><strong>File uploads</strong> (e.g., screenshot proofs on withdrawal forms): Cloudflare R2.</li>
-            <li><strong>App hosting:</strong> Vercel (edge + serverless functions, US regions).</li>
-            <li><strong>Transactional email</strong> (verification codes, receipts): Resend.</li>
-            <li><strong>Payments:</strong> Square (PCI-DSS Level 1 certified).</li>
-            <li><strong>TikTok Shop API:</strong> we exchange OAuth tokens with TikTok Shop Partner Center to read your shop&apos;s GMV and order data on your behalf. We never gain write access to your TikTok account.</li>
+            <li><strong>Account &amp; portal data</strong> sits in our managed database, hosted in the United States. TikTok credentials are encrypted at rest.</li>
+            <li><strong>File uploads</strong> (such as screenshot proofs on withdrawal forms) are stored on object storage tied to Aragon Media&apos;s operations.</li>
+            <li><strong>App hosting</strong> runs on US-based serverless infrastructure under Aragon Media&apos;s control.</li>
+            <li><strong>Transactional email</strong> (verification codes, receipts, payout confirmations) is sent through a vetted email provider.</li>
+            <li><strong>Payments</strong> are processed through a PCI-DSS-certified payment provider; we never see your full card number.</li>
+            <li><strong>TikTok Shop integration</strong> uses standard OAuth tokens scoped to read your shop&apos;s GMV and order data on your behalf. We never gain write access to your TikTok account.</li>
           </ul>
+          <p>Specific vendor names are intentionally not listed here; if you need a current list of subprocessors for due-diligence purposes, email us and we&apos;ll share one privately.</p>
         </section>
 
         <section className="legal-section">
@@ -118,7 +119,7 @@ export default function PrivacyPage() {
           <h2 className="legal-h2"><span className="legal-h2-num">07</span>Retention</h2>
           <ul>
             <li><strong>Account + chat history:</strong> retained as long as your relationship with Aragon Media is active, plus 24 months after offboarding (for tax + dispute records).</li>
-            <li><strong>TikTok credentials:</strong> can be deleted by you at any time from the Portal. Otherwise retained while your TikTok account is under management.</li>
+            <li><strong>TikTok credentials:</strong> retained while your TikTok account is under management. You can render any stored credentials useless at any time by changing your TikTok password (which we strongly recommend after verification completes).</li>
             <li><strong>Withdrawal-form records:</strong> retained for 7 years (tax recordkeeping).</li>
             <li><strong>Verification codes + session tokens:</strong> auto-purged after expiry (15 minutes / 30 days respectively).</li>
             <li><strong>Server logs:</strong> 30 days on Vercel, then auto-rotated.</li>
