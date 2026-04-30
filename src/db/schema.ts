@@ -23,6 +23,7 @@ import {
   pgEnum,
   index,
   uniqueIndex,
+  date,
 } from "drizzle-orm/pg-core";
 
 // ===== Enums =====
@@ -64,6 +65,7 @@ export const withdrawalStatusEnum = pgEnum("withdrawal_status", [
   "approved",
   "paid",
   "rejected",
+  "late_retained",
 ]);
 
 // ===== users =====
@@ -186,6 +188,7 @@ export const messages = pgTable(
 // ===== withdrawals =====
 export const withdrawals = pgTable("withdrawals", {
   id: uuid("id").defaultRandom().primaryKey(),
+  receiptNumber: varchar("receipt_number", { length: 20 }).notNull().unique(),
   userId: uuid("user_id")
     .references(() => users.id, { onDelete: "set null" })
     .notNull(),
@@ -196,6 +199,8 @@ export const withdrawals = pgTable("withdrawals", {
   feeCents: integer("fee_cents").notNull(),
   netCents: integer("net_cents").notNull(),
   status: withdrawalStatusEnum("status").default("requested").notNull(),
+  withdrawalDate: date("withdrawal_date"),
+  sourceAccount: varchar("source_account", { length: 200 }),
   payoutMethod: varchar("payout_method", { length: 50 }),
   payoutRef: varchar("payout_ref", { length: 200 }),
   notes: text("notes"),

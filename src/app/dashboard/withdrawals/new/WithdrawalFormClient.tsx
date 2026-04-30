@@ -1,5 +1,6 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 const PAYOUT_METHODS = [
@@ -20,10 +21,13 @@ export default function WithdrawalFormClient({
   accounts: { id: string; label: string; status: string }[];
   gated: boolean;
 }) {
+  const router = useRouter();
   const [email, setEmail] = useState(userEmail);
   const [name, setName] = useState(userName);
   const [accountId, setAccountId] = useState(accounts[0]?.id ?? "");
   const [amount, setAmount] = useState("");
+  const [withdrawalDate, setWithdrawalDate] = useState("");
+  const [sourceAccount, setSourceAccount] = useState("");
   const [payoutMethod, setPayoutMethod] = useState("");
   const [bankDetails, setBankDetails] = useState("");
   const [notes, setNotes] = useState("");
@@ -45,11 +49,45 @@ export default function WithdrawalFormClient({
       return;
     }
     setSubmitting(true);
-    // Real wire-up comes next round when /api/withdrawals POST exists
-    setTimeout(() => {
-      setMsg({ kind: "ok", text: "Submitted. AM team will review and process Mon–Fri. (Backend wire-up coming next round.)" });
+    try {
+      const res = await fetch("/api/withdrawals/submit", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({
+          accountId,
+          amount,
+          withdrawalDate,
+          sourceAccount,
+          payoutMethod,
+          bankDetails,
+          notes,
+          fileName,
+        }),
+      });
+      const json = (await res.json()) as {
+        ok: boolean;
+        error?: string;
+        redirect?: string;
+        receiptNumber?: string;
+      };
+      if (!res.ok || !json.ok || !json.redirect) {
+        const errMap: Record<string, string> = {
+          unauthorized: "Your session expired. Please sign in again.",
+          invalid_amount: "Enter a withdrawal amount greater than $0.",
+          invalid_withdrawal_date: "Pick the date you withdrew from TikTok.",
+          missing_source_account: "Tell us which Aragon account it came from.",
+          missing_payout_method: "Choose a payout method.",
+        };
+        setMsg({ kind: "err", text: errMap[json.error ?? ""] ?? `Submission failed${json.error ? ` (${json.error})` : ""}.` });
+        setSubmitting(false);
+        return;
+      }
+      setMsg({ kind: "ok", text: `Submitted as ${json.receiptNumber}. Redirecting to your receipt…` });
+      router.push(json.redirect);
+    } catch (err) {
+      setMsg({ kind: "err", text: `Network error — ${err instanceof Error ? err.message : "try again"}.` });
       setSubmitting(false);
-    }, 700);
+    }
   }
 
   return (
@@ -80,6 +118,19 @@ export default function WithdrawalFormClient({
           <span>Amount Withdrawn *</span>
           <input className="settings-input" type="text" value={amount} onChange={(e) => setAmount(e.target.value)} placeholder="$0.00" required />
           <span className="field-note">Exact amount shown on your TikTok withdrawal screen</span>
+        </label>
+      </div>
+
+      <div className="form-grid">
+        <label>
+          <span>Date Withdrawn from TikTok *</span>
+          <input className="settings-input" type="date" value={withdrawalDate} onChange={(e) => setWithdrawalDate(e.target.value)} required />
+          <span className="field-note">The date you initiated the withdrawal in TikTok Shop. Required to enforce the 48-hour window.</span>
+        </label>
+        <label>
+          <span>Aragon Source Account *</span>
+          <input className="settings-input" type="text" value={sourceAccount} onChange={(e) => setSourceAccount(e.target.value)} placeholder="Which Aragon Media account it landed in" required />
+          <span className="field-note">If unsure, name the bank or write the last 4 digits the AM team shared with you.</span>
         </label>
       </div>
 

@@ -707,3 +707,37 @@
   .dash-overlay.visible{opacity:1;pointer-events:auto;}
   .dash-main{padding-top:72px;}
 }
+
+/* ===== Withdrawal receipt page ===== */
+.rcpt-card{padding:36px 32px;display:flex;flex-direction:column;gap:28px;}
+.rcpt-head{display:flex;justify-content:space-between;align-items:flex-start;gap:18px;flex-wrap:wrap;}
+.rcpt-num-eyebrow{font-size:10px;letter-spacing:0.22em;text-transform:uppercase;color:var(--text-sub);font-weight:600;margin-bottom:6px;}
+.rcpt-num{font-family:'Inter Tight',sans-serif;font-size:26px;font-weight:700;letter-spacing:0.04em;color:var(--gold);}
+.rcpt-pill{display:inline-flex;align-items:center;gap:6px;padding:6px 14px;border-radius:999px;font-size:11px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;border:1px solid var(--border);}
+.rcpt-pill-pending{background:rgba(201,168,76,0.08);color:var(--gold);border-color:rgba(201,168,76,0.35);}
+.rcpt-pill-approved{background:rgba(201,168,76,0.12);color:var(--gold);border-color:rgba(201,168,76,0.45);}
+.rcpt-pill-paid{background:rgba(31,139,83,0.12);color:var(--green);border-color:rgba(31,139,83,0.45);}
+.rcpt-pill-late{background:rgba(199,79,79,0.10);color:#C74F4F;border-color:rgba(199,79,79,0.45);}
+.rcpt-pill-rejected{background:rgba(199,79,79,0.10);color:#C74F4F;border-color:rgba(199,79,79,0.45);}
+.rcpt-amount-row{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;background:var(--bg-deep);border:1px solid var(--border);padding:20px 24px;}
+.rcpt-amount-block{display:flex;flex-direction:column;gap:6px;}
+.rcpt-amt-label{font-size:11px;letter-spacing:0.16em;text-transform:uppercase;color:var(--text-sub);font-weight:600;}
+.rcpt-amt-value{font-family:'Inter Tight',sans-serif;font-size:22px;font-weight:700;color:var(--text);letter-spacing:-0.01em;}
+.rcpt-amt-fee{color:var(--text-muted);}
+.rcpt-amt-net{color:var(--green);}
+.rcpt-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:18px 32px;}
+.rcpt-field{display:flex;flex-direction:column;gap:6px;padding-bottom:14px;border-bottom:1px solid var(--border-soft);}
+.rcpt-field-label{font-size:10px;letter-spacing:0.16em;text-transform:uppercase;color:var(--text-sub);font-weight:600;}
+.rcpt-field-value{font-size:14px;color:var(--text);font-weight:500;}
+.rcpt-notes{display:flex;flex-direction:column;gap:8px;}
+.rcpt-notes-body{font-family:'Inter',sans-serif;font-size:13px;line-height:1.7;color:var(--text-muted);background:var(--bg-deep);border:1px solid var(--border);padding:14px 16px;white-space:pre-wrap;word-break:break-word;margin:0;}
+.rcpt-callout{padding:14px 18px;background:rgba(201,168,76,0.06);border:1px solid rgba(201,168,76,0.25);border-left:2px solid var(--gold);font-size:13px;line-height:1.7;color:var(--text-muted);}
+.rcpt-callout strong{color:var(--text);}
+.rcpt-callout code{font-family:'JetBrains Mono','Menlo',monospace;background:var(--bg-deep);color:var(--gold);padding:2px 8px;border-radius:4px;font-size:12px;}
+.rcpt-actions{display:flex;gap:12px;flex-wrap:wrap;}
+@media(max-width:680px){
+  .rcpt-card{padding:24px 18px;}
+  .rcpt-amount-row{grid-template-columns:1fr;padding:18px;}
+  .rcpt-grid{grid-template-columns:1fr;}
+  .rcpt-num{font-size:22px;}
+}
