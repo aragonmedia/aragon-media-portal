@@ -1,4 +1,5 @@
 import Link from "next/link";
+import "../../dashboard/dashboard.css";
 
 export const dynamic = "force-static";
 
