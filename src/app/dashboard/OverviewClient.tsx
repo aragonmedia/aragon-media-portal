@@ -6,36 +6,39 @@ import { useState, useRef, useEffect } from "react";
 
 const STEP_LABELS = [
   "", // 0 unused
-  "Payment\nconfirmed",
+  "Activate\n1st account",
   "Account\ncreated",
   "Submit\nlogin info",
   "AM verifies\naccount",
   "Start selling\non TikTok",
   "Contact AM\nfor payouts",
   "Withdrawal\nform live",
+  "Receive your\n1st payment!",
 ];
 
 const STEP_STATUSES = [
   "",
-  "Step 1 of 7 — Pay activation fee to get started",
-  "Step 2 of 7 — Create your portal account",
-  "Step 3 of 7 — Submit your login credentials below to continue",
-  "Step 4 of 7 — AM team is verifying your TikTok account (up to 24hrs)",
-  "Step 5 of 7 — Your account is verified! Start selling on TikTok Shop",
-  "Step 6 of 7 — Earning commissions? Contact AM to set up your payouts",
-  "Step 7 of 7 — Withdrawal form is now live. Submit anytime Mon–Fri",
+  "Step 1 of 8 — Activate your first TikTok account to begin verification",
+  "Step 2 of 8 — Create your portal account",
+  "Step 3 of 8 — Submit your login credentials below to continue",
+  "Step 4 of 8 — AM team is verifying your TikTok account (up to 24hrs)",
+  "Step 5 of 8 — Your account is verified! Start selling on TikTok Shop",
+  "Step 6 of 8 — Earning commissions? Contact AM to set up your payouts",
+  "Step 7 of 8 — Withdrawal form is now live. Submit anytime Mon–Fri",
+  "Step 8 of 8 — All set. Your first payment is on its way!",
 ];
 
 const PCTS = [0, 12, 25, 37, 50, 62, 75, 87, 100];
 
 const CHECKLIST = [
-  { id: 1, title: "Pay $100 activation fee", sub: "Square · Confirmed" },
+  { id: 1, title: "Activate 1st account", sub: "$100 via Square · secure checkout" },
   { id: 2, title: "Create portal account", sub: "Email verified" },
   { id: 3, title: "Submit TikTok login to AM", sub: "Use the form in chat" },
   { id: 4, title: "AM team verifies account", sub: "Up to 24hrs" },
   { id: 5, title: "Start selling on TikTok Shop", sub: "Promote & earn commissions" },
   { id: 6, title: "Contact AM for payout setup", sub: "Final step before withdrawals" },
   { id: 7, title: "Withdrawal form unlocked", sub: "Submit per withdrawal · Mon–Fri" },
+  { id: 8, title: "Receive your 1st payment!", sub: "Funds land in your bank Mon–Fri" },
 ];
 
 type Msg = { who: "am" | "me" | "sys"; name?: string; text: string };

@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 
 type StatKey = "gmv" | "comm" | "orders" | "videos";
 type Account = "all" | "main" | "beauty" | "pets";
@@ -68,6 +68,8 @@ const STAT_TONE: Record<StatKey, string> = {
 export default function GmvPreviewClient() {
   const [account, setAccount] = useState<Account>("all");
   const [statFocus, setStatFocus] = useState<StatKey>("gmv");
+  const [hoverIdx, setHoverIdx] = useState<number | null>(null);
+  const svgRef = useRef<SVGSVGElement>(null);
 
   const series = SERIES[account];
   const totals = useMemo(() => ({
@@ -81,7 +83,41 @@ export default function GmvPreviewClient() {
   const W = 500, H = 174;
   const focusData = series[statFocus];
   const max = Math.max(...focusData) * 1.1;
-  const overlay = statFocus === "gmv" ? series.comm : null;
+  const dx = W / (focusData.length - 1);
+  const overlay: number[] | null = statFocus === "gmv" ? series.comm : null;
+
+  function handleMove(e: React.MouseEvent<SVGSVGElement>) {
+    const svg = svgRef.current;
+    if (!svg) return;
+    const pt = svg.createSVGPoint();
+    pt.x = e.clientX;
+    pt.y = e.clientY;
+    const ctm = svg.getScreenCTM();
+    if (!ctm) return;
+    const local = pt.matrixTransform(ctm.inverse());
+    const idx = Math.round(local.x / dx);
+    const clamped = Math.max(0, Math.min(focusData.length - 1, idx));
+    setHoverIdx(clamped);
+  }
+  function handleLeave() { setHoverIdx(null); }
+
+  // Helper for hover indicator coordinates
+  const hoverX = hoverIdx != null ? hoverIdx * dx : 0;
+  const hoverYFocus = hoverIdx != null ? H - (focusData[hoverIdx] / max) * H : 0;
+  const hoverYOverlay = hoverIdx != null && overlay ? H - (overlay[hoverIdx] / max) * H : 0;
+
+  // Date label for tooltip
+  const today = new Date();
+  function dateLabel(idx: number): string {
+    const d = new Date(today);
+    d.setDate(d.getDate() - (focusData.length - 1 - idx));
+    return d.toLocaleDateString("en-US", { month: "short", day: "numeric" });
+  }
+  function fmtVal(v: number, key: StatKey): string {
+    if (key === "videos") return `${Math.round(v)}`;
+    if (key === "orders") return `${Math.round(v).toLocaleString()}`;
+    return `$${Math.round(v).toLocaleString()}`;
+  }
 
   const focusPath = pathFromSeries(focusData, W, H, max);
   const focusFill = areaFromSeries(focusData, W, H, max);
@@ -167,7 +203,7 @@ export default function GmvPreviewClient() {
             <span>$0</span>
           </div>
           <div className="chart-plot">
-            <svg width="100%" height="100%" viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="none" style={{ overflow: "visible" }}>
+            <svg ref={svgRef} width="100%" height="100%" viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="none" style={{ overflow: "visible", cursor: "crosshair" }} onMouseMove={handleMove} onMouseLeave={handleLeave}>
               <defs>
                 <linearGradient id="gFocus" x1="0" y1="0" x2="0" y2="1">
                   <stop offset="0%" stopColor={focusColor} stopOpacity="0.3" />
@@ -190,7 +226,31 @@ export default function GmvPreviewClient() {
               {/* lines */}
               <path d={focusPath} fill="none" stroke={focusColor} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
               {overlayPath && <path d={overlayPath} fill="none" stroke="#3DCF82" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />}
+              {hoverIdx != null && (
+                <>
+                  <line x1={hoverX} y1="0" x2={hoverX} y2={H} stroke="rgba(255,255,255,0.18)" strokeWidth="1" strokeDasharray="3,3" />
+                  <circle cx={hoverX} cy={hoverYFocus} r="5" fill={focusColor} stroke="#0F0F0F" strokeWidth="2" />
+                  {overlay && (<circle cx={hoverX} cy={hoverYOverlay} r="4" fill="#3DCF82" stroke="#0F0F0F" strokeWidth="2" />)}
+                </>
+              )}
             </svg>
+            {hoverIdx != null && (
+              <div className="chart-tooltip" style={{ left: `${(hoverX / W) * 100}%` }}>
+                <div className="chart-tooltip-date">{dateLabel(hoverIdx)}</div>
+                <div className="chart-tooltip-row">
+                  <span className="chart-tooltip-dot" style={{ background: focusColor }} />
+                  <span className="chart-tooltip-label">{STAT_LABEL[statFocus]}</span>
+                  <span className="chart-tooltip-val" style={{ color: focusColor }}>{fmtVal(focusData[hoverIdx], statFocus)}</span>
+                </div>
+                {overlay && (
+                  <div className="chart-tooltip-row">
+                    <span className="chart-tooltip-dot" style={{ background: "#3DCF82" }} />
+                    <span className="chart-tooltip-label">Commission</span>
+                    <span className="chart-tooltip-val" style={{ color: "#3DCF82" }}>{fmtVal(overlay[hoverIdx], "comm")}</span>
+                  </div>
+                )}
+              </div>
+            )}
           </div>
         </div>
         <div className="chart-x-axis">
