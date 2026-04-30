@@ -156,6 +156,14 @@ export default function SigninPage() {
           </form>
         </section>
       )}
+      <footer className="mini-legal-footer">
+        <Link href="/privacy">Privacy</Link>
+        <span className="dot">·</span>
+        <Link href="/terms">Terms</Link>
+        <span className="dot">·</span>
+        <Link href="/">Home</Link>
+      </footer>
     </main>
+
   );
 }

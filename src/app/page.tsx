@@ -467,6 +467,8 @@ export default function Home() {
           <Link href="/signin">Sign in</Link>
           <Link href="/signup">Sign up</Link>
           <Link href="/book-a-demo">Book a Demo</Link>
+          <Link href="/privacy">Privacy</Link>
+          <Link href="/terms">Terms</Link>
         </nav>
         <div className="footer-meta">
           <strong>&copy; 2025 Aragon Media</strong>

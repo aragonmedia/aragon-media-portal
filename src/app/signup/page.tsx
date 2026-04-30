@@ -236,8 +236,8 @@ export default function SignupPage() {
 
             <p className="auth-legal">
               By continuing you agree to the{" "}
-              <a href="#" className="auth-legal-link">Terms of Service</a> and{" "}
-              <a href="#" className="auth-legal-link">Privacy Policy</a>. Aragon Media will never share
+              <a href="/terms" className="auth-legal-link">Terms of Service</a> and{" "}
+              <a href="/privacy" className="auth-legal-link">Privacy Policy</a>. Aragon Media will never share
               your info or post to your accounts without permission.
             </p>
           </form>

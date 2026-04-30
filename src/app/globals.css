@@ -491,3 +491,41 @@ footer{position:relative;align-items:center;}
 /* ===== Journey step-1 SIGN UP HERE CTA — fixed width, centered ===== */
 .journey-cta{display:block;width:fit-content;min-width:180px;max-width:220px;margin:18px auto 0;padding:11px 24px;background:var(--gold);color:var(--black);font-family:'Inter Tight',sans-serif;font-weight:800;font-size:13px;letter-spacing:0.14em;text-transform:uppercase;text-align:center;text-decoration:none;border-radius:6px;transition:transform 0.15s ease, box-shadow 0.15s ease;}
 .journey-cta:hover{transform:translateY(-1px);box-shadow:0 8px 22px -10px rgba(201,168,76,0.55);}
+
+
+/* ===== Legal pages (/privacy, /terms) ===== */
+.legal-page{min-height:100vh;background:var(--black);color:var(--text);padding:0;}
+.legal-topbar{display:flex;align-items:center;justify-content:space-between;padding:22px 36px;border-bottom:1px solid var(--border);background:var(--black);position:sticky;top:0;z-index:5;}
+.legal-topbar .logo{font-size:14px;letter-spacing:0.04em;}
+.legal-topbar .logo span{font-size:9px;letter-spacing:0.18em;}
+.legal-topbar-nav{display:flex;align-items:center;gap:18px;font-size:13px;}
+.legal-topbar-nav a{color:var(--text-muted);text-decoration:none;font-weight:500;transition:color 0.15s ease;}
+.legal-topbar-nav a:hover,.legal-topbar-nav a.active{color:var(--gold);}
+.legal-shell{max-width:780px;margin:0 auto;padding:64px 32px 96px;}
+.legal-eyebrow{font-family:'Inter Tight',sans-serif;font-size:11px;letter-spacing:0.22em;text-transform:uppercase;color:var(--gold);font-weight:700;margin-bottom:14px;}
+.legal-h1{font-family:'Inter Tight',sans-serif;font-size:clamp(32px,4vw,44px);font-weight:700;letter-spacing:-0.02em;color:var(--text);margin-bottom:10px;line-height:1.15;}
+.legal-effective{font-size:12px;color:var(--text-sub);letter-spacing:0.04em;margin-bottom:38px;}
+.legal-intro{font-size:15px;line-height:1.75;color:var(--text-muted);margin-bottom:42px;font-weight:300;border-left:2px solid var(--gold);padding-left:18px;}
+.legal-section{margin-bottom:38px;}
+.legal-h2{font-family:'Inter Tight',sans-serif;font-size:18px;font-weight:700;letter-spacing:-0.005em;color:var(--text);margin-bottom:12px;display:flex;align-items:baseline;gap:10px;}
+.legal-h2-num{font-family:'Inter Tight',sans-serif;font-size:11px;letter-spacing:0.2em;color:var(--gold);font-weight:700;min-width:28px;}
+.legal-section p{font-size:14px;line-height:1.75;color:var(--text-muted);margin-bottom:10px;font-weight:300;}
+.legal-section p strong{color:var(--text);font-weight:600;}
+.legal-section ul{list-style:none;padding:0;margin:8px 0 12px;}
+.legal-section ul li{font-size:14px;line-height:1.75;color:var(--text-muted);padding:4px 0 4px 22px;position:relative;font-weight:300;}
+.legal-section ul li::before{content:"";position:absolute;left:0;top:14px;width:10px;height:1px;background:var(--gold);}
+.legal-callout{margin:14px 0;padding:14px 18px;border:1px solid var(--border);background:rgba(255,255,255,0.02);border-left:2px solid var(--gold);font-size:13px;line-height:1.7;color:var(--text-muted);}
+.legal-foot{margin-top:64px;padding-top:28px;border-top:1px solid var(--border);font-size:12px;color:var(--text-sub);line-height:1.7;display:flex;flex-direction:column;gap:6px;}
+.legal-foot a{color:var(--gold);text-decoration:none;}
+.legal-foot a:hover{text-decoration:underline;}
+@media(max-width:600px){
+  .legal-topbar{padding:16px 20px;flex-direction:column;gap:10px;align-items:flex-start;}
+  .legal-shell{padding:42px 20px 72px;}
+  .legal-h2{flex-direction:column;align-items:flex-start;gap:4px;}
+}
+
+/* Mini legal footer used on auth + book-a-demo pages */
+.mini-legal-footer{display:flex;justify-content:center;align-items:center;gap:14px;padding:24px 16px 32px;font-size:11px;letter-spacing:0.06em;color:var(--text-sub);}
+.mini-legal-footer a{color:var(--text-muted);text-decoration:none;transition:color 0.15s ease;}
+.mini-legal-footer a:hover{color:var(--gold);}
+.mini-legal-footer .dot{color:var(--border);}

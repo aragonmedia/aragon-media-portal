@@ -22,6 +22,14 @@ export default function BookDemoPage() {
           <Link href="/" className="btn-ghost">&larr; Back to home</Link>
         </div>
       </div>
+      <footer className="mini-legal-footer">
+        <Link href="/privacy">Privacy</Link>
+        <span className="dot">·</span>
+        <Link href="/terms">Terms</Link>
+        <span className="dot">·</span>
+        <Link href="/">Home</Link>
+      </footer>
     </main>
+
   );
 }

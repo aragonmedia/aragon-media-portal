@@ -152,6 +152,10 @@ function renderEmail({
               <a href="${PORTAL}/signup" style="color:#C9A84C !important;text-decoration:none !important;font-size:13px;font-weight:600;padding:0 14px;">Sign up</a>
               <span style="color:#5C5750;">·</span>
               <a href="${PORTAL}/book-a-demo" style="color:#C9A84C !important;text-decoration:none !important;font-size:13px;font-weight:600;padding:0 14px;">Book a Demo</a>
+              <span style="color:#5C5750;">·</span>
+              <a href="${PORTAL}/privacy" style="color:#C9A84C !important;text-decoration:none !important;font-size:13px;font-weight:600;padding:0 14px;">Privacy</a>
+              <span style="color:#5C5750;">·</span>
+              <a href="${PORTAL}/terms" style="color:#C9A84C !important;text-decoration:none !important;font-size:13px;font-weight:600;padding:0 14px;">Terms</a>
             </td>
           </tr>
           <tr>
@@ -199,6 +203,8 @@ function renderTextFallback({
     `  Sign in:      ${PORTAL}/signin`,
     `  Sign up:      ${PORTAL}/signup`,
     `  Book a demo:  ${PORTAL}/book-a-demo`,
+    `  Privacy:      ${PORTAL}/privacy`,
+    `  Terms:        ${PORTAL}/terms`,
     "",
     "Aragon Media",
     "1309 Coffeen Ave, Sheridan, WY 82801",
