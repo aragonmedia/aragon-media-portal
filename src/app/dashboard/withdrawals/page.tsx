@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { desc, eq } from "drizzle-orm";
 import { getCurrentUser } from "@/lib/auth/session";
 import { db } from "@/db";
@@ -18,6 +19,8 @@ export default async function WithdrawalsPage() {
     .where(eq(withdrawals.userId, user.id))
     .orderBy(desc(withdrawals.requestedAt));
 
+  const contractSigned = !!user.contractSignedAt;
+
   return (
     <main className="dash-content">
       <header className="dash-page-head">
@@ -28,22 +31,55 @@ export default async function WithdrawalsPage() {
         </div>
       </header>
 
+      {/* Withdrawal gateway: must talk to AM + sign contract before form opens */}
       <div className="dash-card">
         <div className="dash-card-head">
-          <h2>Request a withdrawal</h2>
-          <span className="dash-meta">Available USD goes here once your first commission lands.</span>
+          <h2>Unlock the withdrawal form</h2>
+          <span className={`mini-tag ${contractSigned ? "available" : "locked"}`}>{contractSigned ? "Contract signed" : "Locked"}</span>
         </div>
-        <div className="dash-empty">
-          <div className="dash-empty-body">The withdrawal request form opens once your first activated account has earnings to draw against. Until then this page just shows your history.</div>
+        <div className="withdraw-gate">
+          <div className="withdraw-gate-step">
+            <div className="withdraw-gate-num">1</div>
+            <div>
+              <div className="withdraw-gate-title">Open a chat with AM</div>
+              <div className="withdraw-gate-sub">Let the team know you have commissions ready to withdraw. They&apos;ll send the contract.</div>
+            </div>
+            <Link href="/dashboard/chat" className="dash-cta">Open chat with AM →</Link>
+          </div>
+          <div className="withdraw-gate-step">
+            <div className={`withdraw-gate-num${contractSigned ? " done" : ""}`}>{contractSigned ? "✓" : "2"}</div>
+            <div>
+              <div className="withdraw-gate-title">Sign the operations agreement</div>
+              <div className="withdraw-gate-sub">{contractSigned ? "Signed and on file." : "AM sends the contract once your earnings are verified. Sign once per account."}</div>
+            </div>
+            {contractSigned ? (
+              <span className="status-pill status-paid">Done</span>
+            ) : (
+              <Link href="/dashboard/contract" className="dash-cta ghost">Preview agreement →</Link>
+            )}
+          </div>
+          <div className="withdraw-gate-step">
+            <div className={`withdraw-gate-num${contractSigned ? "" : " locked"}`}>3</div>
+            <div>
+              <div className="withdraw-gate-title">Submit the withdrawal form</div>
+              <div className="withdraw-gate-sub">Upload your TikTok withdrawal screenshot, choose a payout method, and AM moves the money Mon to Fri.</div>
+            </div>
+            {contractSigned ? (
+              <Link href="/dashboard/withdrawals/new" className="dash-cta">Submit a withdrawal →</Link>
+            ) : (
+              <span className="mini-tag locked">Locked</span>
+            )}
+          </div>
         </div>
       </div>
 
       <div className="dash-card" style={{ marginTop: 16 }}>
         <div className="dash-card-head">
           <h2>History</h2>
+          <span className="dash-meta">Every payout request lives here for your records.</span>
         </div>
         {list.length === 0 ? (
-          <div className="dash-empty"><div className="dash-empty-body">No withdrawals yet.</div></div>
+          <div className="dash-empty"><div className="dash-empty-body">No withdrawals yet. Once your form is submitted it shows up here in real time.</div></div>
         ) : (
           <table className="dash-table">
             <thead>

@@ -9,25 +9,21 @@ const SQUARE_LINKS: Record<number, string> = {
   4: "https://square.link/u/oU70xlPo",
 };
 
-function priceEach(n: number): number {
-  if (n <= 3) return 100;
-  if (n <= 4) return 125;
-  return 150;
-}
-function tier(n: number): { label: string; cls: string; idx: 1 | 2 | 3 } {
+// Bundle pricing matches landing-page model: 1=$100, 2=$225, 3=$350, 4=$475
+const BUNDLE_PRICE: Record<number, number> = { 1: 100, 2: 225, 3: 350, 4: 475 };
+
+function tier(n: number): { label: string; cls: string; idx: 1 | 2 } {
   if (n <= 3) return { label: "Standard rate", cls: "tier1", idx: 1 };
-  if (n <= 4) return { label: "Volume rate", cls: "tier2", idx: 2 };
-  return { label: "Premium rate", cls: "tier3", idx: 3 };
+  return { label: "Best offer · 14% off", cls: "tier2", idx: 2 };
 }
 
 export default function AddAccountPage() {
   const [count, setCount] = useState(1);
-  const each = priceEach(count);
-  const total = each * count;
+  const total = BUNDLE_PRICE[count];
+  const each = Math.round(total / count);
   const t = tier(count);
-  const pct = Math.round(((count - 1) / 7) * 100);
-  // Map count to existing Square links for first 4 tiers; for >4 default to highest
-  const checkoutUrl = SQUARE_LINKS[Math.min(count, 4)];
+  const pct = Math.round(((count - 1) / 3) * 100);
+  const checkoutUrl = SQUARE_LINKS[count];
 
   return (
     <main className="dash-content">
@@ -40,8 +36,8 @@ export default function AddAccountPage() {
             <em>multiply your reach.</em>
           </h1>
           <p className="dash-page-sub">
-            Add more TikTok accounts to your portal and have each one verified
-            and managed by the AM team — all tracked from one dashboard.
+            Add up to 4 TikTok accounts per cycle. Each one gets full AM team
+            verification, its own dashboard, and individual GMV tracking.
           </p>
         </div>
       </header>
@@ -64,7 +60,7 @@ export default function AddAccountPage() {
           <input
             type="range"
             min={1}
-            max={8}
+            max={4}
             step={1}
             value={count}
             onChange={(e) => setCount(parseInt(e.target.value))}
@@ -73,36 +69,31 @@ export default function AddAccountPage() {
             }}
             className="add-slider"
           />
-          <div className="tier-markers">
-            {[1, 2, 3, 4, 5, 6, 7, 8].map((n) => (
+          <div className="tier-markers tier-markers-4">
+            {[1, 2, 3, 4].map((n) => (
               <div className="tier-mark" key={n}>
                 <strong>{n}</strong>
-                {n === 1 ? "acct" : n === 8 ? "accts" : ""}
+                {n === 1 ? "Account" : "Accounts"}
               </div>
             ))}
           </div>
         </div>
 
-        <div className="tier-breakdown">
+        <div className="tier-breakdown tier-breakdown-2">
           <div className={`tier-box${t.idx === 1 ? " active-tier" : ""}`}>
             <div className="tier-box-top">Tier 1 · 1–3 accounts</div>
             <div className="tier-box-price">$100 <span>/ account</span></div>
             <div className="tier-box-sub">Standard activation rate</div>
           </div>
           <div className={`tier-box${t.idx === 2 ? " active-tier" : ""}`}>
-            <div className="tier-box-top">Tier 2 · 4 accounts</div>
-            <div className="tier-box-price">$125 <span>/ account</span></div>
-            <div className="tier-box-sub">Volume — expanded ops</div>
-          </div>
-          <div className={`tier-box${t.idx === 3 ? " active-tier" : ""}`}>
-            <div className="tier-box-top">Tier 3 · 5+ accounts</div>
-            <div className="tier-box-price">$150 <span>/ account</span></div>
-            <div className="tier-box-sub">Premium — full management</div>
+            <div className="tier-box-top">Tier 2 · 4-account bundle</div>
+            <div className="tier-box-price">$475 <span>total</span></div>
+            <div className="tier-box-sub">Best offer · save vs incremental</div>
           </div>
         </div>
 
         <div className="includes-list">
-          <div className="inc-item">Full AM team activation per account — within 24 hours each</div>
+          <div className="inc-item">Full AM team activation per account, within 24 hours each</div>
           <div className="inc-item">Dedicated chat channel per account inside your portal</div>
           <div className="inc-item">Individual GMV and revenue tracking per account</div>
           <div className="inc-item">Separate progress tracker and withdrawal form per account</div>
@@ -117,22 +108,24 @@ export default function AddAccountPage() {
       </div>
 
       <div className="dash-card">
-        <div className="sect-label">Why verify more accounts?</div>
-        <div className="why-section">
-          <div className="why-card">
-            <div className="why-num">01</div>
-            <h4>Multiple niches, multiple income streams</h4>
-            <p>Different TikTok accounts let you test different audiences, products, and content styles. Each one earns commissions independently.</p>
-          </div>
-          <div className="why-card">
-            <div className="why-num">02</div>
-            <h4>Protect your primary account</h4>
-            <p>If one account faces a restriction, your other verified accounts stay active and earning while AM resolves it on your behalf.</p>
-          </div>
-          <div className="why-card">
-            <div className="why-num">03</div>
-            <h4>All managed in one place</h4>
-            <p>Every account you verify shows up in this portal. Separate dashboards, one login, one AM team backing all of them.</p>
+        <div className="why-wrap-inner">
+          <div className="sect-label">Why verify more accounts?</div>
+          <div className="why-section">
+            <div className="why-card">
+              <div className="why-num">01</div>
+              <h4>Multiple niches, multiple income streams</h4>
+              <p>Different TikTok accounts let you test different audiences, products, and content styles. Each one earns commissions independently.</p>
+            </div>
+            <div className="why-card">
+              <div className="why-num">02</div>
+              <h4>Protect your primary account</h4>
+              <p>If one account faces a restriction, your other verified accounts stay active and earning while AM resolves it on your behalf.</p>
+            </div>
+            <div className="why-card">
+              <div className="why-num">03</div>
+              <h4>All managed in one place</h4>
+              <p>Every account you verify shows up in this portal. Separate dashboards, one login, one AM team backing all of them.</p>
+            </div>
           </div>
         </div>
       </div>
