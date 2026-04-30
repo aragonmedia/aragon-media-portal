@@ -80,16 +80,24 @@ export default function AddAccountPage() {
         </div>
 
         <div className="tier-breakdown tier-breakdown-2">
-          <div className={`tier-box${t.idx === 1 ? " active-tier" : ""}`}>
+          <button
+            type="button"
+            className={`tier-box tier-box-clickable${t.idx === 1 ? " active-tier" : ""}`}
+            onClick={() => setCount(1)}
+          >
             <div className="tier-box-top">Tier 1 · 1–3 accounts</div>
             <div className="tier-box-price">$100 <span>/ account</span></div>
             <div className="tier-box-sub">Standard activation rate</div>
-          </div>
-          <div className={`tier-box${t.idx === 2 ? " active-tier" : ""}`}>
+          </button>
+          <button
+            type="button"
+            className={`tier-box tier-box-clickable${t.idx === 2 ? " active-tier" : ""}`}
+            onClick={() => setCount(4)}
+          >
             <div className="tier-box-top">Tier 2 · 4-account bundle</div>
             <div className="tier-box-price">$475 <span>total</span></div>
-            <div className="tier-box-sub">Best offer · save vs incremental</div>
-          </div>
+            <div className="tier-box-sub tier-box-sub-green">Best offer · save 14% vs incremental</div>
+          </button>
         </div>
 
         <div className="includes-list">

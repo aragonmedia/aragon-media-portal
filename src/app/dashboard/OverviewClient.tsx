@@ -3,6 +3,8 @@
 import Link from "next/link";
 import { useState, useRef, useEffect } from "react";
 
+const SQUARE_FIRST_ACCOUNT = "https://square.link/u/2rfvqrD1";
+
 const STEP_LABELS = [
   "", // 0 unused
   "Payment\nconfirmed",
@@ -234,9 +236,15 @@ export default function OverviewClient({
                     <div className="ns-ttl">{item.title}</div>
                     <div className="ns-sub">{item.sub}</div>
                   </div>
-                  <span className={`ns-tag ${done ? "done" : active ? "active" : "locked"}`}>
-                    {done ? "Done" : active ? "Active" : "Locked"}
-                  </span>
+                  {active && item.id === 1 ? (
+                    <a href={SQUARE_FIRST_ACCOUNT} target="_blank" rel="noopener noreferrer" className="ns-cta">
+                      Activate now →
+                    </a>
+                  ) : (
+                    <span className={`ns-tag ${done ? "done" : active ? "active" : "locked"}`}>
+                      {done ? "Done" : active ? "Active" : "Locked"}
+                    </span>
+                  )}
                 </div>
               );
             })}
@@ -253,7 +261,7 @@ export default function OverviewClient({
               {step >= 7 ? "Unlocked" : "Locked — Complete steps first"}
             </span>
           </div>
-          <p>Once your account is verified and you&apos;ve earned commissions, submit a screenshot of your TikTok withdrawal screen here. AM processes payouts Mon to Fri.</p>
+          <p>Once you&apos;ve earned TikTok commissions, message the AM team in chat. They&apos;ll grant withdrawal access and send the operations agreement to sign once.</p>
           <Link
             href={step >= 7 ? "/dashboard/withdrawals" : "/dashboard/chat"}
             className={`mini-btn${step >= 7 ? "" : " ghost"}`}

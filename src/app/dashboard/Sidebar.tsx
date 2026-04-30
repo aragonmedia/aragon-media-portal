@@ -118,14 +118,16 @@ export default function Sidebar({
         </nav>
 
         <div className="dash-user">
-          <div className="dash-user-avatar">{initials}</div>
-          <div className="dash-user-meta">
-            <div className="dash-user-name">{userName}</div>
-            <div className="dash-user-sub">
-              <span className={`role-pill role-${userRole}`}>{userRole}</span>
-              <span className="dash-user-email" title={userEmail}>{userEmail}</span>
+          <Link href="/dashboard/settings" className="dash-user-link" onClick={() => setOpen(false)} title="Open settings">
+            <div className="dash-user-avatar">{initials}</div>
+            <div className="dash-user-meta">
+              <div className="dash-user-name">{userName}</div>
+              <div className="dash-user-sub">
+                <span className={`role-pill role-${userRole}`}>{userRole}</span>
+                <span className="dash-user-email" title={userEmail}>{userEmail}</span>
+              </div>
             </div>
-          </div>
+          </Link>
           <button onClick={logout} className="dash-logout" aria-label="Sign out" title="Sign out">
             <SignOutIcon />
           </button>

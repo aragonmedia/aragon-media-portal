@@ -36,8 +36,8 @@ export default async function DashboardLanding() {
   );
   const hasContract = !!user.contractSignedAt;
 
-  let currentStep = 2; // signed up
-  if (hasPaid) currentStep = 3;
+  let currentStep = 1; // signed up but unpaid → step 1 (Activate 1st Account) is active
+  if (hasPaid) currentStep = 3; // payment done, account auto-created → ready for credentials
   if (hasCredentials) currentStep = 4;
   if (hasActive) currentStep = 5;
   if (hasActive && hasContract) currentStep = 6;

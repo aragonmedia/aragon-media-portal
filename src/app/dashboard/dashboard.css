@@ -166,11 +166,11 @@
 .slider-card{padding:28px 28px 24px;}
 .slider-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:18px;gap:24px;flex-wrap:wrap;}
 .slider-label{font-size:11px;letter-spacing:0.14em;text-transform:uppercase;color:#9A9590;margin-bottom:8px;}
-.account-count{font-family:'Playfair Display',serif;font-size:48px;font-weight:700;color:#F5F1E6;line-height:1;}
+.account-count{font-family:'Inter Tight',sans-serif;font-size:48px;font-weight:700;color:#F5F1E6;line-height:1;}
 .account-word{font-size:13px;color:#9A9590;margin-top:4px;}
 .price-display{text-align:right;}
 .price-each{font-size:12px;color:#9A9590;margin-bottom:6px;}
-.price-total{font-family:'Playfair Display',serif;font-size:38px;font-weight:700;color:#C9A84C;line-height:1;}
+.price-total{font-family:'Inter Tight',sans-serif;font-size:38px;font-weight:700;color:#C9A84C;line-height:1;}
 .price-tier-badge{display:inline-block;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;padding:3px 10px;margin-top:8px;border-radius:4px;font-weight:600;}
 .price-tier-badge.tier1{background:rgba(43,165,103,0.12);color:#3DCF82;}
 .price-tier-badge.tier2{background:rgba(201,168,76,0.16);color:#C9A84C;}
@@ -188,7 +188,7 @@
 .tier-box{background:#0F0F0F;border:1px solid #2A2A2A;padding:14px;border-radius:6px;transition:border-color 0.2s ease, background 0.2s ease;}
 .tier-box.active-tier{border-color:rgba(201,168,76,0.45);background:rgba(201,168,76,0.05);}
 .tier-box-top{font-size:10px;letter-spacing:0.15em;text-transform:uppercase;color:#9A9590;margin-bottom:8px;}
-.tier-box-price{font-family:'Playfair Display',serif;font-size:22px;font-weight:600;color:#F5F1E6;line-height:1;}
+.tier-box-price{font-family:'Inter Tight',sans-serif;font-size:22px;font-weight:600;color:#F5F1E6;line-height:1;}
 .tier-box-price span{font-size:12px;font-family:'Inter Tight',sans-serif;color:#9A9590;font-weight:400;}
 .tier-box-sub{font-size:10px;color:#5C5750;margin-top:4px;}
 .tier-box.active-tier .tier-box-price{color:#C9A84C;}
@@ -361,4 +361,49 @@
   .prog-steps{overflow-x:auto;padding-bottom:8px;}
   .prog-lbl{font-size:9px;max-width:60px;}
   .prog-connector{min-width:6px;margin:0 3px;margin-bottom:24px;}
+}
+
+/* ===== Checklist CTA (active step gets a real button instead of "Active" tag) ===== */
+.ns-cta{display:inline-block;background:#C9A84C;color:#0F0F0F;font-family:'Inter Tight',sans-serif;font-weight:700;font-size:10px;letter-spacing:0.1em;text-transform:uppercase;padding:6px 10px;border-radius:5px;text-decoration:none;flex-shrink:0;transition:transform 0.15s ease;}
+.ns-cta:hover{transform:translateY(-1px);}
+
+/* ===== Sidebar profile chip = clickable link to /dashboard/settings ===== */
+.dash-user-link{display:flex;align-items:center;gap:10px;flex:1;min-width:0;text-decoration:none;color:inherit;padding:6px;border-radius:8px;transition:background 0.15s ease;}
+.dash-user-link:hover{background:rgba(201,168,76,0.08);}
+
+/* ===== Add Accounts: clickable tier boxes + green savings highlight ===== */
+.tier-box-clickable{cursor:pointer;border:1px solid #2A2A2A;background:#0F0F0F;text-align:left;font-family:inherit;color:inherit;width:100%;padding:14px;border-radius:6px;transition:border-color 0.2s ease, background 0.2s ease, transform 0.15s ease;}
+.tier-box-clickable:hover{border-color:rgba(201,168,76,0.45);transform:translateY(-1px);}
+.tier-box-clickable:focus-visible{outline:2px solid #C9A84C;outline-offset:2px;}
+.tier-box-clickable.active-tier{border-color:rgba(201,168,76,0.45);background:rgba(201,168,76,0.05);}
+.tier-box-clickable.active-tier .tier-box-price{color:#C9A84C;}
+
+.tier-box-sub-green{color:#2BA567 !important;font-weight:600;}
+
+/* Make best-offer badge in green when tier2 active */
+.price-tier-badge.tier2{background:rgba(43,165,103,0.16);color:#2BA567;}
+
+/* ===== Settings page form ===== */
+.settings-form{padding:6px 0 4px;}
+.settings-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px;}
+.settings-row-locked{opacity:0.7;}
+.settings-row label{display:flex;flex-direction:column;gap:6px;}
+.settings-row label span{font-size:11px;color:#9A9590;letter-spacing:0.08em;text-transform:uppercase;font-weight:600;}
+.settings-input{background:#0F0F0F;border:1px solid #2A2A2A;color:#F5F1E6;font-family:inherit;font-size:14px;padding:11px 13px;border-radius:6px;outline:none;transition:border 0.15s ease;}
+.settings-input:focus{border-color:#C9A84C;}
+.settings-input:disabled{cursor:not-allowed;color:#9A9590;}
+.settings-actions{display:flex;align-items:center;gap:14px;margin-top:8px;}
+.settings-msg{font-size:12px;}
+.settings-msg.ok{color:#2BA567;}
+.settings-msg.err{color:#E07A6E;}
+.dash-cta:disabled{opacity:0.5;cursor:not-allowed;}
+
+.settings-meta{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:0;padding:12px 0 4px;}
+.settings-meta>div{background:#0F0F0F;border:1px solid #2A2A2A;border-radius:8px;padding:14px 16px;}
+.settings-meta dt{font-size:11px;color:#9A9590;letter-spacing:0.08em;text-transform:uppercase;font-weight:600;margin-bottom:6px;}
+.settings-meta dd{margin:0;font-size:14px;color:#F5F1E6;}
+
+@media(max-width:880px){
+  .settings-row{grid-template-columns:1fr;}
+  .settings-meta{grid-template-columns:1fr;}
 }
