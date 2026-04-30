@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
+import ThemeToggle from "./ThemeToggle";
 
 type ProfileShape = {
   email: string;
@@ -144,6 +145,15 @@ export default function SettingsClient({
         )}
 
         <p className="settings-hint">To add another TikTok account, visit Add Accounts and complete activation. Once paid + verified, it will appear here automatically.</p>
+      </div>
+
+      {/* Appearance / Theme */}
+      <div className="dash-card" style={{ marginTop: 16 }}>
+        <div className="dash-card-head">
+          <h2>Appearance</h2>
+          <span className="dash-meta">Pick the look that suits your eyes.</span>
+        </div>
+        <ThemeToggle />
       </div>
 
       {/* Account history */}
