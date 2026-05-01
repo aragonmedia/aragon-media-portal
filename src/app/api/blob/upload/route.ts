@@ -115,3 +115,18 @@ export async function POST(req: NextRequest) {
     );
   }
 }
+
+/**
+ * GET /api/blob/upload
+ *
+ * Tiny health probe so the admin (or this assistant during setup) can
+ * confirm the BLOB_READ_WRITE_TOKEN env var is wired without sending
+ * a real file. Returns presence-only — never echoes the token value.
+ */
+export async function GET() {
+  return Response.json({
+    ok: true,
+    configured: !!process.env.BLOB_READ_WRITE_TOKEN,
+    region: process.env.VERCEL_REGION ?? null,
+  });
+}
