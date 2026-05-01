@@ -1,35 +1,18 @@
 /**
- * /admin — Aragon Media internal team console.
+ * /admin — Operations console home (Overview).
  *
- * Server component. Reads am_admin cookie:
- *   - missing/invalid → render the password gate (client component)
- *   - valid           → query Neon for stats + user table and render the dash
- *
- * One env var required: ADMIN_PASSWORD. Rotating it logs everyone out.
+ * Layout (admin/layout.tsx) handles the auth gate + sidebar. This page
+ * renders just the dashboard content for the Overview tab.
  */
 
 import { db } from "@/db";
-import { users, sessions, purchases, accounts } from "@/db/schema";
-import { isAdminSession } from "@/lib/auth/admin";
+import { users, sessions, purchases, accounts, withdrawals, agreements } from "@/db/schema";
 import { sql, desc, gte, isNull, and, gt } from "drizzle-orm";
-import AdminLogin from "./AdminLogin";
-import AdminLogout from "./AdminLogout";
-import "./admin.css";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
-export default async function AdminPage() {
-  const authed = await isAdminSession();
-  if (!authed) {
-    return (
-      <main className="admin-shell">
-        <AdminLogin />
-      </main>
-    );
-  }
-
-  // ----- queries -----
+export default async function AdminOverviewPage() {
   const oneWeekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
 
   const [{ totalUsers }] = await db
@@ -58,7 +41,20 @@ export default async function AdminPage() {
     .from(accounts)
     .where(sql`${accounts.status} NOT IN ('active', 'verified', 'cancelled')`);
 
-  const userList = await db
+  const [{ totalWithdrawals }] = await db
+    .select({ totalWithdrawals: sql<number>`count(*)::int` })
+    .from(withdrawals);
+
+  const [{ pendingWithdrawals }] = await db
+    .select({ pendingWithdrawals: sql<number>`count(*)::int` })
+    .from(withdrawals)
+    .where(sql`${withdrawals.status} = 'requested'`);
+
+  const [{ totalAgreements }] = await db
+    .select({ totalAgreements: sql<number>`count(*)::int` })
+    .from(agreements);
+
+  const recent = await db
     .select({
       id: users.id,
       email: users.email,
@@ -71,20 +67,19 @@ export default async function AdminPage() {
     })
     .from(users)
     .orderBy(desc(users.createdAt))
-    .limit(100);
+    .limit(20);
 
   return (
-    <main className="admin-shell">
+    <main className="admin-shell admin-shell-nested">
       <header className="admin-header">
         <div>
           <p className="admin-eyebrow">Aragon Media · Internal</p>
           <h1>Operations console</h1>
         </div>
-        <AdminLogout />
       </header>
 
       <section className="admin-stats">
-        <Stat label="Total users" value={totalUsers.toLocaleString()} />
+        <Stat label="Total creators" value={totalUsers.toLocaleString()} />
         <Stat label="New (7d)" value={usersThisWeek.toLocaleString()} />
         <Stat label="Active sessions" value={activeSessions.toLocaleString()} />
         <Stat
@@ -100,12 +95,27 @@ export default async function AdminPage() {
           value={pendingAccounts.toLocaleString()}
           tone={pendingAccounts > 0 ? "gold" : undefined}
         />
+        <Stat
+          label="Withdrawals total"
+          value={totalWithdrawals.toLocaleString()}
+        />
+        <Stat
+          label="Withdrawals pending"
+          value={pendingWithdrawals.toLocaleString()}
+          tone={pendingWithdrawals > 0 ? "gold" : undefined}
+        />
+        <Stat
+          label="Signed agreements"
+          value={totalAgreements.toLocaleString()}
+        />
       </section>
 
       <section className="admin-section">
         <div className="admin-section-head">
           <h2>Recent signups</h2>
-          <span className="admin-meta">Showing latest {userList.length} of {totalUsers}</span>
+          <span className="admin-meta">
+            Showing latest {recent.length} of {totalUsers}
+          </span>
         </div>
         <div className="admin-table-wrap">
           <table className="admin-table">
@@ -121,14 +131,14 @@ export default async function AdminPage() {
               </tr>
             </thead>
             <tbody>
-              {userList.length === 0 && (
+              {recent.length === 0 && (
                 <tr>
                   <td colSpan={7} className="admin-empty">
                     No signups yet. The /signup wizard is wired and ready.
                   </td>
                 </tr>
               )}
-              {userList.map((u) => (
+              {recent.map((u) => (
                 <tr key={u.id}>
                   <td className="mono">{u.email}</td>
                   <td>{u.name}</td>
