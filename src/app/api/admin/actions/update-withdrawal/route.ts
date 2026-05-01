@@ -18,7 +18,7 @@ import { eq } from "drizzle-orm";
 import { db } from "@/db";
 import { withdrawals, users } from "@/db/schema";
 import { isAdminSession } from "@/lib/auth/admin";
-import { sendWithdrawalStatusEmail } from "@/lib/email/send";
+import { sendWithdrawalPaidEmail } from "@/lib/email/send";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -148,8 +148,11 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  // Email creator on any status change
-  if (newStatus) {
+  // Per Kevin: ONLY a flip TO 'paid' triggers a creator email. Every other
+  // status transition is portal-only state. The email pulls the current
+  // net_cents / gross_cents from `after` so admin edits just before the
+  // flip flow into the email.
+  if (newStatus === "paid") {
     const creator = (
       await db
         .select({ email: users.email, name: users.name })
@@ -158,11 +161,10 @@ export async function POST(req: NextRequest) {
         .limit(1)
     )[0];
     if (creator?.email) {
-      await sendWithdrawalStatusEmail({
+      await sendWithdrawalPaidEmail({
         to: creator.email,
         creatorName: creator.name,
         receiptNumber: after.receiptNumber,
-        status: newStatus,
         netCents: after.netCents,
         grossCents: after.grossCents,
       });

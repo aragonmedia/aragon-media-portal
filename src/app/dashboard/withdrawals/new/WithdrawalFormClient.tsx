@@ -25,7 +25,6 @@ export default function WithdrawalFormClient({
   const [email, setEmail] = useState(userEmail);
   const [name, setName] = useState(userName);
   const [accountId, setAccountId] = useState(accounts[0]?.id ?? "");
-  const [amount, setAmount] = useState("");
   const [payoutMethod, setPayoutMethod] = useState("");
   const [bankDetails, setBankDetails] = useState("");
   const [notes, setNotes] = useState("");
@@ -53,7 +52,6 @@ export default function WithdrawalFormClient({
         headers: { "content-type": "application/json" },
         body: JSON.stringify({
           accountId,
-          amount,
           payoutMethod,
           bankDetails,
           notes,
@@ -69,7 +67,6 @@ export default function WithdrawalFormClient({
       if (!res.ok || !json.ok || !json.redirect) {
         const errMap: Record<string, string> = {
           unauthorized: "Your session expired. Please sign in again.",
-          invalid_amount: "Enter a withdrawal amount greater than $0.",
           missing_payout_method: "Choose a payout method.",
         };
         setMsg({ kind: "err", text: errMap[json.error ?? ""] ?? `Submission failed${json.error ? ` (${json.error})` : ""}.` });
@@ -97,23 +94,17 @@ export default function WithdrawalFormClient({
         </label>
       </div>
 
-      <div className="form-grid">
-        <label>
-          <span>TikTok Account *</span>
-          <select className="settings-input" value={accountId} onChange={(e) => setAccountId(e.target.value)} required>
-            <option value="">Select your TikTok account</option>
-            {accounts.map((a) => (
-              <option key={a.id} value={a.id}>{a.label} ({a.status.replace("_", " ")})</option>
-            ))}
-            {accounts.length === 0 && <option value="" disabled>No accounts yet — add one in Settings</option>}
-          </select>
-        </label>
-        <label>
-          <span>Amount Withdrawn *</span>
-          <input className="settings-input" type="text" value={amount} onChange={(e) => setAmount(e.target.value)} placeholder="$0.00" required />
-          <span className="field-note">Exact amount shown on your TikTok withdrawal screen</span>
-        </label>
-      </div>
+      <label>
+        <span>TikTok Account *</span>
+        <select className="settings-input" value={accountId} onChange={(e) => setAccountId(e.target.value)} required>
+          <option value="">Select your TikTok account</option>
+          {accounts.map((a) => (
+            <option key={a.id} value={a.id}>{a.label} ({a.status.replace("_", " ")})</option>
+          ))}
+          {accounts.length === 0 && <option value="" disabled>No accounts yet — add one in Settings</option>}
+        </select>
+        <span className="field-note">Aragon Media calculates the dollar amount on our end from your screenshot — no need to type it here.</span>
+      </label>
 
       <div className="example-block">
         <div className="example-label">Example — what your TikTok withdrawal screenshot looks like</div>
@@ -127,7 +118,7 @@ export default function WithdrawalFormClient({
       <label className="upload-block">
         <span>Your TikTok Withdrawal Screenshot *</span>
         <div className="upload-drop">
-          <input type="file" accept="image/*" onChange={onFile} className="upload-input" />
+          <input type="file" accept="image/png,image/jpeg,image/webp,image/heic" onChange={onFile} className="upload-input" />
           <div className="upload-cta">{fileName ?? "Click or drop your TikTok withdrawal screen capture"}</div>
         </div>
         <span className="field-note">Required proof — screenshot of the withdrawal confirmation in your TikTok Shop dashboard.</span>

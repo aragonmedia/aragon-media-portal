@@ -182,6 +182,14 @@ export default async function AgreementPage() {
             <Link href="/dashboard/withdrawals" className="dash-cta ghost">
               View receipts
             </Link>
+            <a
+              href={`/api/agreement/${signed.id}/pdf`}
+              className="dash-cta ghost"
+              target="_blank"
+              rel="noreferrer"
+            >
+              Download signed PDF ⬇
+            </a>
           </div>
         </section>
       )}

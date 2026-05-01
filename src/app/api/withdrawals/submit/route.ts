@@ -9,13 +9,13 @@ export const dynamic = "force-dynamic";
 
 type Body = {
   accountId?: string | null;
-  amount?: string;             // dollar string like "$123.45" or "123.45"
-  withdrawalDate?: string;     // YYYY-MM-DD
-  sourceAccount?: string;
+  // amount is no longer collected from the creator — admin computes it
+  // from the uploaded screenshot in /admin/withdrawals/[id].
+  amount?: string;
   payoutMethod?: string;
   bankDetails?: string;        // free text — stored in notes for now
   notes?: string;
-  fileName?: string | null;    // screenshot file name placeholder until R2 wired
+  fileName?: string | null;    // screenshot file name placeholder until storage wired
 };
 
 function parseAmountToCents(raw?: string): number | null {
@@ -40,10 +40,11 @@ export async function POST(req: NextRequest) {
     return Response.json({ ok: false, error: "invalid_json" }, { status: 400 });
   }
 
-  const grossCents = parseAmountToCents(body.amount);
-  if (grossCents === null) {
-    return Response.json({ ok: false, error: "invalid_amount" }, { status: 400 });
-  }
+  // Creator no longer types an amount — admin computes it. We accept any
+  // value the form might still send (legacy clients) but default to 0 so
+  // the row inserts cleanly. Admin edits set the real numbers later.
+  const parsed = parseAmountToCents(body.amount);
+  const grossCents = parsed ?? 0;
   if (!body.payoutMethod || body.payoutMethod.trim().length < 2) {
     return Response.json({ ok: false, error: "missing_payout_method" }, { status: 400 });
   }

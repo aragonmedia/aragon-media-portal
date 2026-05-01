@@ -7,7 +7,7 @@
  */
 
 import { NextRequest } from "next/server";
-import { sendWithdrawalStatusEmail } from "@/lib/email/send";
+import { sendWithdrawalPaidEmail } from "@/lib/email/send";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -25,11 +25,10 @@ export async function GET(req: NextRequest) {
     return Response.json({ ok: false, error: "unauthorized" }, { status: 401 });
   }
 
-  await sendWithdrawalStatusEmail({
+  await sendWithdrawalPaidEmail({
     to: "aragonkevin239@gmail.com",
     creatorName: "Kevin Aragon",
     receiptNumber: "AM-WDR-PREVIEW",
-    status: "paid",
     netCents: 107360,   // $1,073.60
     grossCents: 134200, // $1,342.00
   });

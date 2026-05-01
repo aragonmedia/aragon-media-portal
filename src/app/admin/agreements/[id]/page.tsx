@@ -51,9 +51,20 @@ export default async function AdminAgreementDetail({
             The text below is the exact contract version they agreed to.
           </p>
         </div>
-        <Link href="/admin/agreements" className="admin-row-btn">
-          ← Back to all agreements
-        </Link>
+        <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+          <a
+            href={`/api/agreement/${a.id}/pdf`}
+            className="admin-row-btn admin-row-btn-primary"
+            target="_blank"
+            rel="noreferrer"
+            title="Download a PDF copy of this signed agreement"
+          >
+            Download PDF ⬇
+          </a>
+          <Link href="/admin/agreements" className="admin-row-btn">
+            ← Back to all agreements
+          </Link>
+        </div>
       </header>
 
       <section className="admin-section">
