@@ -54,6 +54,7 @@ export const codePurposeEnum = pgEnum("code_purpose", [
   "signup",
   "signin",
   "withdrawal_confirm",
+  "admin_signin",
 ]);
 export const messageSenderEnum = pgEnum("message_sender", [
   "user",

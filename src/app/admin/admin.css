@@ -57,3 +57,15 @@
 @media(max-width:520px){
   .admin-stats{grid-template-columns:1fr;}
 }
+
+/* ===== Email-code admin login extras ===== */
+.admin-input-otp{font-family:'JetBrains Mono','Menlo',monospace !important;font-size:24px !important;letter-spacing:0.4em !important;text-align:center;padding:14px 16px !important;}
+.admin-info{padding:10px 14px;margin:10px 0;background:rgba(201,168,76,0.08);border:1px solid rgba(201,168,76,0.35);border-left:2px solid #C9A84C;color:#D4CFB6;font-size:12px;line-height:1.55;}
+.admin-gate-foot{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:14px;flex-wrap:wrap;}
+.admin-link{background:none;border:none;color:#9A9590;font-size:12px;letter-spacing:0.04em;cursor:pointer;padding:4px 0;font-family:inherit;text-decoration:underline;text-underline-offset:3px;}
+.admin-link:hover:not(:disabled){color:#C9A84C;}
+.admin-link:disabled{cursor:not-allowed;opacity:0.5;text-decoration:none;}
+@media(max-width:480px){
+  .admin-input-otp{font-size:20px !important;letter-spacing:0.3em !important;}
+  .admin-gate-foot{flex-direction:column;align-items:flex-start;gap:6px;}
+}

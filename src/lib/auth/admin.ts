@@ -1,42 +1,57 @@
 /**
- * Admin password gate.
+ * Admin email-code auth.
  *
- * - ADMIN_PASSWORD env var = the single shared password for the AM team.
- * - On successful POST to /api/admin/login we set an httpOnly cookie
- *   `am_admin` containing sha256(ADMIN_PASSWORD). On every admin request we
- *   recompute the hash from the env var and compare. Rotating the env var
- *   invalidates all admin sessions automatically.
+ * - The single shared ADMIN_PASSWORD env-var gate has been removed.
+ * - To sign in as admin: enter your email on /admin → if the matching
+ *   row in `users` has is_admin=true, a 6-digit code is emailed → enter
+ *   the code → we set the `am_admin` cookie.
+ * - The cookie value is a random opaque token (NOT a password hash) so
+ *   rotating any single secret can't invalidate all admin sessions —
+ *   we manage them through expiry instead.
+ *
+ * 12-hour cookie lifetime; admins re-authenticate twice a day at most.
  */
 
 import crypto from "node:crypto";
 import { cookies } from "next/headers";
 
 export const ADMIN_COOKIE = "am_admin";
+const COOKIE_MAX_AGE = 60 * 60 * 12; // 12 hours
 
-export function expectedHash(): string | null {
-  const pwd = process.env.ADMIN_PASSWORD;
-  if (!pwd) return null;
-  return crypto.createHash("sha256").update(pwd).digest("hex");
+/** Stable HMAC of the cookie token using a server secret (so a stolen DB
+ *  dump alone can't forge admin sessions — they'd also need MIGRATION_SECRET).
+ */
+function sign(token: string): string {
+  const secret = process.env.MIGRATION_SECRET ?? "fallback-not-set";
+  return crypto.createHmac("sha256", secret).update(token).digest("hex");
 }
 
 export async function isAdminSession(): Promise<boolean> {
-  const expected = expectedHash();
-  if (!expected) return false;
   const store = await cookies();
   const cookie = store.get(ADMIN_COOKIE);
-  return !!cookie && cookie.value === expected;
+  if (!cookie || !cookie.value.includes(".")) return false;
+  const [token, sig] = cookie.value.split(".", 2);
+  if (!token || !sig) return false;
+  const expected = sign(token);
+  // Constant-time compare
+  if (sig.length !== expected.length) return false;
+  let mismatch = 0;
+  for (let i = 0; i < sig.length; i++) {
+    mismatch |= sig.charCodeAt(i) ^ expected.charCodeAt(i);
+  }
+  return mismatch === 0;
 }
 
 export async function setAdminCookie() {
-  const expected = expectedHash();
-  if (!expected) throw new Error("ADMIN_PASSWORD not set");
+  const token = crypto.randomBytes(24).toString("hex");
+  const value = `${token}.${sign(token)}`;
   const store = await cookies();
-  store.set(ADMIN_COOKIE, expected, {
+  store.set(ADMIN_COOKIE, value, {
     httpOnly: true,
     secure: true,
     sameSite: "lax",
     path: "/",
-    maxAge: 60 * 60 * 12, // 12 hours
+    maxAge: COOKIE_MAX_AGE,
   });
 }
 
