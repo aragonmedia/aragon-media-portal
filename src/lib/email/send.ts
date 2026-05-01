@@ -374,3 +374,80 @@ export async function sendWithdrawalPaidEmail(opts: {
     console.error("[email] sendWithdrawalPaidEmail failed:", err);
   }
 }
+
+/**
+ * Chat notification email — fired when a reply lands and the OTHER party
+ * isn't actively typing. Throttled at the call site (5min between sends
+ * per chat per sender side) so the recipient isn't hammered during a
+ * live exchange.
+ */
+export async function sendChatNotificationEmail(opts: {
+  to: string;
+  fromLabel: string;     // "Aragon Media" or the creator's display name
+  fromContext: string;   // "AM team" or the creator's email
+  snippet: string;       // up to ~280 chars of the message body
+  openUrl: string;       // direct link to the chat for the recipient
+  recipientIsAdmin: boolean;
+}) {
+  try {
+    const resend = getResend();
+    const subject = opts.recipientIsAdmin
+      ? `New chat from ${opts.fromLabel} — Aragon Media portal`
+      : `New message from Aragon Media`;
+
+    const html = `<!DOCTYPE html><html><head>
+      <meta name="color-scheme" content="dark only">
+      <meta name="supported-color-schemes" content="dark">
+    </head>
+    <body style="margin:0;padding:0;background:#0F0F0F !important;color:#FAF7EE !important;font-family:system-ui,-apple-system,'Inter Tight',sans-serif;">
+      <table role="presentation" width="100%" bgcolor="#0F0F0F" style="background:#0F0F0F !important;">
+        <tr><td align="center" style="padding:32px 18px;">
+          <table role="presentation" width="600" bgcolor="#0F0F0F" style="background:#0F0F0F !important;border:1px solid #2A2A2A;max-width:600px;width:100%;">
+            <tr><td bgcolor="#0F0F0F" style="padding:30px 32px 14px;background:#0F0F0F !important;">
+              <p style="margin:0 0 6px 0;font-size:11px;letter-spacing:0.2em;color:#C9A84C !important;text-transform:uppercase;font-weight:700;">New chat message</p>
+              <h1 style="margin:0;font-size:22px;line-height:1.25;color:#FAF7EE !important;letter-spacing:-0.01em;">${opts.fromLabel} replied</h1>
+              <p style="margin:6px 0 0;font-size:12px;color:#9A9590 !important;">${opts.fromContext}</p>
+            </td></tr>
+            <tr><td bgcolor="#0F0F0F" style="padding:14px 32px;background:#0F0F0F !important;">
+              <div style="background:#0B0B0B;border:1px solid #2A2A2A;border-left:2px solid #C9A84C;padding:14px 16px;font-size:14px;color:#D4CFB6 !important;line-height:1.65;white-space:pre-wrap;word-break:break-word;">${escapeHtml(opts.snippet)}</div>
+            </td></tr>
+            <tr><td bgcolor="#0F0F0F" style="padding:18px 32px 22px;background:#0F0F0F !important;">
+              <a href="${opts.openUrl}" style="display:inline-block;padding:12px 22px;background:#C9A84C !important;color:#0F0F0F !important;text-decoration:none !important;font-size:13px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;border-radius:3px;">Open chat →</a>
+            </td></tr>
+            <tr><td bgcolor="#0F0F0F" style="padding:14px 32px 26px;background:#0F0F0F !important;border-top:1px solid #2A2A2A;color:#5C5750 !important;font-size:11px;line-height:1.6;text-align:center;">
+              © 2026 Aragon Media · 1309 Coffeen Ave, Sheridan, WY 82801
+            </td></tr>
+          </table>
+        </td></tr>
+      </table>
+    </body></html>`;
+
+    const text = [
+      "NEW CHAT MESSAGE",
+      "",
+      `${opts.fromLabel} replied (${opts.fromContext}):`,
+      "",
+      opts.snippet,
+      "",
+      `Open chat: ${opts.openUrl}`,
+    ].join("\n");
+
+    await resend.emails.send({
+      from: FROM,
+      to: [opts.to],
+      subject,
+      text,
+      html,
+    });
+  } catch (err) {
+    console.error("[email] sendChatNotificationEmail failed:", err);
+  }
+}
+
+function escapeHtml(s: string): string {
+  return s
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
+}

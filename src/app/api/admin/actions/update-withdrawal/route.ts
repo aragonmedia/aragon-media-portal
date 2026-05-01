@@ -151,9 +151,9 @@ export async function POST(req: NextRequest) {
   }
 
   // Per Kevin: ONLY a flip TO 'paid' triggers a creator email. Every other
-  // status transition is portal-only state. The email pulls the current
-  // net_cents / gross_cents from `after` so admin edits just before the
-  // flip flow into the email.
+  // status transition is portal-only state. Pull net_cents / gross_cents
+  // from `after` so admin edits just before the flip flow into the email.
+  let emailSent = false;
   if (newStatus === "paid") {
     const creator = (
       await db
@@ -170,8 +170,9 @@ export async function POST(req: NextRequest) {
         netCents: after.netCents,
         grossCents: after.grossCents,
       });
+      emailSent = true;
     }
   }
 
-  return Response.json({ ok: true, withdrawal: after });
+  return Response.json({ ok: true, withdrawal: after, emailSent });
 }

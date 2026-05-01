@@ -1,49 +1,79 @@
-import { eq, desc } from "drizzle-orm";
+import { and, asc, eq } from "drizzle-orm";
 import { getCurrentUser } from "@/lib/auth/session";
 import { db } from "@/db";
-import { chats } from "@/db/schema";
+import { chats, messages } from "@/db/schema";
+import ChatRoomClient from "@/app/components/ChatRoomClient";
 
 export const dynamic = "force-dynamic";
 
 export default async function ChatPage() {
   const user = await getCurrentUser();
   if (!user) return null;
-  const myChats = await db
-    .select()
-    .from(chats)
-    .where(eq(chats.userId, user.id))
-    .orderBy(desc(chats.lastMessageAt));
+
+  // Find or create the creator's single open chat thread.
+  let row = (
+    await db
+      .select()
+      .from(chats)
+      .where(and(eq(chats.userId, user.id), eq(chats.status, "open")))
+      .limit(1)
+  )[0];
+
+  if (!row) {
+    const inserted = await db
+      .insert(chats)
+      .values({
+        userId: user.id,
+        subject: "Aragon Media support",
+        status: "open",
+      })
+      .returning();
+    row = inserted[0];
+    // Seed a system welcome message so the room isn't empty
+    await db.insert(messages).values({
+      chatId: row.id,
+      sender: "system",
+      body: "Welcome — this is your private channel with the Aragon Media team. Drop us a note any time and we'll respond ASAP.",
+    });
+  }
+
+  const initial = await db
+    .select({
+      id: messages.id,
+      sender: messages.sender,
+      body: messages.body,
+      createdAt: messages.createdAt,
+    })
+    .from(messages)
+    .where(eq(messages.chatId, row.id))
+    .orderBy(asc(messages.createdAt));
 
   return (
     <main className="dash-content">
       <header className="dash-page-head">
         <div>
-          <p className="dash-eyebrow">Chat</p>
-          <h1>AM team thread</h1>
-          <p className="dash-page-sub">All communications for this service hosted here.</p>
+          <p className="dash-eyebrow">Chat with AM team</p>
+          <h1>Your direct line</h1>
+          <p className="dash-page-sub">
+            Every message lives here. The Aragon Media team gets an email
+            whenever you reply, so we&apos;ll get back to you fast.
+          </p>
         </div>
       </header>
 
-      {myChats.length === 0 ? (
-        <div className="dash-card dash-card-block">
-          <div className="dash-empty-large">
-            <div className="dash-empty-title">No active thread yet</div>
-            <div className="dash-empty-body">A private chat with the AM team opens automatically the moment you complete your first activation. No setup needed.</div>
-          </div>
-        </div>
-      ) : (
-        <div className="dash-card">
-          <ul className="dash-chat-list">
-            {myChats.map((c) => (
-              <li key={c.id} className="dash-chat-row">
-                <div className="dash-chat-name">{c.subject ?? "Aragon Media support"}</div>
-                <div className="dash-chat-meta">Last activity {new Date(c.lastMessageAt).toLocaleString()}</div>
-                <span className={`status-pill status-${c.status}`}>{c.status}</span>
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
+      <ChatRoomClient
+        chatId={row.id}
+        viewer="user"
+        viewerName={user.name}
+        initialMessages={initial.map((m) => ({
+          id: m.id,
+          sender: m.sender,
+          body: m.body,
+          createdAt: typeof m.createdAt === "string"
+            ? m.createdAt
+            : m.createdAt.toISOString(),
+        }))}
+      />
     </main>
   );
 }

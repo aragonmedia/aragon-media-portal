@@ -83,13 +83,22 @@ export default function WithdrawalEditPanel({
           status,
         }),
       });
-      const j = (await res.json()) as { ok: boolean; error?: string };
+      const j = (await res.json()) as {
+        ok: boolean;
+        error?: string;
+        emailSent?: boolean;
+      };
       if (!res.ok || !j.ok) {
         setMsg({ kind: "err", text: j.error ?? "Save failed" });
         setBusy(false);
         return;
       }
-      setMsg({ kind: "ok", text: "Saved. Creator notified by email." });
+      setMsg({
+        kind: "ok",
+        text: j.emailSent
+          ? "Saved · Paid email sent to creator."
+          : "Saved.",
+      });
       router.refresh();
     } catch (err) {
       setMsg({

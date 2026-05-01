@@ -8,6 +8,7 @@
  */
 
 import Link from "next/link";
+import OverviewChart from "./OverviewChart";
 import { db } from "@/db";
 import {
   users,
@@ -109,6 +110,53 @@ export default async function AdminOverviewPage() {
   const [{ totalAgreements }] = await db
     .select({ totalAgreements: sql<number>`count(*)::int` })
     .from(agreements);
+
+  // Daily series for the Overview chart — paid revenue (Square purchases)
+  // + AM commissions earned (sum of fee_cents on paid withdrawals).
+  // Bucket by created_at::date for purchases and paid_at::date for
+  // withdrawals so a paid receipt counts on the day it was actually paid.
+  const purchaseDays = (await db.execute(sql`
+    select to_char(date_trunc('day', created_at), 'YYYY-MM-DD') as d,
+           coalesce(sum(amount_cents), 0)::int as cents
+      from purchases
+     where status = 'paid'
+     group by 1
+     order by 1
+  `)) as unknown as { rows: { d: string; cents: number }[] };
+
+  const withdrawalDays = (await db.execute(sql`
+    select to_char(date_trunc('day', paid_at), 'YYYY-MM-DD') as d,
+           coalesce(sum(fee_cents), 0)::int as cents
+      from withdrawals
+     where status = 'paid' and paid_at is not null
+     group by 1
+     order by 1
+  `)) as unknown as { rows: { d: string; cents: number }[] };
+
+  // Walk every day from the earliest event to today so the line has no gaps.
+  const allDates = [
+    ...(purchaseDays.rows ?? []).map((r) => r.d),
+    ...(withdrawalDays.rows ?? []).map((r) => r.d),
+  ];
+  const today = new Date();
+  const todayStr = today.toISOString().slice(0, 10);
+  const earliest = allDates.length > 0
+    ? allDates.reduce((min, d) => (d < min ? d : min), allDates[0])
+    : new Date(today.getTime() - 27 * 86400_000).toISOString().slice(0, 10);
+  const purchaseMap = new Map((purchaseDays.rows ?? []).map((r) => [r.d, r.cents]));
+  const withdrawalMap = new Map((withdrawalDays.rows ?? []).map((r) => [r.d, r.cents]));
+  const dailySeries: { date: string; revenue: number; commissions: number }[] = [];
+  const cur = new Date(earliest + "T00:00:00Z");
+  const end = new Date(todayStr + "T00:00:00Z");
+  while (cur <= end) {
+    const k = cur.toISOString().slice(0, 10);
+    dailySeries.push({
+      date: k,
+      revenue: purchaseMap.get(k) ?? 0,
+      commissions: withdrawalMap.get(k) ?? 0,
+    });
+    cur.setUTCDate(cur.getUTCDate() + 1);
+  }
 
   // Recent lists for the 3 scrollable cards
   const recentCreators = await db
@@ -229,6 +277,11 @@ export default async function AdminOverviewPage() {
             value={totalAgreements.toLocaleString()}
           />
         </div>
+      </section>
+
+      {/* Live revenue + AM commissions line chart */}
+      <section className="admin-section">
+        <OverviewChart daily={dailySeries} />
       </section>
 
       {/* Three scrollable mini-lists */}
