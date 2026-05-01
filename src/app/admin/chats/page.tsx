@@ -58,53 +58,106 @@ export default async function AdminChatsListPage() {
         </div>
       </header>
 
-      <section className="admin-section">
-        <div className="chat-list">
-          {list.length === 0 ? (
-            <div className="wdr-history-empty">
-              No chat threads yet. Threads open automatically the moment a
-              creator visits /dashboard/chat.
-            </div>
-          ) : (
-            list.map((c) => (
-              <Link
-                key={c.id}
-                href={`/admin/chats/${c.id}`}
-                className="chat-list-card"
-              >
-                <div className="chat-list-top">
-                  <div>
-                    <div className="chat-list-name">
-                      {c.creatorName ?? "Unknown creator"}
-                    </div>
-                    <div className="chat-list-email">{c.creatorEmail ?? "—"}</div>
+      {(() => {
+        // Split: UNREAD = creator-sent last (awaiting AM reply).
+        //         REPLIED = AM-sent last (or system / no messages yet).
+        const unread = list.filter((c) => c.lastSender === "user");
+        const replied = list.filter((c) => c.lastSender !== "user");
+
+        function Card({ c }: { c: (typeof list)[number] }) {
+          return (
+            <Link
+              key={c.id}
+              href={`/admin/chats/${c.id}`}
+              className={`chat-list-card${c.lastSender === "user" ? " chat-list-card-unread" : ""}`}
+            >
+              <div className="chat-list-top">
+                <div>
+                  <div className="chat-list-name">
+                    {c.creatorName ?? "Unknown creator"}
+                    {c.lastSender === "user" && (
+                      <span className="chat-list-dot" aria-hidden="true" />
+                    )}
                   </div>
-                  <div className="chat-list-side">
-                    <span className="chat-list-count">
-                      {c.messageCount} msg{c.messageCount === 1 ? "" : "s"}
-                    </span>
-                    <span className="chat-list-time">
-                      {fmt(c.lastMessageAt)}
-                    </span>
-                  </div>
+                  <div className="chat-list-email">{c.creatorEmail ?? "—"}</div>
                 </div>
-                {c.lastSnippet && (
-                  <div className="chat-list-preview">
-                    <span className={`chat-list-pill chat-list-pill-${c.lastSender ?? "system"}`}>
-                      {c.lastSender === "am_team"
-                        ? "AM"
-                        : c.lastSender === "user"
-                          ? "Creator"
-                          : "System"}
-                    </span>
-                    <span className="chat-list-snippet">{c.lastSnippet}</span>
+                <div className="chat-list-side">
+                  <span className="chat-list-count">
+                    {c.messageCount} msg{c.messageCount === 1 ? "" : "s"}
+                  </span>
+                  <span className="chat-list-time">{fmt(c.lastMessageAt)}</span>
+                </div>
+              </div>
+              {c.lastSnippet && (
+                <div className="chat-list-preview">
+                  <span
+                    className={`chat-list-pill chat-list-pill-${
+                      c.lastSender ?? "system"
+                    }`}
+                  >
+                    {c.lastSender === "am_team"
+                      ? "AM"
+                      : c.lastSender === "user"
+                        ? "Creator"
+                        : "System"}
+                  </span>
+                  <span className="chat-list-snippet">{c.lastSnippet}</span>
+                </div>
+              )}
+            </Link>
+          );
+        }
+
+        return (
+          <>
+            <section className="admin-section">
+              <div className="admin-section-head">
+                <h2>
+                  <span className="chat-section-label chat-section-label-unread">
+                    Unread
+                  </span>
+                  <span className="chat-section-count">{unread.length}</span>
+                </h2>
+                <span className="admin-meta">
+                  Awaiting an AM reply — sorted newest first.
+                </span>
+              </div>
+              <div className="chat-list">
+                {unread.length === 0 ? (
+                  <div className="wdr-history-empty">
+                    All caught up — no creators are waiting on a reply.
                   </div>
+                ) : (
+                  unread.map((c) => <Card key={c.id} c={c} />)
                 )}
-              </Link>
-            ))
-          )}
-        </div>
-      </section>
+              </div>
+            </section>
+
+            <section className="admin-section">
+              <div className="admin-section-head">
+                <h2>
+                  <span className="chat-section-label chat-section-label-replied">
+                    Replied
+                  </span>
+                  <span className="chat-section-count">{replied.length}</span>
+                </h2>
+                <span className="admin-meta">
+                  Threads where AM sent the last message (or no messages yet).
+                </span>
+              </div>
+              <div className="chat-list">
+                {replied.length === 0 ? (
+                  <div className="wdr-history-empty">
+                    No replied threads yet.
+                  </div>
+                ) : (
+                  replied.map((c) => <Card key={c.id} c={c} />)
+                )}
+              </div>
+            </section>
+          </>
+        );
+      })()}
     </main>
   );
 }

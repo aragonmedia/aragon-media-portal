@@ -27,20 +27,32 @@ export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 export async function POST(req: NextRequest) {
-  let body: { chatId?: string; body?: string };
+  let body: { chatId?: string; body?: string; attachmentUrls?: string[] };
   try {
-    body = (await req.json()) as { chatId?: string; body?: string };
+    body = (await req.json()) as { chatId?: string; body?: string; attachmentUrls?: string[] };
   } catch {
     return Response.json({ ok: false, error: "invalid_json" }, { status: 400 });
   }
 
   const chatId = (body.chatId ?? "").trim();
   const text = (body.body ?? "").trim();
+  const attachments = Array.isArray(body.attachmentUrls)
+    ? body.attachmentUrls
+        .filter((u): u is string => typeof u === "string")
+        .filter((u) => /^https?:\/\//.test(u))
+        .slice(0, 4)
+    : [];
   if (!chatId) {
     return Response.json({ ok: false, error: "chatId_required" }, { status: 400 });
   }
-  if (text.length === 0 || text.length > 4000) {
-    return Response.json({ ok: false, error: "invalid_body" }, { status: 400 });
+  if (text.length > 4000) {
+    return Response.json({ ok: false, error: "body_too_long" }, { status: 400 });
+  }
+  if (text.length === 0 && attachments.length === 0) {
+    return Response.json(
+      { ok: false, error: "empty_message" },
+      { status: 400 }
+    );
   }
 
   // Resolve the chat + its owner
@@ -78,11 +90,18 @@ export async function POST(req: NextRequest) {
   const now = new Date();
   const inserted = await db
     .insert(messages)
-    .values({ chatId, sender, body: text, createdAt: now })
+    .values({
+      chatId,
+      sender,
+      body: text,
+      attachmentUrls: attachments.length > 0 ? JSON.stringify(attachments) : null,
+      createdAt: now,
+    })
     .returning({
       id: messages.id,
       sender: messages.sender,
       body: messages.body,
+      attachmentUrls: messages.attachmentUrls,
       createdAt: messages.createdAt,
     });
   await db
@@ -108,13 +127,14 @@ export async function POST(req: NextRequest) {
 
   if (shouldEmail) {
     try {
+      const snippetText = text || `[Sent ${attachments.length} image attachment${attachments.length === 1 ? "" : "s"}]`;
       if (sender === "user" && chatRow.ownerEmail) {
         // Notify admin of the creator's reply
         await sendChatNotificationEmail({
           to: "aragonkevin239@gmail.com",
           fromLabel: chatRow.ownerName ?? "A creator",
           fromContext: chatRow.ownerEmail,
-          snippet: text.slice(0, 280),
+          snippet: snippetText.slice(0, 280),
           openUrl: `https://aragon-media-portal.vercel.app/admin/chats/${chatId}`,
           recipientIsAdmin: true,
         });
@@ -124,7 +144,7 @@ export async function POST(req: NextRequest) {
           to: chatRow.ownerEmail,
           fromLabel: "Aragon Media",
           fromContext: "AM team",
-          snippet: text.slice(0, 280),
+          snippet: snippetText.slice(0, 280),
           openUrl: `https://aragon-media-portal.vercel.app/dashboard/chat`,
           recipientIsAdmin: false,
         });
@@ -140,6 +160,7 @@ export async function POST(req: NextRequest) {
       id: inserted[0].id,
       sender: inserted[0].sender,
       body: inserted[0].body,
+      attachmentUrls: attachments,
       createdAt:
         typeof inserted[0].createdAt === "string"
           ? inserted[0].createdAt

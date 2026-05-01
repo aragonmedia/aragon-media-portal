@@ -6,6 +6,18 @@ import { chats, messages, users } from "@/db/schema";
 import ChatRoomClient from "@/app/components/ChatRoomClient";
 
 export const dynamic = "force-dynamic";
+
+function parseAttachments(raw: string | null): string[] {
+  if (!raw) return [];
+  try {
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed)
+      ? parsed.filter((u): u is string => typeof u === "string")
+      : [];
+  } catch {
+    return [];
+  }
+}
 export const revalidate = 0;
 
 export default async function AdminChatRoom({
@@ -36,6 +48,7 @@ export default async function AdminChatRoom({
       id: messages.id,
       sender: messages.sender,
       body: messages.body,
+      attachmentUrls: messages.attachmentUrls,
       createdAt: messages.createdAt,
     })
     .from(messages)
@@ -75,6 +88,7 @@ export default async function AdminChatRoom({
             id: m.id,
             sender: m.sender,
             body: m.body,
+            attachmentUrls: parseAttachments(m.attachmentUrls),
             createdAt:
               typeof m.createdAt === "string"
                 ? m.createdAt

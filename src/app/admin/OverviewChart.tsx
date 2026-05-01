@@ -66,8 +66,41 @@ export default function OverviewChart({ daily }: { daily: Day[] }) {
     [series]
   );
 
+  // Prior period of equal length (immediately before the active range)
+  // so we can render a +/- % delta. Lifetime view doesn't have a prior
+  // period, so we hide the chip in that case.
+  const prior = useMemo(() => {
+    if (range === "lifetime") return null;
+    const span = range === "7d" ? 7 : 28;
+    const start = Math.max(0, daily.length - span * 2);
+    const end = Math.max(0, daily.length - span);
+    const slice = daily.slice(start, end);
+    return slice.reduce(
+      (a, b) => ({
+        revenue: a.revenue + b.revenue,
+        commissions: a.commissions + b.commissions,
+      }),
+      { revenue: 0, commissions: 0 }
+    );
+  }, [daily, range]);
+
+  function pct(current: number, before: number): { label: string; tone: "up" | "down" | "flat" } | null {
+    if (!prior) return null;
+    if (current === 0 && before === 0) return { label: "—", tone: "flat" };
+    if (before === 0) return { label: "new", tone: "up" };
+    const delta = ((current - before) / before) * 100;
+    const rounded = Math.round(delta);
+    if (rounded === 0) return { label: "0%", tone: "flat" };
+    return {
+      label: `${rounded > 0 ? "+" : ""}${rounded}%`,
+      tone: rounded > 0 ? "up" : "down",
+    };
+  }
+  const revPct = pct(totals.revenue, prior?.revenue ?? 0);
+  const commPct = pct(totals.commissions, prior?.commissions ?? 0);
+
   const max = Math.max(
-    1,
+    100, // 1 dollar floor so flat zeros sit at the bottom, not centered
     ...series.flatMap((d) => [d.revenue, d.commissions])
   );
 
@@ -123,7 +156,10 @@ export default function OverviewChart({ daily }: { daily: Day[] }) {
   const hoverYComm =
     hoverIdx !== null && commPts[hoverIdx] ? commPts[hoverIdx].y : 0;
 
-  const empty = totals.revenue === 0 && totals.commissions === 0;
+  // Only suppress the chart entirely when there's literally no series at
+  // all (newest install). Once there's any history, both lines render so
+  // the trend reads cleanly even when one side is zero on a given day.
+  const empty = series.length === 0;
 
   return (
     <div className="ovr-chart-card">
@@ -133,9 +169,19 @@ export default function OverviewChart({ daily }: { daily: Day[] }) {
           <div className="ovr-chart-totals">
             <span className="ovr-chart-total ovr-chart-rev">
               <span className="ovr-chart-dot" /> Revenue {fmtUsd(totals.revenue)}
+              {revPct && (
+                <span className={`ovr-chart-trend ovr-chart-trend-${revPct.tone}`}>
+                  {revPct.label}
+                </span>
+              )}
             </span>
             <span className="ovr-chart-total ovr-chart-comm">
               <span className="ovr-chart-dot" /> Commissions {fmtUsd(totals.commissions)}
+              {commPct && (
+                <span className={`ovr-chart-trend ovr-chart-trend-${commPct.tone}`}>
+                  {commPct.label}
+                </span>
+              )}
             </span>
           </div>
         </div>

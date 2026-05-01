@@ -304,3 +304,18 @@
   .chat-list-card{padding:14px 16px;}
   .chat-list-side{align-items:flex-start;flex-direction:row;gap:10px;}
 }
+
+/* ===== Admin chats — Unread / Replied sectioning ===== */
+.chat-section-label{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:4px;font-size:11px;letter-spacing:0.18em;text-transform:uppercase;font-weight:700;}
+.chat-section-label-unread{background:rgba(31,139,83,0.14);color:#5BD18C;border:1px solid rgba(31,139,83,0.45);}
+.chat-section-label-replied{background:rgba(154,149,144,0.10);color:#9A9590;border:1px solid #2A2A2A;}
+.chat-section-count{margin-left:8px;font-size:13px;color:#FAF7EE;font-weight:700;}
+.chat-list-card-unread{border-left:3px solid #5BD18C;background:#181D1A;}
+.chat-list-card-unread:hover{border-color:#5BD18C;}
+.chat-list-dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:#5BD18C;margin-left:8px;vertical-align:middle;box-shadow:0 0 0 2px rgba(31,139,83,0.30);}
+
+/* Trend chips next to the chart totals */
+.ovr-chart-trend{margin-left:8px;font-size:10px;font-weight:700;letter-spacing:0.06em;padding:3px 7px;border-radius:999px;}
+.ovr-chart-trend-up{background:rgba(31,139,83,0.16);color:#5BD18C;border:1px solid rgba(31,139,83,0.45);}
+.ovr-chart-trend-down{background:rgba(199,79,79,0.14);color:#E07B7B;border:1px solid rgba(199,79,79,0.45);}
+.ovr-chart-trend-flat{background:#1A1A1A;color:#9A9590;border:1px solid #2A2A2A;}
