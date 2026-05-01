@@ -21,13 +21,16 @@ import { getCurrentUser } from "@/lib/auth/session";
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
-const MAX_BYTES = 8 * 1024 * 1024; // 8MB
+const MAX_BYTES = 25 * 1024 * 1024; // 25MB — large enough for short MP4 appeals clips
 const ALLOWED_TYPES = new Set([
   "image/png",
   "image/jpeg",
   "image/webp",
   "image/heic",
   "image/jpg",
+  "video/mp4",
+  "video/quicktime",
+  "video/webm",
 ]);
 
 export async function POST(req: NextRequest) {

@@ -319,3 +319,42 @@
 .ovr-chart-trend-up{background:rgba(31,139,83,0.16);color:#5BD18C;border:1px solid rgba(31,139,83,0.45);}
 .ovr-chart-trend-down{background:rgba(199,79,79,0.14);color:#E07B7B;border:1px solid rgba(199,79,79,0.45);}
 .ovr-chart-trend-flat{background:#1A1A1A;color:#9A9590;border:1px solid #2A2A2A;}
+
+/* Chart axes — match GMV preview aesthetic */
+.ovr-chart-svg-wrap{position:relative;}
+.ovr-chart-yaxis{position:absolute;left:0;top:12px;bottom:34px;width:60px;display:flex;flex-direction:column;justify-content:space-between;pointer-events:none;font-family:'JetBrains Mono','Menlo',monospace;font-size:10px;color:#5C5750;letter-spacing:0.04em;padding-left:6px;}
+.ovr-chart-xaxis{display:flex;justify-content:space-between;padding:8px 14px 6px 70px;font-family:'JetBrains Mono','Menlo',monospace;font-size:10px;color:#5C5750;letter-spacing:0.06em;text-transform:uppercase;}
+.ovr-chart-svg-wrap .ovr-chart-svg{padding-left:60px;height:240px;}
+
+/* Creators list — ADMIN badge alignment */
+.creator-cell{display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
+.creator-cell-email{color:#FAF7EE;text-decoration:none;border-bottom:1px dashed #2A2A2A;}
+.creator-cell-email:hover{color:#C9A84C;border-bottom-style:solid;border-bottom-color:#C9A84C;}
+.creator-cell-badge{margin-left:0 !important;flex:0 0 auto;}
+
+/* TikTok account row in creator detail */
+.acct-list{display:flex;flex-direction:column;gap:10px;}
+.acct-row{display:grid;grid-template-columns:1fr auto auto;align-items:center;gap:14px;padding:14px 18px;background:#191919;border:1px solid #2A2A2A;}
+.acct-row-verified, .acct-row-active{border-left:3px solid #1F8B53;}
+.acct-row-suspended, .acct-row-cancelled{border-left:3px solid #C74F4F;opacity:0.7;}
+.acct-row-pending, .acct-row-credentials_received, .acct-row-two_factor_pending{border-left:3px solid #C9A84C;}
+.acct-row-handle{font-family:'JetBrains Mono','Menlo',monospace;font-size:15px;color:#FAF7EE;font-weight:700;}
+.acct-row-meta{font-size:11px;color:#9A9590;margin-top:4px;letter-spacing:0.04em;}
+.acct-pill{padding:5px 10px;font-size:10px;}
+.acct-pill-verified, .acct-pill-active{background:rgba(31,139,83,0.16);color:#5BD18C;border:1px solid rgba(31,139,83,0.45);}
+.acct-pill-pending, .acct-pill-credentials_received, .acct-pill-two_factor_pending{background:rgba(201,168,76,0.10);color:#C9A84C;border:1px solid rgba(201,168,76,0.40);}
+.acct-pill-suspended, .acct-pill-cancelled{background:rgba(199,79,79,0.10);color:#E07B7B;border:1px solid rgba(199,79,79,0.40);}
+.acct-flip{display:inline-flex;align-items:center;gap:8px;flex-wrap:wrap;}
+.acct-flip-select{min-width:160px;}
+.acct-status-verified, .acct-status-active{color:#5BD18C !important;border-color:rgba(31,139,83,0.45) !important;}
+.acct-status-suspended, .acct-status-cancelled{color:#E07B7B !important;border-color:rgba(199,79,79,0.40) !important;}
+.acct-quick-verify{background:rgba(31,139,83,0.85) !important;color:#0F0F0F !important;border-color:rgba(31,139,83,0.85) !important;}
+.acct-quick-verify:hover{background:#5BD18C !important;border-color:#5BD18C !important;}
+@media(max-width:680px){
+  .acct-row{grid-template-columns:1fr;gap:10px;}
+  .acct-flip-select{width:100%;}
+}
+
+/* Chats: 'All caught up' empty state in its own frame */
+.chats-empty-frame{padding:18px 22px;background:rgba(31,139,83,0.06);border:1px dashed rgba(31,139,83,0.45);border-radius:6px;text-align:center;color:#9A9590;font-size:13px;line-height:1.6;}
+.chats-empty-frame strong{color:#5BD18C;}

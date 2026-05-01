@@ -124,8 +124,8 @@ export default async function AdminChatsListPage() {
               </div>
               <div className="chat-list">
                 {unread.length === 0 ? (
-                  <div className="wdr-history-empty">
-                    All caught up — no creators are waiting on a reply.
+                  <div className="chats-empty-frame">
+                    <strong>All caught up</strong> — no creators are waiting on a reply.
                   </div>
                 ) : (
                   unread.map((c) => <Card key={c.id} c={c} />)

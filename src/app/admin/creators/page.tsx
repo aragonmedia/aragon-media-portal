@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { db } from "@/db";
 import { users, accounts, agreements, withdrawals } from "@/db/schema";
 import { sql, desc } from "drizzle-orm";
@@ -69,13 +70,22 @@ export default async function AdminCreatorsPage() {
               ) : (
                 list.map((u) => (
                   <tr key={u.id}>
-                    <td className="mono">
-                      {u.email}
-                      {u.isAdmin && (
-                        <span className="role-pill role-admin">admin</span>
-                      )}
+                    <td>
+                      <div className="creator-cell">
+                        <Link
+                          href={`/admin/creators/${u.id}`}
+                          className="creator-cell-email mono"
+                        >
+                          {u.email}
+                        </Link>
+                        {u.isAdmin && (
+                          <span className="creator-cell-badge role-pill role-admin">
+                            admin
+                          </span>
+                        )}
+                      </div>
                     </td>
-                    <td>{u.name}</td>
+                    <td><Link href={`/admin/creators/${u.id}`} className="admin-cell-link">{u.name}</Link></td>
                     <td className="mono dim">{u.handle ?? "—"}</td>
                     <td>{u.accountsCount}</td>
                     <td>{u.withdrawalsCount}</td>

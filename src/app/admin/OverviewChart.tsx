@@ -209,6 +209,15 @@ export default function OverviewChart({ daily }: { daily: Day[] }) {
             once Square purchases or paid withdrawals land.
           </div>
         ) : (
+          <>
+          {/* Y-axis $ ticks at quartiles */}
+          <div className="ovr-chart-yaxis">
+            <span>{fmtUsd(max)}</span>
+            <span>{fmtUsd(Math.round(max * 0.75))}</span>
+            <span>{fmtUsd(Math.round(max * 0.5))}</span>
+            <span>{fmtUsd(Math.round(max * 0.25))}</span>
+            <span>$0</span>
+          </div>
           <svg
             ref={svgRef}
             viewBox={`0 0 ${W} ${H}`}
@@ -278,6 +287,28 @@ export default function OverviewChart({ daily }: { daily: Day[] }) {
               </>
             )}
           </svg>
+          {/* X-axis date ticks — only show 5 markers regardless of bucket count */}
+          <div className="ovr-chart-xaxis">
+            {(() => {
+              if (series.length === 0) return null;
+              const ticks = [0, 0.25, 0.5, 0.75, 1].map((p) =>
+                series[Math.min(series.length - 1, Math.round(p * (series.length - 1)))]
+              );
+              const labels =
+                range === "lifetime"
+                  ? ticks.map((t) =>
+                      new Date(t.date).toLocaleDateString("en-US", {
+                        month: "short",
+                        day: "numeric",
+                      })
+                    )
+                  : range === "7d"
+                    ? ["7d ago", "5d", "3d", "1d", "today"]
+                    : ["28d ago", "21d", "14d", "7d", "today"];
+              return labels.map((l, i) => <span key={i}>{l}</span>);
+            })()}
+          </div>
+          </>
         )}
 
         {hoverDay && !empty && (

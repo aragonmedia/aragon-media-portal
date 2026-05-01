@@ -32,6 +32,10 @@ function fmtTime(iso: string): string {
   });
 }
 
+function isVideoUrl(u: string): boolean {
+  return /\.(mp4|mov|webm|m4v)(\?|#|$)/i.test(u);
+}
+
 function parseUrls(raw: string | string[] | null | undefined): string[] {
   if (!raw) return [];
   if (Array.isArray(raw)) return raw.filter((x) => typeof x === "string");
@@ -120,7 +124,7 @@ export default function ChatRoomClient({
     const next: Pending[] = [];
     for (let i = 0; i < picked.length && next.length < remaining; i++) {
       const f = picked[i];
-      if (!f.type.startsWith("image/")) continue;
+      if (!f.type.startsWith("image/") && !f.type.startsWith("video/")) continue;
       next.push({ file: f, preview: URL.createObjectURL(f) });
     }
     if (picked.length > remaining) {
@@ -247,19 +251,39 @@ export default function ChatRoomClient({
                 {m.body && <div className="chat-msg-body">{m.body}</div>}
                 {urls.length > 0 && (
                   <div className={`chat-attach-grid${urls.length === 1 ? " one" : ""}`}>
-                    {urls.map((u) => (
-                      <a
-                        key={u}
-                        href={u}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="chat-attach-thumb"
-                        title="Click to open full-size"
-                      >
-                        {/* eslint-disable-next-line @next/next/no-img-element */}
-                        <img src={u} alt="attachment" loading="lazy" />
-                      </a>
-                    ))}
+                    {urls.map((u) =>
+                      isVideoUrl(u) ? (
+                        <div key={u} className="chat-attach-thumb chat-attach-video">
+                          <video
+                            src={u}
+                            controls
+                            preload="metadata"
+                            playsInline
+                            className="chat-attach-vid"
+                          />
+                          <a
+                            href={u}
+                            download
+                            className="chat-attach-download"
+                            title="Download video"
+                          >
+                            ⬇ Download
+                          </a>
+                        </div>
+                      ) : (
+                        <a
+                          key={u}
+                          href={u}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="chat-attach-thumb"
+                          title="Click to open full-size"
+                        >
+                          {/* eslint-disable-next-line @next/next/no-img-element */}
+                          <img src={u} alt="attachment" loading="lazy" />
+                        </a>
+                      )
+                    )}
                   </div>
                 )}
               </div>
@@ -274,8 +298,17 @@ export default function ChatRoomClient({
             <div className="chat-attach-preview">
               {pending.map((p, i) => (
                 <div key={i} className="chat-attach-preview-tile">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={p.preview} alt={p.file.name} />
+                  {p.file.type.startsWith("video/") ? (
+                    <div className="chat-attach-preview-video">
+                      <span className="chat-attach-preview-icon">▶︎</span>
+                      <span className="chat-attach-preview-name">
+                        {p.file.name}
+                      </span>
+                    </div>
+                  ) : (
+                    /* eslint-disable-next-line @next/next/no-img-element */
+                    <img src={p.preview} alt={p.file.name} />
+                  )}
                   <button
                     type="button"
                     className="chat-attach-preview-x"
@@ -311,14 +344,14 @@ export default function ChatRoomClient({
                 className="chat-tool-btn"
                 onClick={() => fileInputRef.current?.click()}
                 disabled={sending || pending.length >= MAX_ATTACHMENTS}
-                title={`Attach up to ${MAX_ATTACHMENTS} images`}
+                title={`Attach up to ${MAX_ATTACHMENTS} images or videos`}
               >
-                📎 Attach{pending.length > 0 ? ` (${pending.length}/${MAX_ATTACHMENTS})` : ""}
+                📎 Attach image/video{pending.length > 0 ? ` (${pending.length}/${MAX_ATTACHMENTS})` : ""}
               </button>
               <input
                 ref={fileInputRef}
                 type="file"
-                accept="image/png,image/jpeg,image/webp,image/heic"
+                accept="image/png,image/jpeg,image/webp,image/heic,video/mp4,video/quicktime,video/webm"
                 multiple
                 className="chat-attach-input"
                 onChange={(e) => addFiles(e.target.files)}
