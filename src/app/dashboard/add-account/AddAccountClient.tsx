@@ -221,7 +221,7 @@ export default function AddAccountClient({
             <div className="why-card">
               <div className="why-num">03</div>
               <h4>All managed in one place</h4>
-              <p>Every account you verify shows up in this portal. One login, one AM team backing all of them.</p>
+              <p>Every account we verify for you shows up in this portal. One login, one AM team backing all of them.</p>
             </div>
           </div>
         </div>

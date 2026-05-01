@@ -101,11 +101,10 @@ export default async function AgreementPage() {
             Your Operations Agreement isn&apos;t open yet
           </h2>
           <p className="agr-locked-body">
-            The Agency unlocks this agreement once your TikTok account is fully
-            verified and your verification screenshots are on file. The full
-            text is shown below so you know what to expect — but the{" "}
-            <strong>Sign</strong> button stays inactive until the team flips
-            this open in the portal.
+            The Agency unlocks this agreement once we&apos;ve completed
+            verifying your TikTok Shop account on our end. Until then, you
+            can read the full text below so you know exactly what to expect
+            — but the <strong>Sign</strong> button stays inactive.
           </p>
           <Link href="/dashboard/chat" className="dash-cta">
             Notify AM Team in chat →
