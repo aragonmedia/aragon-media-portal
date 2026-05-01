@@ -48,6 +48,19 @@ export default async function AgreementPage() {
         </Link>
       </header>
 
+      {/* Top-of-page importance callout — visible in every state so the
+          creator always understands the prerequisite relationship between
+          this agreement and being able to receive their first payment. */}
+      <div className="dash-card agr-importance">
+        <span className="agr-importance-pill">Important</span>
+        <p>
+          This Operations Agreement <strong>must be signed before you can
+          receive your first payment</strong>. Once it&apos;s signed, your
+          withdrawal form unlocks immediately and you&apos;ll be able to
+          submit your first request.
+        </p>
+      </div>
+
       {/* STATE 3 — already signed. Show receipt-style confirmation. */}
       {signed && (
         <section className="dash-card agr-signed-card">
@@ -144,6 +157,33 @@ export default async function AgreementPage() {
             contractVersion={CONTRACT_VERSION}
             disabled
           />
+        </section>
+      )}
+
+      {/* Post-sign CTA — only renders once signed. Acts as the natural
+          "you're done here, go to the next step" prompt + multi-path
+          unlock to the withdrawal form. The withdrawal form itself
+          already auto-unlocks when contract_signed_at is set, so this
+          button is the final visual confirmation + a one-tap path. */}
+      {signed && (
+        <section className="dash-card agr-postsign-card">
+          <div className="agr-postsign-pill">✓ All set — withdrawals unlocked</div>
+          <h2 className="agr-postsign-title">
+            You can now submit withdrawals
+          </h2>
+          <p className="agr-postsign-body">
+            Your form is open. The AM Team has been notified you signed and is
+            standing by for your first submission. If anything looks off,
+            refresh the page and the new state should appear.
+          </p>
+          <div className="agr-postsign-actions">
+            <Link href="/dashboard/withdrawals/new" className="dash-cta">
+              Submit your 1st withdrawal →
+            </Link>
+            <Link href="/dashboard/withdrawals" className="dash-cta ghost">
+              View receipts
+            </Link>
+          </div>
         </section>
       )}
     </main>

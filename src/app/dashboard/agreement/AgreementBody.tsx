@@ -1,5 +1,16 @@
-// Pure JSX block — renders the v1.0.0 contract text.
-// Kept in its own component so the same body is shown on the live page,
+// Pure JSX block — renders the v2.0.0 Operations Agreement.
+// Faithful port of Kevin's official PDF with the following deltas:
+//  - Governing law: Wyoming (not Washington)
+//  - Per-account verification fee: framed as "base rate of $100, starting
+//    rate subject to change" so the on-portal copy stays correct as
+//    pricing evolves
+//  - Section 9 (Service Re-Invite + Hold Policy) added verbatim
+//  - Section 11 (Opt-Out Clause) added verbatim
+//  - "Legal Binding and Entire Agreement" header renamed to
+//    "Mutual Operations Establishment" per Kevin's language preference
+//    (avoid "binding" / "contract" / "linking" framing)
+//
+// Kept in its own component so the same body renders on the live page,
 // the public preview, and (later) the PDF generator.
 import { CONTRACT_VERSION } from "./constants";
 
@@ -13,94 +24,133 @@ export default function AgreementBody({ creatorName }: { creatorName?: string })
         <span>Effective from the date of signature below</span>
       </div>
 
-      <p>
-        This Operations Agreement (the &ldquo;Agreement&rdquo;) is entered into by
-        and between <strong>Aragon Media</strong>, a creator-management agency
-        (&ldquo;Agency&rdquo;), and{" "}
-        <strong>{creatorName ? creatorName : "the undersigned creator"}</strong>{" "}
-        (&ldquo;Creator&rdquo;), together the &ldquo;Parties.&rdquo;
+      <p className="agr-intro">
+        This Operations Agreement (the &ldquo;Agreement&rdquo;) is made between{" "}
+        <strong>{creatorName ? creatorName : "the undersigned"}</strong>,
+        hereinafter referred to as &ldquo;Content Creator&rdquo;, and{" "}
+        <strong>Aragon Media</strong>, hereinafter referred to as
+        &ldquo;Agency&rdquo;.
       </p>
 
-      <h3>1. Scope of services</h3>
+      <h3>Purpose of Agreement</h3>
+
       <p>
-        The Agency will register as the Approved Partner on each TikTok Shop
-        account the Creator submits for verification, perform the verification
-        handshake on the Creator&apos;s behalf, and operate as the collection
-        endpoint for TikTok Shop commissions earned through those accounts. The
-        Agency does not create content, post on the Creator&apos;s behalf, or
-        retain login access after verification is complete.
+        <strong>1.</strong> The Agency agrees to provide the service of
+        verifying the Content Creator&apos;s TikTok Account. This Agreement is
+        limited to verification services only and does not establish any
+        further obligations related to brand partnerships or campaign
+        management.
       </p>
 
-      <h3>2. Mutual obligations</h3>
       <p>
-        This Agreement is mutually binding. It secures the Creator&apos;s right
-        to receive their commission balance (after the agreed fee) for any
-        commissions collected by the Agency through the Creator&apos;s verified
-        accounts. It also secures the Agency&apos;s right to collect that fee
-        on those commissions for the duration of the relationship.
+        <strong>2.</strong> This Agreement constitutes a single-service
+        operational relationship and is independent from any brand, affiliate,
+        or creative campaign arrangement.
       </p>
 
-      <h3>3. Service fee</h3>
       <p>
-        The Agency&apos;s service fee is <strong>20% of TikTok Shop
-        commissions</strong> collected on the Creator&apos;s behalf. This rate
-        is locked permanently for the life of this Agreement and will not
-        increase. Any future fee changes apply only to new agreements, not to
-        rows already signed.
+        <strong>3. Enforceability of Rules:</strong> These terms are
+        non-negotiable and enforced uniformly. The Agency is not responsible
+        for payment delays caused by non-compliance.
       </p>
 
-      <h3>4. Withdrawal mechanics</h3>
+      <h3>Operations Terms and Service Scope</h3>
+
       <p>
-        The Creator initiates withdrawals from inside TikTok Shop. Funds land
-        in the Agency&apos;s account. Within <strong>48 hours</strong> of each
-        TikTok-side withdrawal, the Creator must submit a Withdrawal Form in
-        the portal: amount, date, source account, screenshot proof, and
-        payout details. The Agency processes payouts manually Monday through
-        Friday. There is no minimum payout amount.
+        <strong>4.</strong> The Agency will assist in the verification of the
+        Content Creator&apos;s TikTok Page using the necessary operational
+        processes.
       </p>
 
-      <h3>5. Grace Period Policy (48 hours)</h3>
       <p>
-        If a Withdrawal Form is submitted more than 48 hours after the
-        TikTok-side withdrawal, the Agency reserves the right to retain the
-        full value of that transaction. The portal will flag late submissions
-        but still record them; whether to honor or retain is at the
-        Agency&apos;s discretion. This rule exists because late or missing
-        forms make reconciliation impossible.
+        <strong>5. Independent Contractor Status:</strong> The Content Creator
+        acknowledges they are engaging in this Agreement as an independent
+        contractor, not as an employee or representative of the Agency. Before
+        completion of the required verification process, a per-account
+        verification fee is collected — <strong>base rate of $100 per
+        account · starting rate, subject to change</strong> based on the
+        Content Creator&apos;s selected tier and any active promotional
+        pricing at the time of purchase.
       </p>
 
-      <h3>6. Creator responsibilities</h3>
-      <ul>
-        <li>Change the TikTok password promptly after verification is confirmed.</li>
-        <li>Keep portal email and payout details up to date.</li>
-        <li>Submit Withdrawal Forms on time, with accurate screenshots.</li>
-        <li>Do not share portal credentials, TikTok credentials, or the 1-on-1 chat thread with anyone outside Aragon Media.</li>
-        <li>Comply with TikTok Community Guidelines, FTC disclosure rules, and applicable tax law.</li>
-      </ul>
-
-      <h3>7. Termination</h3>
       <p>
-        Either Party may terminate this Agreement at any time, in writing
-        (email is sufficient). On termination, the Agency stops accepting new
-        orders and processes the final outstanding-balance payout within 30
-        days. Material breach (fraud, fake credentials, repeated late
-        Withdrawal Forms, FTC violation) may result in forfeiture of unpaid
-        balances tied to the breach.
+        <strong>6. Transaction Fee Deduction:</strong> The Agency will deduct a{" "}
+        <strong>20% fee from each transaction</strong> originating from
+        &ldquo;TikTok&rdquo; as compensation for operations and banking
+        services. This 20% fee shall be deemed all-inclusive, meaning it
+        incorporates and fully covers all applicable U.S. taxes, regulatory
+        obligations, and operational expenses related to such transactions.
+        The Content Creator shall not be subject to any additional fees,
+        deductions, or charges beyond the stated 20% transaction fee.
       </p>
 
-      <h3>8. Governing terms</h3>
       <p>
-        This Agreement is read alongside the published{" "}
-        <a href="/terms" target="_blank" rel="noreferrer">
-          Aragon Media Terms of Service
-        </a>{" "}
-        and{" "}
-        <a href="/privacy" target="_blank" rel="noreferrer">
-          Privacy Policy
-        </a>
-        . If any term in this Agreement conflicts with the Terms, this
-        Agreement controls. Governing law is the State of Wyoming, USA.
+        <strong>7. Proof of Fund Submission:</strong> The Content Creator must
+        complete and submit the designated Withdrawal Form inside the Aragon
+        Media portal within <strong>48 hours</strong> of each TikTok
+        withdrawal as proof of compliance and fund verification.
       </p>
+
+      <p>
+        <strong>8. Grace Period Policy:</strong> If the required form is not
+        submitted within 48 hours, the Agency reserves the right to retain the
+        full value of the associated transaction. This does not affect future
+        withdrawals assuming compliance continues.
+      </p>
+
+      <p>
+        <strong>9. Service Re-Invite and Hold Policy:</strong> For the first{" "}
+        <strong>sixty (60) days</strong> after your account is verified, our
+        team will send you a new TikTok invitation to keep your service
+        active. If the invitation is not accepted, your operations and
+        payouts will be placed on a temporary service hold until you accept.
+        This same re-invite process will repeat once per year every{" "}
+        <strong>(365) days</strong> to maintain compliance and continued
+        access to services.
+      </p>
+
+      <h3>Mutual Operations Establishment</h3>
+
+      <p>
+        <strong>10.</strong> This Agreement shall be governed by and construed
+        in accordance with the laws of the <strong>State of Wyoming</strong>,
+        United States of America.
+      </p>
+
+      <p>
+        <strong>11. Opt-Out Clause:</strong> The Content Creator may opt out
+        of operational services with written notice. Upon opting out, the
+        Creator may use their own credentials for verification. The Agency
+        service fees will cease to apply, but prior obligations remain agreed
+        upon between both parties.
+      </p>
+
+      <p>
+        <strong>12.</strong> By signing this Agreement, the Content Creator
+        acknowledges and agrees to all the terms and conditions stated by the
+        Agency herein, ensuring full compliance with security, operational,
+        and anti-fraud measures. The Agreement is a mutual operating
+        understanding that establishes good business between both parties.
+      </p>
+
+      <p className="agr-witness">
+        <strong>IN WITNESS WHEREOF</strong>, the Content Creator acknowledges
+        that they have read, understood, and agree to operate under the terms
+        and conditions of this Operations Agreement.
+      </p>
+
+      <div className="agr-signers">
+        <div className="agr-signer">
+          <div className="agr-signer-label">Content Creator</div>
+          <div className="agr-signer-line">
+            {creatorName ? creatorName : "_________________________"}
+          </div>
+        </div>
+        <div className="agr-signer">
+          <div className="agr-signer-label">Agency · Aragon Media</div>
+          <div className="agr-signer-line agr-signer-kevin">Kevin Aragon</div>
+        </div>
+      </div>
     </div>
   );
 }

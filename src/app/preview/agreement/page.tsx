@@ -38,6 +38,17 @@ export default function PreviewAgreementPage() {
         </div>
       </div>
 
+      {/* Top-of-page importance callout (always visible on real page). */}
+      <div className="dash-card agr-importance">
+        <span className="agr-importance-pill">Important</span>
+        <p>
+          This Operations Agreement <strong>must be signed before you can
+          receive your first payment</strong>. Once it&apos;s signed, your
+          withdrawal form unlocks immediately and you&apos;ll be able to
+          submit your first request.
+        </p>
+      </div>
+
       {/* STATE 1 — locked */}
       <section className="dash-card agr-locked-card">
         <div className="agr-locked-pill">🔒 Locked</div>
@@ -103,7 +114,26 @@ export default function PreviewAgreementPage() {
         <AgreementBody creatorName={SAMPLE_NAME} />
       </section>
 
-      {/* Sign panel mock — shown locked here so Kevin can preview the field */}
+      {/* STATE 4 mock — what the creator sees right after they click sign */}
+      <section className="dash-card agr-postsign-card">
+        <div className="agr-postsign-pill">✓ All set — withdrawals unlocked</div>
+        <h2 className="agr-postsign-title">You can now submit withdrawals</h2>
+        <p className="agr-postsign-body">
+          Your form is open. The AM Team has been notified you signed and is
+          standing by for your first submission. If anything looks off,
+          refresh the page and the new state should appear.
+        </p>
+        <div className="agr-postsign-actions">
+          <Link href="/preview/receipt" className="dash-cta">
+            Submit your 1st withdrawal →
+          </Link>
+          <Link href="/preview/withdrawals" className="dash-cta ghost">
+            View receipts
+          </Link>
+        </div>
+      </section>
+
+      {/* Sign panel mock — shown unlocked here so Kevin can preview the field */}
       <section className="dash-card agr-sign-card">
         <div className="agr-sign-form">
           <label className="agr-sign-label">

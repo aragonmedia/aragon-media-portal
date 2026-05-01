@@ -4,6 +4,7 @@ import { db } from "@/db";
 import { agreements, users } from "@/db/schema";
 import { getCurrentUser } from "@/lib/auth/session";
 import { CONTRACT_VERSION } from "@/app/dashboard/agreement/constants";
+import { sendAgreementSignedNotification } from "@/lib/email/send";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -65,6 +66,17 @@ export async function POST(req: NextRequest) {
       contractVersion: CONTRACT_VERSION,
     })
     .where(eq(users.id, user.id));
+
+  // Notify the AM team. Awaited so the email actually fires before the
+  // serverless function returns; the helper swallows its own errors so a
+  // Resend outage can never break the sign flow.
+  await sendAgreementSignedNotification({
+    creatorEmail: user.email,
+    creatorName: user.name,
+    signature: sig.slice(0, 200),
+    contractVersion: CONTRACT_VERSION,
+    signedAt: now,
+  });
 
   return Response.json({
     ok: true,

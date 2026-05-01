@@ -210,3 +210,59 @@ function renderTextFallback({
     "1309 Coffeen Ave, Sheridan, WY 82801",
   ].join("\n");
 }
+
+/**
+ * Internal AM-team notification when a creator signs the Operations
+ * Agreement. Fire-and-forget — caller should not await this in a way
+ * that blocks the user's response. Failures are logged and swallowed
+ * so a Resend hiccup never breaks the sign flow.
+ */
+export async function sendAgreementSignedNotification(opts: {
+  creatorEmail: string;
+  creatorName: string;
+  signature: string;
+  contractVersion: string;
+  signedAt: Date;
+}) {
+  try {
+    const resend = getResend();
+    const subject = `Operations Agreement signed — ${opts.creatorName}`;
+    const text = [
+      "A creator just signed the Operations Agreement.",
+      "",
+      `Creator:    ${opts.creatorName}`,
+      `Email:      ${opts.creatorEmail}`,
+      `Signature:  ${opts.signature}`,
+      `Version:    ${opts.contractVersion}`,
+      `Signed at:  ${opts.signedAt.toISOString()}`,
+      "",
+      "Action: their withdrawal form is now unlocked. Standby for their first submission.",
+      "",
+      `Portal: ${PORTAL}/dashboard`,
+    ].join("\n");
+    const html = `<!DOCTYPE html><html><body style="font-family:system-ui,sans-serif;background:#0F0F0F;color:#FAF7EE;padding:24px;line-height:1.6;">
+      <h2 style="color:#C9A84C;margin:0 0 16px 0;">Operations Agreement signed</h2>
+      <table cellpadding="6" style="font-size:14px;color:#D4CFB6;">
+        <tr><td><strong>Creator:</strong></td><td>${opts.creatorName}</td></tr>
+        <tr><td><strong>Email:</strong></td><td>${opts.creatorEmail}</td></tr>
+        <tr><td><strong>Signature:</strong></td><td>${opts.signature}</td></tr>
+        <tr><td><strong>Version:</strong></td><td>${opts.contractVersion}</td></tr>
+        <tr><td><strong>Signed at:</strong></td><td>${opts.signedAt.toISOString()}</td></tr>
+      </table>
+      <p style="font-size:13px;color:#9A9590;margin-top:18px;">
+        Their withdrawal form is now unlocked. Standby for their first submission.
+      </p>
+      <p style="font-size:12px;color:#5C5750;margin-top:14px;">${PORTAL}/dashboard</p>
+    </body></html>`;
+    await resend.emails.send({
+      from: FROM,
+      to: ["aragonkevin239@gmail.com"],
+      subject,
+      text,
+      html,
+    });
+  } catch (err) {
+    // Swallow — this notification is nice-to-have, not blocking.
+    console.error("[email] sendAgreementSignedNotification failed:", err);
+  }
+}

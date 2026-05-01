@@ -808,3 +808,41 @@
   .agr-signed-grid{grid-template-columns:1fr;}
   .agr-sign-input{font-size:18px !important;padding:12px 14px !important;}
 }
+
+/* ===== Operations Agreement — v2.0.0 additions ===== */
+
+/* Importance callout pinned to top of /dashboard/agreement (every state) */
+.agr-importance{padding:18px 24px;display:flex;align-items:flex-start;gap:14px;background:rgba(201,168,76,0.08);border:1px solid rgba(201,168,76,0.45);border-left:3px solid var(--gold);}
+.agr-importance-pill{flex:0 0 auto;padding:5px 12px;border-radius:999px;font-size:10px;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;background:var(--gold);color:#0F0F0F;}
+.agr-importance p{margin:0;font-size:14px;line-height:1.65;color:var(--text-muted);font-weight:300;}
+.agr-importance p strong{color:var(--text);font-weight:600;}
+
+/* Agreement body — intro + witness clause + signers */
+.agr-intro{padding-top:6px;}
+.agr-witness{margin-top:18px;padding:14px 18px;background:var(--bg-deep);border:1px solid var(--border);border-left:2px solid var(--gold);font-size:13px;line-height:1.7;color:var(--text-muted);}
+.agr-witness strong{color:var(--gold);letter-spacing:0.06em;}
+.agr-signers{display:grid;grid-template-columns:repeat(2,1fr);gap:24px;margin-top:24px;padding-top:18px;border-top:1px dashed var(--border);}
+.agr-signer{display:flex;flex-direction:column;gap:8px;}
+.agr-signer-label{font-size:10px;letter-spacing:0.18em;text-transform:uppercase;color:var(--text-sub);font-weight:600;}
+.agr-signer-line{font-family:'Playfair Display',serif;font-style:italic;font-size:18px;color:var(--text);padding-bottom:6px;border-bottom:1px solid var(--border);min-height:32px;}
+.agr-signer-kevin{color:var(--gold);}
+
+/* Post-sign CTA card — only renders when user.contractSignedAt is set */
+.agr-postsign-card{padding:28px 32px;display:flex;flex-direction:column;gap:14px;background:rgba(31,139,83,0.06);border:1px solid rgba(31,139,83,0.45);border-left:3px solid var(--green);}
+.agr-postsign-pill{align-self:flex-start;display:inline-flex;align-items:center;gap:6px;padding:6px 14px;border-radius:999px;font-size:11px;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;background:rgba(31,139,83,0.12);color:var(--green);border:1px solid rgba(31,139,83,0.45);}
+.agr-postsign-title{font-family:'Inter Tight',sans-serif;font-size:22px;font-weight:700;letter-spacing:-0.01em;color:var(--text);margin:0;line-height:1.25;}
+.agr-postsign-body{font-size:14px;line-height:1.7;color:var(--text-muted);margin:0;font-weight:300;}
+.agr-postsign-actions{display:flex;gap:12px;flex-wrap:wrap;margin-top:6px;}
+
+/* Mobile — agreement page */
+@media(max-width:680px){
+  .agr-importance{flex-direction:column;gap:10px;padding:16px 18px;}
+  .agr-importance-pill{align-self:flex-start;}
+  .agr-witness{padding:12px 14px;font-size:12px;}
+  .agr-signers{grid-template-columns:1fr;gap:18px;}
+  .agr-signer-line{font-size:16px;}
+  .agr-postsign-card{padding:22px 20px;}
+  .agr-postsign-title{font-size:19px;}
+  .agr-postsign-actions{flex-direction:column;}
+  .agr-postsign-actions .dash-cta{width:100%;text-align:center;}
+}
