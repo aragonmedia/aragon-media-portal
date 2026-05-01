@@ -93,7 +93,8 @@ export async function POST(req: NextRequest) {
     const blob = await put(key, file, {
       access: "public",
       contentType: file.type,
-      addRandomSuffix: false,
+      allowOverwrite: true,
+      token: process.env.BLOB_READ_WRITE_TOKEN,
     });
     return Response.json({
       ok: true,
@@ -104,12 +105,16 @@ export async function POST(req: NextRequest) {
       filename: file.name,
     });
   } catch (err) {
-    console.error("[blob/upload] put failed:", err);
+    const msg = err instanceof Error ? err.message : String(err);
+    const name = err instanceof Error ? err.name : typeof err;
+    const stack = err instanceof Error ? err.stack : undefined;
+    console.error("[blob/upload] put failed:", name, msg, stack);
     return Response.json(
       {
         ok: false,
         error: "upload_failed",
-        detail: err instanceof Error ? err.message : String(err),
+        errorName: name,
+        detail: msg,
       },
       { status: 500 }
     );
