@@ -123,15 +123,45 @@ export async function POST(req: NextRequest) {
 
 /**
  * GET /api/blob/upload
- *
- * Tiny health probe so the admin (or this assistant during setup) can
- * confirm the BLOB_READ_WRITE_TOKEN env var is wired without sending
- * a real file. Returns presence-only — never echoes the token value.
+ *   - bare GET: returns { configured }
+ *   - GET ?selftest=1: attempts an actual put() with a 4-byte payload and
+ *     surfaces the full error. Lets the assistant diagnose without needing
+ *     to multipart-POST from a browser.
  */
-export async function GET() {
-  return Response.json({
+import { NextRequest as NReq } from "next/server";
+export async function GET(req: NReq) {
+  const url = new URL(req.url);
+  const base = {
     ok: true,
     configured: !!process.env.BLOB_READ_WRITE_TOKEN,
     region: process.env.VERCEL_REGION ?? null,
-  });
+  };
+  if (url.searchParams.get("selftest") !== "1") {
+    return Response.json(base);
+  }
+  try {
+    const probe = await put(`__selftest/${Date.now()}.txt`, "ping", {
+      access: "public",
+      contentType: "text/plain",
+      allowOverwrite: true,
+      token: process.env.BLOB_READ_WRITE_TOKEN,
+    });
+    return Response.json({
+      ...base,
+      selftest: "ok",
+      url: probe.url,
+      pathname: probe.pathname,
+    });
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : String(err);
+    const name = err instanceof Error ? err.name : typeof err;
+    const stack = err instanceof Error ? err.stack : undefined;
+    return Response.json({
+      ...base,
+      selftest: "failed",
+      errorName: name,
+      detail: msg,
+      stack: stack?.split("\n").slice(0, 6),
+    });
+  }
 }
