@@ -20,6 +20,8 @@ function statusPill(status: string) {
     return { label: "Late · retained", className: "rcpt-pill-late" };
   if (status === "approved")
     return { label: "Approved", className: "rcpt-pill-approved" };
+  if (status === "calculated")
+    return { label: "Calculated", className: "rcpt-pill-calculated" };
   if (status === "rejected")
     return { label: "Rejected", className: "rcpt-pill-rejected" };
   return { label: "Pending review", className: "rcpt-pill-pending" };

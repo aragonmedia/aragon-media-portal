@@ -43,6 +43,7 @@ function fmt(d: Date | string | null | undefined): string {
 const STATUS_LABEL: Record<string, string> = {
   requested: "Pending",
   approved: "Approved",
+  calculated: "Calculated",
   paid: "Paid",
   rejected: "Rejected",
   late_retained: "Late · retained",

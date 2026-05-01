@@ -216,3 +216,39 @@
   .admin-3up{grid-template-columns:1fr;}
   .admin-mini-list{max-height:360px;}
 }
+
+/* ===== 5-color admin withdrawal row tinting ===== */
+/* Map (per Kevin):
+ *   requested      = Regular (default white text, no row tint)
+ *   approved       = BOLD white  (money landed in our bank)
+ *   calculated     = ORANGE      (admin computed amounts, ready to pay)
+ *   paid           = GREEN       (sent to creator)
+ *   rejected       = RED dim     (won't process)
+ *   late_retained  = RED dim     (Grace Period enforcement)
+ */
+.admin-wdr-row td{transition:background 0.12s ease, color 0.12s ease;}
+.admin-wdr-row-approved td{font-weight:600;color:#FAF7EE;}
+.admin-wdr-row-calculated td{background:rgba(212,128,40,0.08);color:#E6A357;}
+.admin-wdr-row-calculated td.gold{color:#E6A357;}
+.admin-wdr-row-paid td{background:rgba(31,139,83,0.10);color:#5BD18C;}
+.admin-wdr-row-paid td.gold{color:#5BD18C;}
+.admin-wdr-row-rejected td,.admin-wdr-row-late_retained td{opacity:0.55;}
+
+/* Status select dropdown — orange variant for the new state */
+.admin-status-select.status-calculated{color:#E6A357;border-color:rgba(212,128,40,0.55);}
+
+/* Pill for Calculated state (used on /dashboard receipt + admin pages) */
+.rcpt-pill-calculated{background:rgba(212,128,40,0.10);color:#E6A357;border:1px solid rgba(212,128,40,0.45);}
+
+/* Screenshot preview frame on admin withdrawal detail */
+.admin-screenshot-wrap{display:flex;flex-direction:column;gap:10px;}
+.admin-screenshot-frame{display:block;position:relative;background:#0B0B0B;border:1px solid #2A2A2A;padding:12px;text-align:center;text-decoration:none;color:inherit;transition:border-color 0.12s ease, box-shadow 0.12s ease;}
+.admin-screenshot-frame:hover{border-color:#C9A84C;box-shadow:0 8px 28px -10px rgba(201,168,76,0.35);}
+.admin-screenshot-img{max-width:100%;max-height:560px;height:auto;display:inline-block;border:1px solid #1F1F1F;}
+.admin-screenshot-overlay{position:absolute;top:14px;right:14px;padding:4px 10px;background:rgba(15,15,15,0.85);color:#C9A84C;font-size:11px;letter-spacing:0.06em;text-transform:uppercase;border:1px solid rgba(201,168,76,0.35);}
+.admin-screenshot-meta{font-size:11px;color:#5C5750;letter-spacing:0.04em;}
+.admin-screenshot-meta code{font-family:'JetBrains Mono','Menlo',monospace;background:#0B0B0B;color:#9A9590;padding:3px 8px;word-break:break-all;}
+@media(max-width:680px){
+  .admin-screenshot-img{max-height:380px;}
+  .admin-screenshot-frame{padding:8px;}
+}

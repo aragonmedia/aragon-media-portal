@@ -36,6 +36,13 @@
       "when": 1777617800000,
       "tag": "0004_seed_kevin_admin",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1777621100000,
+      "tag": "0005_calculated_withdrawal_status",
+      "breakpoints": true
     }
   ]
 }

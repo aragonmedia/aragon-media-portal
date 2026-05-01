@@ -26,6 +26,7 @@ export const dynamic = "force-dynamic";
 const STATUS_OK = new Set([
   "requested",
   "approved",
+  "calculated",
   "paid",
   "rejected",
   "late_retained",
@@ -34,6 +35,7 @@ const STATUS_OK = new Set([
 type WStatus =
   | "requested"
   | "approved"
+  | "calculated"
   | "paid"
   | "rejected"
   | "late_retained";

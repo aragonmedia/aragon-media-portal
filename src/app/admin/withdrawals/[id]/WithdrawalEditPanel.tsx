@@ -6,6 +6,7 @@ import { useState } from "react";
 const STATUS_LABELS: Record<string, string> = {
   requested: "Pending",
   approved: "Approved",
+  calculated: "Calculated",
   paid: "Paid",
   rejected: "Rejected",
   late_retained: "Late · retained",

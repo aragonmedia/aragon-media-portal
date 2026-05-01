@@ -29,11 +29,14 @@ export default function WithdrawalFormClient({
   const [bankDetails, setBankDetails] = useState("");
   const [notes, setNotes] = useState("");
   const [fileName, setFileName] = useState<string | null>(null);
+  const [fileObj, setFileObj] = useState<File | null>(null);
+  const [uploadProgress, setUploadProgress] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [msg, setMsg] = useState<{ kind: "ok" | "err"; text: string } | null>(null);
 
   function onFile(e: React.ChangeEvent<HTMLInputElement>) {
-    const f = e.target.files?.[0];
+    const f = e.target.files?.[0] ?? null;
+    setFileObj(f);
     setFileName(f ? f.name : null);
   }
 
@@ -46,6 +49,47 @@ export default function WithdrawalFormClient({
       return;
     }
     setSubmitting(true);
+    let uploadedUrl: string | null = null;
+    if (fileObj) {
+      try {
+        setUploadProgress("Uploading screenshot…");
+        const fd = new FormData();
+        fd.append("file", fileObj);
+        const upRes = await fetch("/api/blob/upload", {
+          method: "POST",
+          body: fd,
+        });
+        const upJson = (await upRes.json()) as {
+          ok: boolean;
+          url?: string;
+          error?: string;
+          hint?: string;
+        };
+        if (upRes.ok && upJson.ok && upJson.url) {
+          uploadedUrl = upJson.url;
+          setUploadProgress(null);
+        } else if (upJson.error === "storage_not_configured") {
+          // Fall back gracefully — store filename only, AM will request via chat
+          setUploadProgress("Screenshot upload not yet configured · saving filename only");
+        } else {
+          setMsg({
+            kind: "err",
+            text: `Screenshot upload failed${upJson.error ? ` (${upJson.error})` : ""}.`,
+          });
+          setSubmitting(false);
+          setUploadProgress(null);
+          return;
+        }
+      } catch (uploadErr) {
+        setMsg({
+          kind: "err",
+          text: `Upload error — ${uploadErr instanceof Error ? uploadErr.message : "try again"}.`,
+        });
+        setSubmitting(false);
+        setUploadProgress(null);
+        return;
+      }
+    }
     try {
       const res = await fetch("/api/withdrawals/submit", {
         method: "POST",
@@ -56,6 +100,7 @@ export default function WithdrawalFormClient({
           bankDetails,
           notes,
           fileName,
+          proofUrl: uploadedUrl,
         }),
       });
       const json = (await res.json()) as {
@@ -153,8 +198,11 @@ export default function WithdrawalFormClient({
 
       <div className="settings-actions">
         <button type="submit" className="dash-cta" disabled={submitting}>
-          {submitting ? "Submitting…" : "Submit Withdrawal Request →"}
+          {submitting ? (uploadProgress ?? "Submitting…") : "Submit Withdrawal Request →"}
         </button>
+        {uploadProgress && !msg && (
+          <span className="settings-msg ok">{uploadProgress}</span>
+        )}
         {msg && <span className={`settings-msg ${msg.kind === "ok" ? "ok" : "err"}`}>{msg.text}</span>}
       </div>
     </form>

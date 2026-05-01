@@ -6,6 +6,7 @@ import { useState } from "react";
 const OPTIONS = [
   "requested",
   "approved",
+  "calculated",
   "paid",
   "rejected",
   "late_retained",

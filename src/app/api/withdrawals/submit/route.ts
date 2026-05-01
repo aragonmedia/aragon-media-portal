@@ -15,7 +15,8 @@ type Body = {
   payoutMethod?: string;
   bankDetails?: string;        // free text — stored in notes for now
   notes?: string;
-  fileName?: string | null;    // screenshot file name placeholder until storage wired
+  fileName?: string | null;    // screenshot file name (always)
+  proofUrl?: string | null;    // public Vercel Blob URL when upload succeeded
 };
 
 function parseAmountToCents(raw?: string): number | null {
@@ -78,6 +79,7 @@ export async function POST(req: NextRequest) {
       status: "requested",
       payoutMethod: body.payoutMethod.trim().slice(0, 50),
       notes: noteLines.slice(0, 4000),
+      proofUrl: body.proofUrl && body.proofUrl.length > 0 ? body.proofUrl.slice(0, 500) : null,
     })
     .returning({
       id: withdrawals.id,

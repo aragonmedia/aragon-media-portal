@@ -28,6 +28,7 @@ function fmt(d: Date | string | null | undefined): string {
 const STATUS_LABELS: Record<string, string> = {
   requested: "Pending",
   approved: "Approved",
+  calculated: "Calculated",
   paid: "Paid",
   rejected: "Rejected",
   late_retained: "Late · retained",
@@ -119,7 +120,7 @@ export default async function AdminWithdrawalsPage({
                 </tr>
               ) : (
                 list.map((w) => (
-                  <tr key={w.id}>
+                  <tr key={w.id} className={`admin-wdr-row admin-wdr-row-${w.status}`}>
                     <td className="mono gold"><Link href={`/admin/withdrawals/${w.id}`} className="admin-cell-link">{w.receiptNumber}</Link></td>
                     <td>
                       <div>{w.creatorName ?? "—"}</div>

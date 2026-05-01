@@ -142,6 +142,42 @@ export default async function AdminWithdrawalDetail({
         />
       </section>
 
+      {/* Screenshot preview — only rendered when proofUrl is a URL */}
+      {w.proofUrl && /^https?:\/\//.test(w.proofUrl) && (
+        <section className="admin-section">
+          <div className="admin-section-head">
+            <h2>Withdrawal screenshot</h2>
+            <span className="admin-meta">
+              Uploaded by the creator on submit. Click the image to open
+              full-size in a new tab.
+            </span>
+          </div>
+          <div className="admin-screenshot-wrap">
+            <a
+              href={w.proofUrl}
+              target="_blank"
+              rel="noreferrer"
+              className="admin-screenshot-frame"
+              title="Open full-size in a new tab"
+            >
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={w.proofUrl}
+                alt="Creator's TikTok withdrawal screenshot"
+                className="admin-screenshot-img"
+                loading="lazy"
+              />
+              <div className="admin-screenshot-overlay">
+                <span>Click to open full-size ↗</span>
+              </div>
+            </a>
+            <div className="admin-screenshot-meta">
+              <code>{w.proofUrl}</code>
+            </div>
+          </div>
+        </section>
+      )}
+
       {/* Original creator submission notes */}
       <section className="admin-section">
         <div className="admin-section-head">
@@ -153,9 +189,9 @@ export default async function AdminWithdrawalDetail({
         </div>
         <div className="admin-record-doc">
           <pre className="admin-notes-pre">{w.notes ?? "(no notes)"}</pre>
-          {w.proofUrl && (
+          {w.proofUrl && !/^https?:\/\//.test(w.proofUrl) && (
             <p className="admin-meta" style={{ marginTop: 12 }}>
-              Screenshot reference: <code>{w.proofUrl}</code>
+              Screenshot reference (filename only — not uploaded): <code>{w.proofUrl}</code>
             </p>
           )}
         </div>

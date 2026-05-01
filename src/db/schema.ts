@@ -64,6 +64,7 @@ export const messageSenderEnum = pgEnum("message_sender", [
 export const withdrawalStatusEnum = pgEnum("withdrawal_status", [
   "requested",
   "approved",
+  "calculated",
   "paid",
   "rejected",
   "late_retained",
