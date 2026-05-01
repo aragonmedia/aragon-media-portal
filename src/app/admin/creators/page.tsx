@@ -23,6 +23,7 @@ export default async function AdminCreatorsPage() {
       contractVersion: users.contractVersion,
       accountsCount: sql<number>`(select count(*)::int from ${accounts} a where a.user_id = ${users.id})`,
       agreementsCount: sql<number>`(select count(*)::int from ${agreements} g where g.user_id = ${users.id})`,
+      latestAgreementId: sql<string | null>`(select id::text from ${agreements} g where g.user_id = ${users.id} order by g.signed_at desc limit 1)`,
       withdrawalsCount: sql<number>`(select count(*)::int from ${withdrawals} w where w.user_id = ${users.id})`,
     })
     .from(users)
@@ -101,6 +102,8 @@ export default async function AdminCreatorsPage() {
                         email={u.email}
                         contractUnlocked={u.contractUnlocked}
                         contractSigned={!!u.contractSignedAt}
+                        latestAgreementId={u.latestAgreementId}
+                        receiptsCount={u.withdrawalsCount}
                       />
                     </td>
                   </tr>

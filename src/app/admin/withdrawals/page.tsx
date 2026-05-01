@@ -1,6 +1,7 @@
 import { db } from "@/db";
 import { withdrawals, users, accounts } from "@/db/schema";
 import { desc, eq } from "drizzle-orm";
+import Link from "next/link";
 import WithdrawalStatusFlip from "./WithdrawalStatusFlip";
 
 export const dynamic = "force-dynamic";
@@ -32,7 +33,16 @@ const STATUS_LABELS: Record<string, string> = {
   late_retained: "Late · retained",
 };
 
-export default async function AdminWithdrawalsPage() {
+export default async function AdminWithdrawalsPage({
+  searchParams,
+}: {
+  searchParams?: Promise<{ creator?: string }>;
+}) {
+  const sp = (await searchParams) ?? {};
+  const creatorId = sp.creator && sp.creator.length > 0 ? sp.creator : null;
+
+  const where = creatorId ? eq(withdrawals.userId, creatorId) : undefined;
+
   const list = await db
     .select({
       id: withdrawals.id,
@@ -44,6 +54,7 @@ export default async function AdminWithdrawalsPage() {
       payoutMethod: withdrawals.payoutMethod,
       requestedAt: withdrawals.requestedAt,
       paidAt: withdrawals.paidAt,
+      userId: withdrawals.userId,
       creatorEmail: users.email,
       creatorName: users.name,
       tiktokHandle: accounts.tiktokHandle,
@@ -51,19 +62,35 @@ export default async function AdminWithdrawalsPage() {
     .from(withdrawals)
     .leftJoin(users, eq(users.id, withdrawals.userId))
     .leftJoin(accounts, eq(accounts.id, withdrawals.accountId))
+    .where(where)
     .orderBy(desc(withdrawals.requestedAt));
+
+  const filteredCreatorName = creatorId && list.length > 0 ? list[0].creatorName : null;
 
   return (
     <main className="admin-shell admin-shell-nested">
       <header className="admin-header">
         <div>
           <p className="admin-eyebrow">Aragon Media · Withdrawals</p>
-          <h1>All withdrawal receipts</h1>
+          <h1>
+            {creatorId && filteredCreatorName
+              ? `${filteredCreatorName}'s receipts`
+              : "All withdrawal receipts"}
+          </h1>
           <p className="admin-page-sub">
-            {list.length} receipt{list.length === 1 ? "" : "s"} across all
-            creators. Flip status from the dropdown · Paid for processed
-            payouts · Late · retained for past-48h Grace Period enforcement.
+            {list.length} receipt{list.length === 1 ? "" : "s"}
+            {creatorId ? " for this creator" : " across all creators"}. Click a
+            receipt # to open the detail view + edit gross/fee/net values.
+            Flip status from the dropdown.
           </p>
+          {creatorId && (
+            <p className="admin-filter-strip">
+              <span>Filtered by creator</span>
+              <Link href="/admin/withdrawals" className="admin-row-btn">
+                Clear filter
+              </Link>
+            </p>
+          )}
         </div>
       </header>
 
@@ -93,7 +120,7 @@ export default async function AdminWithdrawalsPage() {
               ) : (
                 list.map((w) => (
                   <tr key={w.id}>
-                    <td className="mono gold">{w.receiptNumber}</td>
+                    <td className="mono gold"><Link href={`/admin/withdrawals/${w.id}`} className="admin-cell-link">{w.receiptNumber}</Link></td>
                     <td>
                       <div>{w.creatorName ?? "—"}</div>
                       <div className="dim small">{w.creatorEmail ?? "—"}</div>

@@ -30,7 +30,7 @@ export default function WithdrawalStatusFlip({
     setBusy(true);
     setErr(null);
     try {
-      const res = await fetch("/api/admin/actions/set-withdrawal-status", {
+      const res = await fetch("/api/admin/actions/update-withdrawal", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ id, status: next }),

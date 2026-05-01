@@ -266,3 +266,160 @@ export async function sendAgreementSignedNotification(opts: {
     console.error("[email] sendAgreementSignedNotification failed:", err);
   }
 }
+
+/**
+ * Status-change email to the creator when the AM team flips a withdrawal
+ * receipt's state. Status-specific subject + headline + body. Same dark-only
+ * template as the verification email.
+ *
+ * BCC's aragonkevin239@gmail.com so the AM team has a paper trail.
+ */
+type WStatus = "requested" | "approved" | "paid" | "rejected" | "late_retained";
+
+function fmtUsd(cents: number): string {
+  return `$${(cents / 100).toLocaleString(undefined, {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  })}`;
+}
+
+function statusCopy(status: WStatus, receiptNumber: string, netCents: number) {
+  switch (status) {
+    case "paid":
+      return {
+        subject: `${receiptNumber} · Paid · ${fmtUsd(netCents)} sent`,
+        eyebrow: "Withdrawal Paid",
+        headline: "Your money is on the way",
+        body: `We just processed receipt <strong>${receiptNumber}</strong>. <strong>${fmtUsd(
+          netCents
+        )}</strong> has been sent to the payout method on file. Depending on your bank or wallet, it should land within minutes (instant rails) to a few business days (ACH/wire).`,
+        accent: "#1F8B53",
+      };
+    case "approved":
+      return {
+        subject: `${receiptNumber} · Approved`,
+        eyebrow: "Withdrawal Approved",
+        headline: "Your receipt is approved",
+        body: `Receipt <strong>${receiptNumber}</strong> for <strong>${fmtUsd(
+          netCents
+        )}</strong> has been approved by the AM team and is queued for payout. We process payouts Monday through Friday — you'll get a second email the moment it's sent.`,
+        accent: "#C9A84C",
+      };
+    case "rejected":
+      return {
+        subject: `${receiptNumber} · Action needed`,
+        eyebrow: "Withdrawal Rejected",
+        headline: "Your receipt couldn't be processed",
+        body: `Receipt <strong>${receiptNumber}</strong> for <strong>${fmtUsd(
+          netCents
+        )}</strong> was rejected. Open a chat with the AM team to find out what's missing — usually a clearer screenshot or corrected payout details.`,
+        accent: "#C74F4F",
+      };
+    case "late_retained":
+      return {
+        subject: `${receiptNumber} · Late · retained per Grace Period`,
+        eyebrow: "Grace Period Policy",
+        headline: "This receipt was submitted late",
+        body: `Receipt <strong>${receiptNumber}</strong> for <strong>${fmtUsd(
+          netCents
+        )}</strong> was submitted more than 48 hours after the TikTok-side withdrawal. Per the Grace Period Policy in your Operations Agreement, the Agency has retained the value of this transaction. Future on-time submissions are unaffected.`,
+        accent: "#C74F4F",
+      };
+    default:
+      return {
+        subject: `${receiptNumber} · Pending review`,
+        eyebrow: "Withdrawal Pending",
+        headline: "Your receipt is back in the queue",
+        body: `Receipt <strong>${receiptNumber}</strong> for <strong>${fmtUsd(
+          netCents
+        )}</strong> is now Pending review. The AM team will action it shortly.`,
+        accent: "#C9A84C",
+      };
+  }
+}
+
+function withdrawalStatusHtml(args: {
+  eyebrow: string;
+  headline: string;
+  body: string;
+  accent: string;
+  receiptNumber: string;
+}) {
+  return `<!DOCTYPE html><html><head>
+  <meta name="color-scheme" content="dark only">
+  <meta name="supported-color-schemes" content="dark">
+</head>
+<body style="margin:0;padding:0;background:#0F0F0F !important;color:#FAF7EE !important;font-family:system-ui,-apple-system,'Inter Tight',sans-serif;">
+  <table role="presentation" width="100%" bgcolor="#0F0F0F" style="background:#0F0F0F !important;">
+    <tr><td align="center" style="padding:32px 18px;">
+      <table role="presentation" width="600" bgcolor="#0F0F0F" style="background:#0F0F0F !important;border:1px solid #2A2A2A;max-width:600px;width:100%;">
+        <tr><td bgcolor="#0F0F0F" style="padding:30px 32px 12px;background:#0F0F0F !important;">
+          <p style="margin:0 0 6px 0;font-size:11px;letter-spacing:0.18em;color:${args.accent} !important;text-transform:uppercase;font-weight:700;">${args.eyebrow}</p>
+          <h1 style="margin:0;font-size:24px;line-height:1.2;color:#FAF7EE !important;letter-spacing:-0.02em;">${args.headline}</h1>
+        </td></tr>
+        <tr><td bgcolor="#0F0F0F" style="padding:14px 32px 22px;background:#0F0F0F !important;">
+          <p style="margin:0;color:#D4CFB6 !important;font-size:14px;line-height:1.7;">${args.body}</p>
+        </td></tr>
+        <tr><td bgcolor="#0F0F0F" style="padding:0 32px 22px;background:#0F0F0F !important;">
+          <a href="${PORTAL}/dashboard/withdrawals" style="display:inline-block;padding:12px 22px;background:${args.accent} !important;color:#0F0F0F !important;text-decoration:none !important;font-size:13px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;border-radius:3px;">View ${args.receiptNumber} →</a>
+        </td></tr>
+        <tr><td bgcolor="#0F0F0F" style="padding:18px 32px;background:#0F0F0F !important;border-top:1px solid #2A2A2A;text-align:center;">
+          <a href="${PORTAL}/dashboard" style="color:#C9A84C !important;text-decoration:none !important;font-size:13px;font-weight:600;padding:0 14px;">Dashboard</a>
+          <span style="color:#5C5750;">·</span>
+          <a href="${PORTAL}/dashboard/chat" style="color:#C9A84C !important;text-decoration:none !important;font-size:13px;font-weight:600;padding:0 14px;">Chat with AM</a>
+        </td></tr>
+        <tr><td bgcolor="#0F0F0F" style="padding:14px 32px 26px;background:#0F0F0F !important;border-top:1px solid #2A2A2A;color:#5C5750 !important;font-size:11px;line-height:1.6;text-align:center;">
+          &copy; 2026 Aragon Media &middot; 1309 Coffeen Ave, Sheridan, WY 82801
+        </td></tr>
+      </table>
+    </td></tr>
+  </table>
+</body></html>`;
+}
+
+export async function sendWithdrawalStatusEmail(opts: {
+  to: string;
+  creatorName: string;
+  receiptNumber: string;
+  status: WStatus;
+  netCents: number;
+  grossCents: number;
+}) {
+  try {
+    const resend = getResend();
+    const copy = statusCopy(opts.status, opts.receiptNumber, opts.netCents);
+    const html = withdrawalStatusHtml({
+      eyebrow: copy.eyebrow,
+      headline: copy.headline,
+      body: copy.body,
+      accent: copy.accent,
+      receiptNumber: opts.receiptNumber,
+    });
+    const text = [
+      copy.eyebrow.toUpperCase(),
+      "",
+      `${opts.creatorName},`,
+      "",
+      copy.body.replace(/<[^>]+>/g, ""),
+      "",
+      `Receipt:  ${opts.receiptNumber}`,
+      `Net:      ${fmtUsd(opts.netCents)}`,
+      `Gross:    ${fmtUsd(opts.grossCents)}`,
+      "",
+      `Open the receipt: ${PORTAL}/dashboard/withdrawals`,
+      `Chat with AM:     ${PORTAL}/dashboard/chat`,
+      "",
+      "Aragon Media · 1309 Coffeen Ave, Sheridan, WY 82801",
+    ].join("\n");
+    await resend.emails.send({
+      from: FROM,
+      to: [opts.to],
+      bcc: ["aragonkevin239@gmail.com"],
+      subject: copy.subject,
+      text,
+      html,
+    });
+  } catch (err) {
+    console.error("[email] sendWithdrawalStatusEmail failed:", err);
+  }
+}
