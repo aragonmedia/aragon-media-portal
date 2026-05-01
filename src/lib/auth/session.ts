@@ -20,6 +20,7 @@ export type CurrentUser = {
   verifiedAt: Date | string | null;
   contractSignedAt: Date | string | null;
   contractVersion: string | null;
+  contractUnlocked: boolean;
 };
 
 export async function getCurrentUser(): Promise<CurrentUser | null> {
@@ -41,6 +42,7 @@ export async function getCurrentUser(): Promise<CurrentUser | null> {
       verifiedAt: users.verifiedAt,
       contractSignedAt: users.contractSignedAt,
       contractVersion: users.contractVersion,
+      contractUnlocked: users.contractUnlocked,
     })
     .from(sessions)
     .innerJoin(users, eq(users.id, sessions.userId))

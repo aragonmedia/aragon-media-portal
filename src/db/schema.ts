@@ -81,6 +81,8 @@ export const users = pgTable(
     isAdmin: boolean("is_admin").default(false).notNull(),
     contractSignedAt: timestamp("contract_signed_at", { withTimezone: true }),
     contractVersion: varchar("contract_version", { length: 20 }),
+    contractUnlocked: boolean("contract_unlocked").default(false).notNull(),
+    contractUnlockedAt: timestamp("contract_unlocked_at", { withTimezone: true }),
     createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
     verifiedAt: timestamp("verified_at", { withTimezone: true }),
     lastSigninAt: timestamp("last_signin_at", { withTimezone: true }),
@@ -209,3 +211,23 @@ export const withdrawals = pgTable("withdrawals", {
   approvedAt: timestamp("approved_at", { withTimezone: true }),
   paidAt: timestamp("paid_at", { withTimezone: true }),
 });
+
+// ===== agreements =====
+// One row per signed Operations Agreement. Multiple rows per user is allowed
+// so re-signs (after a contract version bump) keep an immutable audit trail.
+export const agreements = pgTable(
+  "agreements",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    userId: uuid("user_id")
+      .references(() => users.id, { onDelete: "cascade" })
+      .notNull(),
+    signature: varchar("signature", { length: 200 }).notNull(),
+    contractVersion: varchar("contract_version", { length: 20 }).notNull(),
+    signedAt: timestamp("signed_at", { withTimezone: true }).defaultNow().notNull(),
+  },
+  (t) => ({
+    userIdx: index("agreements_user_idx").on(t.userId),
+    signedAtIdx: index("agreements_signed_at_idx").on(t.signedAt),
+  })
+);
