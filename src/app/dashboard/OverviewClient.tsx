@@ -48,11 +48,13 @@ export default function OverviewClient({
   currentStep,
   hasPaid,
   activationFeeCents,
+  isExistingCreator = false,
 }: {
   firstName: string;
   currentStep: number;
   hasPaid: boolean;
   activationFeeCents: number;
+  isExistingCreator?: boolean;
 }) {
   const [step] = useState(currentStep);
   const [msgs, setMsgs] = useState<Msg[]>([
@@ -231,25 +233,37 @@ export default function OverviewClient({
             })}
           </div>
 
-          <div className={`cred-form${step < 3 ? " cred-form-locked" : ""}${submittedCreds ? " cred-form-done" : ""}`}>
-            <div className="cred-title">🔒 Submit TikTok Account Login Credentials for Verification</div>
-            <div className="cred-sub">
-              {step < 3
-                ? "Unlocks once your activation fee is paid. Use this form to send your TikTok login to the AM team — never share it in chat."
-                : submittedCreds
-                ? "Credentials received. The AM team is verifying — they'll ping you in chat if a 2FA code is needed."
-                : "Used only by the AM team to complete TikTok account verification. Never shared externally."}
+          {!isExistingCreator && (
+            <div className={`cred-form${step < 3 ? " cred-form-locked" : ""}${submittedCreds ? " cred-form-done" : ""}`}>
+              <div className="cred-title">🔒 Submit TikTok Account Login Credentials for Verification</div>
+              <div className="cred-sub">
+                {step < 3
+                  ? "Unlocks once your activation fee is paid. Use this form to send your TikTok login to the AM team — never share it in chat."
+                  : submittedCreds
+                  ? "Credentials received. The AM team is verifying — they'll ping you in chat if a 2FA code is needed."
+                  : "Used only by the AM team to complete TikTok account verification. Never shared externally."}
+              </div>
+              <div className="cred-row">
+                <input className="cred-input" placeholder="TikTok username or email" value={credUser} onChange={(e) => setCredUser(e.target.value)} disabled={step < 3 || submittedCreds} />
+                <input className="cred-input" type="password" placeholder="Account password" value={credPass} onChange={(e) => setCredPass(e.target.value)} disabled={step < 3 || submittedCreds} />
+                <input className="cred-input" placeholder="6-digit email code (when requested)" value={credCode} onChange={(e) => setCredCode(e.target.value)} maxLength={6} disabled={step < 3 || submittedCreds} />
+              </div>
+              <div className="cred-note">Credentials encrypted at rest, used only to complete verification.</div>
+              <button className="cred-submit" onClick={submitCreds} disabled={step < 3 || submittedCreds || !credUser || !credPass}>
+                {step < 3 ? "Locked — pay activation fee first" : submittedCreds ? "Sent to AM team" : "Submit Credentials to AM Team →"}
+              </button>
             </div>
-            <div className="cred-row">
-              <input className="cred-input" placeholder="TikTok username or email" value={credUser} onChange={(e) => setCredUser(e.target.value)} disabled={step < 3 || submittedCreds} />
-              <input className="cred-input" type="password" placeholder="Account password" value={credPass} onChange={(e) => setCredPass(e.target.value)} disabled={step < 3 || submittedCreds} />
-              <input className="cred-input" placeholder="6-digit email code (when requested)" value={credCode} onChange={(e) => setCredCode(e.target.value)} maxLength={6} disabled={step < 3 || submittedCreds} />
+          )}
+          {isExistingCreator && (
+            <div className="cred-form cred-form-done">
+              <div className="cred-title">✓ Existing creator — already operational</div>
+              <div className="cred-sub">
+                Your accounts were verified before the portal launched. No
+                credential drop needed. Use Withdrawals to submit a new
+                payout, or Chat to reach the AM team directly.
+              </div>
             </div>
-            <div className="cred-note">Credentials encrypted at rest, used only to complete verification.</div>
-            <button className="cred-submit" onClick={submitCreds} disabled={step < 3 || submittedCreds || !credUser || !credPass}>
-              {step < 3 ? "Locked — pay activation fee first" : submittedCreds ? "Sent to AM team" : "Submit Credentials to AM Team →"}
-            </button>
-          </div>
+          )}
 
           <div className="chat-input-row">
             <input className="chat-input" placeholder="Message the AM team…" value={chatInput} onChange={(e) => setChatInput(e.target.value)} onKeyDown={(e) => e.key === "Enter" && sendMsg()} />

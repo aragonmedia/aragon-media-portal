@@ -18,6 +18,7 @@ const SECTIONS: NavSection[] = [
       { href: "/dashboard/settings", label: "Settings", icon: <SettingsIcon /> },
       { href: "/dashboard/accounts", label: "My Accounts", icon: <AccountsIcon /> },
       { href: "/dashboard/add-account", label: "Add Accounts", icon: <PlusIcon /> },
+      { href: "/dashboard/account-supplier", label: "Account Supplier", icon: <SupplierIcon /> },
     ],
   },
 ];
@@ -152,3 +153,5 @@ function AdminIcon() { return (<svg width="16" height="16" viewBox="0 0 24 24" f
 function SignOutIcon() { return (<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>); }
 function TikTokIcon() { return (<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 12a4 4 0 1 0 4 4V4a5 5 0 0 0 5 5"/></svg>); }
 function PlusIcon() { return (<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="9"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>); }
+
+function SupplierIcon() { return (<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>); }

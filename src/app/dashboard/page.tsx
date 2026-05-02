@@ -49,12 +49,20 @@ export default async function DashboardLanding() {
     .filter((p) => p.status === "paid")
     .reduce((sum, p) => sum + p.amountCents, 0);
 
+  // Grandfathered creators bypass the activation roadmap entirely — they
+  // already have accounts running with AM. Force step 8 (final state) so
+  // the roadmap shows complete, and pass an explicit flag so the client
+  // can render a 'Welcome back' state instead of the verification cred form.
+  const isExisting = !!user.isExistingCreator;
+  if (isExisting) currentStep = 8;
+
   return (
     <OverviewClient
       firstName={firstName}
       currentStep={currentStep}
-      hasPaid={hasPaid}
+      hasPaid={hasPaid || isExisting}
       activationFeeCents={activationFeeCents}
+      isExistingCreator={isExisting}
     />
   );
 }

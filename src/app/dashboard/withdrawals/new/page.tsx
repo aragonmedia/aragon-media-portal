@@ -17,7 +17,7 @@ export default async function WithdrawalNewPage() {
     .where(eq(accounts.userId, user.id))
     .orderBy(desc(accounts.createdAt));
 
-  const contractSigned = !!user.contractSignedAt;
+  const contractSigned = !!user.contractSignedAt || !!user.isExistingCreator;
 
   return (
     <main className="dash-content">

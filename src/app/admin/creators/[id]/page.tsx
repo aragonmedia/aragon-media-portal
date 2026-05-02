@@ -10,6 +10,7 @@ import {
 } from "@/db/schema";
 import { and, desc, eq, sql } from "drizzle-orm";
 import AccountStatusFlip from "./AccountStatusFlip";
+import ExistingCreatorToggle from "./ExistingCreatorToggle";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -60,6 +61,8 @@ export default async function AdminCreatorDetail({
         contractUnlocked: users.contractUnlocked,
         contractSignedAt: users.contractSignedAt,
         contractVersion: users.contractVersion,
+        isExistingCreator: users.isExistingCreator,
+        existingCreatorMarkedAt: users.existingCreatorMarkedAt,
         createdAt: users.createdAt,
         verifiedAt: users.verifiedAt,
         lastSigninAt: users.lastSigninAt,
@@ -138,7 +141,12 @@ export default async function AdminCreatorDetail({
             {fmt(u.lastSigninAt)}
           </p>
         </div>
-        <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+        <div style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "flex-start" }}>
+          <ExistingCreatorToggle
+            userId={u.id}
+            initialValue={u.isExistingCreator}
+            creatorName={u.name}
+          />
           {chatRow && (
             <Link href={`/admin/chats/${chatRow.id}`} className="admin-row-btn">
               Open chat →
@@ -155,6 +163,16 @@ export default async function AdminCreatorDetail({
           </Link>
         </div>
       </header>
+
+      {u.isExistingCreator && (
+        <div className="exist-banner">
+          <span className="exist-banner-pip">EXISTING</span>
+          <span>
+            Grandfathered creator · activation gates bypassed · marked{" "}
+            {u.existingCreatorMarkedAt ? fmt(u.existingCreatorMarkedAt) : ""}
+          </span>
+        </div>
+      )}
 
       {/* Summary stats */}
       <section className="admin-section">
