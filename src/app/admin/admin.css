@@ -358,3 +358,23 @@
 /* Chats: 'All caught up' empty state in its own frame */
 .chats-empty-frame{padding:18px 22px;background:rgba(31,139,83,0.06);border:1px dashed rgba(31,139,83,0.45);border-radius:6px;text-align:center;color:#9A9590;font-size:13px;line-height:1.6;}
 .chats-empty-frame strong{color:#5BD18C;}
+
+/* Floating tooltip anchored above the hovered dot (matches GMV creator chart) */
+.ovr-chart-tooltip-floating{position:absolute;background:rgba(15,15,15,0.96);border:1px solid rgba(201,168,76,0.55);border-radius:6px;padding:10px 12px;display:flex;flex-direction:column;gap:6px;pointer-events:none;box-shadow:0 14px 28px -12px rgba(0,0,0,0.7);z-index:10;}
+.ovr-chart-tooltip-floating .ovr-chart-tooltip-date{font-family:'JetBrains Mono','Menlo',monospace;font-size:11px;color:#FAF7EE;letter-spacing:0.14em;font-weight:700;border-bottom:1px solid #2A2A2A;padding-bottom:5px;margin-bottom:2px;}
+.ovr-chart-tooltip-row{display:flex;align-items:center;justify-content:space-between;gap:10px;font-size:12px;}
+.ovr-chart-tooltip-label{display:inline-flex;align-items:center;gap:6px;color:#9A9590;}
+.ovr-chart-tooltip-value{font-family:'JetBrains Mono','Menlo',monospace;font-weight:700;font-size:13px;letter-spacing:0.02em;}
+.ovr-chart-tooltip-value.ovr-chart-rev{color:#C9A84C;}
+.ovr-chart-tooltip-value.ovr-chart-comm{color:#5BD18C;}
+
+/* Hide the old top-right tooltip if it ever falls back */
+.ovr-chart-tooltip{display:none !important;}
+
+/* X-axis grid extended to 7 ticks comfortably */
+.ovr-chart-xaxis{padding:8px 8px 6px 70px;justify-content:space-between;flex-wrap:nowrap;overflow:hidden;}
+.ovr-chart-xaxis span{flex:0 0 auto;white-space:nowrap;}
+@media(max-width:680px){
+  .ovr-chart-xaxis{font-size:9px;padding:8px 4px 4px 56px;}
+  .ovr-chart-tooltip-floating{padding:8px 10px;font-size:11px;}
+}

@@ -14,7 +14,7 @@
  * creator-side and admin-side charts read as one design language.
  */
 
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 type Day = { date: string; revenue: number; commissions: number };
 
@@ -45,6 +45,20 @@ function bucketWeekly(days: Day[]): Day[] {
 export default function OverviewChart({ daily }: { daily: Day[] }) {
   const [range, setRange] = useState<"7d" | "28d" | "lifetime">("28d");
   const [hoverIdx, setHoverIdx] = useState<number | null>(null);
+  const [wrapW, setWrapW] = useState(0);
+  const wrapRef = useRef<HTMLDivElement | null>(null);
+
+  // Re-measure the wrapper width so tooltip positioning stays accurate on resize.
+  useEffect(() => {
+    if (!wrapRef.current) return;
+    const ro = new ResizeObserver((entries) => {
+      for (const e of entries) {
+        setWrapW(e.contentRect.width);
+      }
+    });
+    ro.observe(wrapRef.current);
+    return () => ro.disconnect();
+  }, []);
   const svgRef = useRef<SVGSVGElement | null>(null);
 
   const series = useMemo<Day[]>(() => {
@@ -156,6 +170,20 @@ export default function OverviewChart({ daily }: { daily: Day[] }) {
   const hoverYComm =
     hoverIdx !== null && commPts[hoverIdx] ? commPts[hoverIdx].y : 0;
 
+  // Project the SVG-space x-coordinate into CSS px space inside the wrap.
+  // The SVG sits in a 60px left rail (y-axis labels). Width = (wrapW - 60).
+  const tooltipPxLeft = (() => {
+    if (wrapW === 0 || hoverIdx === null) return 0;
+    const svgPxW = Math.max(1, wrapW - 60);
+    return 60 + (hoverX / W) * svgPxW;
+  })();
+  const tooltipYPx = (() => {
+    if (hoverIdx === null) return 0;
+    // Anchor above the higher of the two dots, plus a small gap
+    const minY = Math.min(hoverYRev, hoverYComm);
+    return (minY / H) * 240; // svg height in CSS px (matches .ovr-chart-svg height)
+  })();
+
   // Only suppress the chart entirely when there's literally no series at
   // all (newest install). Once there's any history, both lines render so
   // the trend reads cleanly even when one side is zero on a given day.
@@ -202,7 +230,7 @@ export default function OverviewChart({ daily }: { daily: Day[] }) {
         </div>
       </div>
 
-      <div className="ovr-chart-svg-wrap">
+      <div className="ovr-chart-svg-wrap" ref={wrapRef}>
         {empty ? (
           <div className="ovr-chart-empty">
             No paid revenue or commissions yet in this range. Numbers populate
@@ -287,43 +315,79 @@ export default function OverviewChart({ daily }: { daily: Day[] }) {
               </>
             )}
           </svg>
-          {/* X-axis date ticks — only show 5 markers regardless of bucket count */}
+          {/* X-axis date ticks — actual day-level dates ("Apr 4", "Apr 7"…)
+              spaced to ~7 markers so the strip stays readable on every range. */}
           <div className="ovr-chart-xaxis">
             {(() => {
               if (series.length === 0) return null;
-              const ticks = [0, 0.25, 0.5, 0.75, 1].map((p) =>
-                series[Math.min(series.length - 1, Math.round(p * (series.length - 1)))]
-              );
-              const labels =
-                range === "lifetime"
-                  ? ticks.map((t) =>
-                      new Date(t.date).toLocaleDateString("en-US", {
-                        month: "short",
-                        day: "numeric",
-                      })
-                    )
-                  : range === "7d"
-                    ? ["7d ago", "5d", "3d", "1d", "today"]
-                    : ["28d ago", "21d", "14d", "7d", "today"];
-              return labels.map((l, i) => <span key={i}>{l}</span>);
+              const targetTicks = 7;
+              const tickIdxs: number[] = [];
+              if (series.length <= targetTicks) {
+                for (let i = 0; i < series.length; i++) tickIdxs.push(i);
+              } else {
+                for (let i = 0; i < targetTicks; i++) {
+                  tickIdxs.push(Math.round((i / (targetTicks - 1)) * (series.length - 1)));
+                }
+              }
+              return tickIdxs.map((i) => {
+                const d = new Date(series[i].date + "T00:00:00Z");
+                return (
+                  <span key={i}>
+                    {d.toLocaleDateString("en-US", {
+                      month: "short",
+                      day: "numeric",
+                    })}
+                  </span>
+                );
+              });
             })()}
           </div>
           </>
         )}
 
-        {hoverDay && !empty && (
-          <div className="ovr-chart-tooltip">
-            <div className="ovr-chart-tooltip-date">{hoverDay.date}</div>
-            <div className="ovr-chart-tooltip-line">
-              <span className="ovr-chart-dot ovr-chart-dot-rev" />
-              Revenue {fmtUsd(hoverDay.revenue)}
+        {hoverDay && !empty && wrapW > 0 && (() => {
+          // Clamp left so the card never spills off the chart edges.
+          const cardW = 200;
+          const margin = 8;
+          let left = tooltipPxLeft - cardW / 2;
+          left = Math.max(margin, Math.min(wrapW - cardW - margin, left));
+          // Position vertically above the higher dot, fall back to top if too high
+          const top = Math.max(8, tooltipYPx - 90);
+          const dateLabel = new Date(hoverDay.date + "T00:00:00Z").toLocaleDateString(
+            "en-US",
+            { month: "short", day: "numeric" }
+          );
+          return (
+            <div
+              className="ovr-chart-tooltip-floating"
+              style={{
+                left: `${left}px`,
+                top: `${top}px`,
+                width: `${cardW}px`,
+              }}
+            >
+              <div className="ovr-chart-tooltip-date">
+                {dateLabel.toUpperCase()}
+              </div>
+              <div className="ovr-chart-tooltip-row">
+                <span className="ovr-chart-tooltip-label">
+                  <span className="ovr-chart-dot ovr-chart-dot-rev" /> Revenue
+                </span>
+                <span className="ovr-chart-tooltip-value ovr-chart-rev">
+                  {fmtUsd(hoverDay.revenue)}
+                </span>
+              </div>
+              <div className="ovr-chart-tooltip-row">
+                <span className="ovr-chart-tooltip-label">
+                  <span className="ovr-chart-dot ovr-chart-dot-comm" /> Commission
+                </span>
+                <span className="ovr-chart-tooltip-value ovr-chart-comm">
+                  {fmtUsd(hoverDay.commissions)}
+                </span>
+              </div>
             </div>
-            <div className="ovr-chart-tooltip-line">
-              <span className="ovr-chart-dot ovr-chart-dot-comm" />
-              Commissions {fmtUsd(hoverDay.commissions)}
-            </div>
-          </div>
-        )}
+          );
+        })()}
       </div>
     </div>
   );
