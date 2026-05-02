@@ -20,7 +20,7 @@ export default async function AccountSupplierPage() {
       <header className="dash-page-head">
         <div>
           <p className="dash-eyebrow">Account Supplier</p>
-          <h1>Buy verified TikTok accounts from our trusted supplier</h1>
+          <h1>Buy TikTok Shop Ready Accounts from our trusted supplier</h1>
           <p className="dash-page-sub">
             Need more accounts to scale your TikTok Shop work? Aragon Media
             partners with a vetted supplier to keep your account pipeline
@@ -99,8 +99,7 @@ export default async function AccountSupplierPage() {
             <div className="supplier-why-eyebrow">No lock-in</div>
             <p>
               You own the accounts you buy outright. Aragon Media just runs
-              ops on them once you&apos;re ready. Walk away any time per the
-              opt-out clause in your Operations Agreement.
+              ops on them once you&apos;re ready.
             </p>
           </div>
         </div>
