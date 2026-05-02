@@ -891,3 +891,21 @@
 /* Overview chat panel — 'Open full chat →' CTA replaces the inline input */
 .chat-open-full{display:inline-flex;align-items:center;justify-content:center;width:100%;padding:11px 18px;background:rgba(201,168,76,0.10);color:var(--gold);font-weight:700;font-size:13px;letter-spacing:0.06em;text-transform:uppercase;text-decoration:none;border:1px solid rgba(201,168,76,0.40);border-radius:6px;transition:background 0.12s ease, border-color 0.12s ease;}
 .chat-open-full:hover{background:rgba(201,168,76,0.20);border-color:var(--gold);}
+
+/* Add/request a TikTok account form (Settings + admin creator detail) */
+.acct-add-form{display:flex;flex-direction:column;gap:8px;margin:6px 0 18px;}
+.acct-add-label{display:flex;flex-direction:column;gap:8px;font-size:12px;color:var(--text-muted);letter-spacing:0.04em;}
+.acct-add-label > span:first-child{font-size:11px;letter-spacing:0.14em;text-transform:uppercase;color:var(--text-sub);font-weight:600;}
+.acct-add-row{display:flex;align-items:stretch;gap:8px;flex-wrap:wrap;}
+.acct-add-prefix{display:inline-flex;align-items:center;padding:0 12px;background:var(--bg-deep);color:var(--gold);font-family:'JetBrains Mono','Menlo',monospace;font-size:14px;border:1px solid var(--border);border-right:none;flex:0 0 auto;}
+.acct-add-input{flex:1 1 200px;font-family:'JetBrains Mono','Menlo',monospace;}
+.acct-add-status{flex:0 0 140px;}
+.acct-add-form .field-note{display:block;font-size:11px;color:var(--text-sub);line-height:1.55;}
+.acct-add-form .settings-msg{padding:8px 12px;font-size:12px;border-radius:4px;}
+.acct-add-form .settings-msg.ok{background:rgba(31,139,83,0.10);color:#5BD18C;border:1px solid rgba(31,139,83,0.40);}
+.acct-add-form .settings-msg.err{background:rgba(199,79,79,0.10);color:#E07B7B;border:1px solid rgba(199,79,79,0.40);}
+@media(max-width:680px){
+  .acct-add-row{flex-direction:column;}
+  .acct-add-prefix{border-right:1px solid var(--border);border-bottom:none;justify-content:center;}
+  .acct-add-input,.acct-add-status{width:100%;}
+}

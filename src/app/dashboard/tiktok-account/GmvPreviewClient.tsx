@@ -265,22 +265,38 @@ export default function GmvPreviewClient() {
   );
 }
 
+// Catmull-Rom-style smoothing: each segment gets two cubic bezier
+// control points so the line passes THROUGH every data point but the
+// corners curve gently. Tension 0.4 = smooth without overshooting.
+function smoothPath(pts: { x: number; y: number }[]): string {
+  if (pts.length === 0) return "";
+  if (pts.length === 1) return `M ${pts[0].x.toFixed(1)} ${pts[0].y.toFixed(1)}`;
+  const TENSION = 0.4;
+  let d = `M ${pts[0].x.toFixed(1)} ${pts[0].y.toFixed(1)}`;
+  for (let i = 0; i < pts.length - 1; i++) {
+    const p0 = pts[i - 1] ?? pts[i];
+    const p1 = pts[i];
+    const p2 = pts[i + 1];
+    const p3 = pts[i + 2] ?? p2;
+    const c1x = p1.x + ((p2.x - p0.x) / 6) * TENSION * 2;
+    const c1y = p1.y + ((p2.y - p0.y) / 6) * TENSION * 2;
+    const c2x = p2.x - ((p3.x - p1.x) / 6) * TENSION * 2;
+    const c2y = p2.y - ((p3.y - p1.y) / 6) * TENSION * 2;
+    d += ` C ${c1x.toFixed(1)} ${c1y.toFixed(1)}, ${c2x.toFixed(1)} ${c2y.toFixed(1)}, ${p2.x.toFixed(1)} ${p2.y.toFixed(1)}`;
+  }
+  return d;
+}
+
 function pathFromSeries(data: number[], W: number, H: number, max: number): string {
   const dx = W / (data.length - 1);
-  const pts = data.map((v, i) => {
-    const x = i * dx;
-    const y = H - (v / max) * H;
-    return `${i === 0 ? "M" : "L"}${x.toFixed(1)},${y.toFixed(1)}`;
-  });
-  return pts.join(" ");
+  const pts = data.map((v, i) => ({
+    x: i * dx,
+    y: H - (v / max) * H,
+  }));
+  return smoothPath(pts);
 }
 
 function areaFromSeries(data: number[], W: number, H: number, max: number): string {
-  const dx = W / (data.length - 1);
-  const top = data.map((v, i) => {
-    const x = i * dx;
-    const y = H - (v / max) * H;
-    return `${i === 0 ? "M" : "L"}${x.toFixed(1)},${y.toFixed(1)}`;
-  }).join(" ");
-  return `${top} L${W},${H} L0,${H} Z`;
+  const top = pathFromSeries(data, W, H, max);
+  return `${top} L ${W.toFixed(1)} ${H.toFixed(1)} L 0 ${H.toFixed(1)} Z`;
 }

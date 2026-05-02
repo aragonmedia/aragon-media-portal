@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import ThemeToggle from "./ThemeToggle";
 
@@ -111,19 +112,21 @@ export default function SettingsClient({
         </form>
       </div>
 
-      {/* TikTok accounts (read-only) */}
+      {/* TikTok accounts (with inline 'request to add' form) */}
       <div className="dash-card" style={{ marginTop: 16 }}>
         <div className="dash-card-head">
           <h2>Your TikTok accounts</h2>
-          <span className="dash-meta">{tiktokAccounts.length} verified or in progress</span>
+          <span className="dash-meta">{tiktokAccounts.length} on file</span>
         </div>
+
+        <RequestAddAccountForm />
 
         {tiktokAccounts.length === 0 ? (
           <div className="dash-empty">
             <div className="dash-empty-body">
-              No TikTok accounts linked yet. New accounts are added via the Add Accounts page after activation payment is received and the AM team begins verification.
+              No TikTok accounts linked yet. Submit a username above and the
+              AM team will approve it within 24 hours.
             </div>
-            <Link href="/dashboard/add-account" className="dash-cta">Go to Add Accounts →</Link>
           </div>
         ) : (
           <div className="settings-account-list">
@@ -144,7 +147,11 @@ export default function SettingsClient({
           </div>
         )}
 
-        <p className="settings-hint">To add another TikTok account, visit Add Accounts and complete activation. Once paid + verified, it will appear here automatically.</p>
+        <p className="settings-hint">
+          Got an account that needs the full Aragon Media activation flow
+          (Square payment + verification screenshots)? Use{" "}
+          <Link href="/dashboard/add-account">Add Accounts</Link> instead.
+        </p>
       </div>
 
       {/* Appearance / Theme */}
@@ -183,5 +190,94 @@ export default function SettingsClient({
         </dl>
       </div>
     </main>
+  );
+}
+
+
+function RequestAddAccountForm() {
+  const [handle, setHandle] = useState("");
+  const [busy, setBusy] = useState(false);
+  const [msg, setMsg] = useState<{ kind: "ok" | "err"; text: string } | null>(null);
+  const router = useRouter();
+
+  async function submit(e: React.FormEvent) {
+    e.preventDefault();
+    if (busy) return;
+    const cleaned = handle.replace(/^@+/, "").trim();
+    if (cleaned.length < 2) {
+      setMsg({ kind: "err", text: "Type the TikTok username (without @)." });
+      return;
+    }
+    setBusy(true);
+    setMsg(null);
+    try {
+      const res = await fetch("/api/accounts/request-add", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ tiktokHandle: cleaned }),
+      });
+      const j = (await res.json()) as { ok: boolean; error?: string; already?: boolean; hint?: string };
+      if (!res.ok || !j.ok) {
+        setMsg({
+          kind: "err",
+          text: j.hint ?? j.error ?? "Couldn't submit — try again.",
+        });
+        setBusy(false);
+        return;
+      }
+      setMsg({
+        kind: "ok",
+        text: j.already
+          ? `@${cleaned} is already on your profile.`
+          : `Submitted @${cleaned} for AM approval. We'll confirm in chat once it's verified.`,
+      });
+      setHandle("");
+      router.refresh();
+    } catch (err) {
+      setMsg({
+        kind: "err",
+        text: err instanceof Error ? err.message : "Network error.",
+      });
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  return (
+    <form className="acct-add-form" onSubmit={submit}>
+      <label className="acct-add-label">
+        <span>Add a TikTok account by username</span>
+        <div className="acct-add-row">
+          <span className="acct-add-prefix">@</span>
+          <input
+            type="text"
+            className="settings-input acct-add-input"
+            placeholder="yourtiktokhandle"
+            value={handle}
+            onChange={(e) => setHandle(e.target.value)}
+            disabled={busy}
+            autoComplete="off"
+            spellCheck={false}
+          />
+          <button
+            type="submit"
+            className="dash-cta"
+            disabled={busy || handle.trim().length < 2}
+          >
+            {busy ? "Submitting…" : "Submit for approval"}
+          </button>
+        </div>
+        <span className="field-note">
+          AM team approves new handles within 24 hours. No payment required
+          for grandfathered creators or repeat additions on accounts we
+          already manage.
+        </span>
+      </label>
+      {msg && (
+        <div className={`settings-msg ${msg.kind === "ok" ? "ok" : "err"}`}>
+          {msg.text}
+        </div>
+      )}
+    </form>
   );
 }

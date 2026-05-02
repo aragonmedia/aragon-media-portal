@@ -387,33 +387,7 @@ export default function Home() {
         </div>
       </div>
 
-      <div className="compare-wrap">
-        <p className="why-label">With Aragon Media vs. without</p>
-        <div className="compare-card">
-          <div className="compare-col ours">
-            <div className="compare-col-header"><span className="compare-col-icon">✅</span><h4>With Aragon Media</h4></div>
-            <ul className="compare-list ours">
-              <li><span className="compare-mark check">✅</span>Verified within 24 hours</li>
-              <li><span className="compare-mark check">✅</span>Real-time GMV dashboard, built-in</li>
-              <li><span className="compare-mark check">✅</span>USD payouts to your bank, Mon&ndash;Fri</li>
-              <li><span className="compare-mark check">✅</span>Dedicated support thread with team</li>
-              <li><span className="compare-mark check">✅</span>Up to 4 verified accounts at once</li>
-            </ul>
-          </div>
-          <div className="compare-col theirs">
-            <div className="compare-col-header"><span className="compare-col-icon">❌</span><h4>Without AM&apos;s Help</h4></div>
-            <ul className="compare-list theirs">
-              <li><span className="compare-mark cross">❌</span>Weeks of waiting and downtime</li>
-              <li><span className="compare-mark cross">❌</span>Unreliable tracking and miscommunication</li>
-              <li><span className="compare-mark cross">❌</span>TikTok limits, regional friction, 1% method</li>
-              <li><span className="compare-mark cross">❌</span>Cold support tickets, DMs, and groupchats</li>
-              <li><span className="compare-mark cross">❌</span>Stacked percentages, surprise deductions</li>
-            </ul>
-          </div>
-        </div>
-      </div>
-
-      <section className="testi-section">
+<section className="testi-section">
         <p className="section-label">From the creators we work with</p>
         <h2>Hear it <em>from them.</em></h2>
         <p className="section-intro">Real Creators, Real Activations, Real Payouts.<br />Swipe through their experience.</p>

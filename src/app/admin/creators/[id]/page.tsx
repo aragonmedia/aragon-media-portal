@@ -11,6 +11,8 @@ import {
 import { and, desc, eq, sql } from "drizzle-orm";
 import AccountStatusFlip from "./AccountStatusFlip";
 import ExistingCreatorToggle from "./ExistingCreatorToggle";
+import DeleteCreatorButton from "./DeleteCreatorButton";
+import AdminAddAccount from "./AdminAddAccount";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -161,6 +163,12 @@ export default async function AdminCreatorDetail({
           <Link href="/admin/creators" className="admin-row-btn">
             ← All creators
           </Link>
+          <DeleteCreatorButton
+            userId={u.id}
+            creatorName={u.name}
+            creatorEmail={u.email}
+            isAdmin={u.isAdmin}
+          />
         </div>
       </header>
 
@@ -228,6 +236,7 @@ export default async function AdminCreatorDetail({
             Verifying stamps verified_at automatically.
           </span>
         </div>
+        <AdminAddAccount userId={u.id} creatorName={u.name} />
         {accts.length === 0 ? (
           <div className="wdr-history-empty">
             No TikTok accounts on file yet.

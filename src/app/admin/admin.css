@@ -391,3 +391,26 @@
 
 .exist-banner{display:flex;align-items:center;gap:12px;padding:12px 18px;margin-top:14px;background:rgba(31,139,83,0.08);border:1px solid rgba(31,139,83,0.45);border-radius:6px;font-size:12px;color:#D4CFB6;}
 .exist-banner-pip{padding:3px 9px;background:#5BD18C;color:#0F0F0F;font-size:10px;font-weight:800;letter-spacing:0.16em;border-radius:3px;}
+
+/* Danger CTA */
+.admin-row-btn-danger{background:rgba(199,79,79,0.18);color:#E07B7B;border-color:rgba(199,79,79,0.55);}
+.admin-row-btn-danger:hover{background:#C74F4F;color:#FAF7EE;border-color:#C74F4F;}
+
+/* Delete-confirmation modal */
+.delete-modal-backdrop{position:fixed;inset:0;background:rgba(0,0,0,0.65);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;padding:18px;z-index:60;}
+.delete-modal{background:#191919;border:1px solid #2A2A2A;border-radius:8px;padding:28px 30px;max-width:480px;width:100%;display:flex;flex-direction:column;gap:14px;box-shadow:0 28px 60px -16px rgba(0,0,0,0.85);}
+.delete-modal-pill{align-self:flex-start;padding:5px 11px;background:rgba(199,79,79,0.18);color:#E07B7B;border:1px solid rgba(199,79,79,0.45);font-size:10px;font-weight:800;letter-spacing:0.18em;text-transform:uppercase;border-radius:4px;}
+.delete-modal-title{font-family:'Inter Tight',sans-serif;font-size:22px;font-weight:700;color:#FAF7EE;margin:0;letter-spacing:-0.01em;line-height:1.25;}
+.delete-modal-body{font-size:13px;line-height:1.65;color:#9A9590;margin:0;}
+.delete-modal-body strong{color:#FAF7EE;}
+.delete-modal-label{font-size:11px;letter-spacing:0.14em;text-transform:uppercase;color:#5C5750;font-weight:600;margin-top:4px;}
+.delete-modal-label code{font-family:'JetBrains Mono','Menlo',monospace;background:#0B0B0B;color:#E07B7B;padding:2px 8px;border-radius:3px;font-size:11px;}
+.delete-modal-input{padding:10px 12px;background:#0B0B0B;border:1px solid #2A2A2A;color:#FAF7EE;font-family:'JetBrains Mono','Menlo',monospace;font-size:14px;}
+.delete-modal-input:focus{outline:none;border-color:#C74F4F;}
+.delete-modal-err{color:#E07B7B;font-size:12px;}
+.delete-modal-actions{display:flex;gap:10px;justify-content:flex-end;flex-wrap:wrap;margin-top:6px;}
+@media(max-width:480px){
+  .delete-modal{padding:22px 20px;}
+  .delete-modal-actions{flex-direction:column-reverse;}
+  .delete-modal-actions .admin-row-btn{width:100%;text-align:center;}
+}
