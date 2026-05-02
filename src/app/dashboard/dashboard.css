@@ -887,3 +887,7 @@
   .supplier-code{font-size:22px;padding:12px 16px;letter-spacing:0.12em;}
   .supplier-why{grid-template-columns:1fr;}
 }
+
+/* Overview chat panel — 'Open full chat →' CTA replaces the inline input */
+.chat-open-full{display:inline-flex;align-items:center;justify-content:center;width:100%;padding:11px 18px;background:rgba(201,168,76,0.10);color:var(--gold);font-weight:700;font-size:13px;letter-spacing:0.06em;text-transform:uppercase;text-decoration:none;border:1px solid rgba(201,168,76,0.40);border-radius:6px;transition:background 0.12s ease, border-color 0.12s ease;}
+.chat-open-full:hover{background:rgba(201,168,76,0.20);border-color:var(--gold);}

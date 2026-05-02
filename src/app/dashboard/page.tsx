@@ -1,8 +1,9 @@
-import { desc, eq } from "drizzle-orm";
+import { and, desc, eq } from "drizzle-orm";
 import { getCurrentUser } from "@/lib/auth/session";
 import { db } from "@/db";
 import { accounts, purchases } from "@/db/schema";
 import OverviewClient from "./OverviewClient";
+import { chats, messages } from "@/db/schema";
 
 export const dynamic = "force-dynamic";
 
@@ -49,6 +50,41 @@ export default async function DashboardLanding() {
     .filter((p) => p.status === "paid")
     .reduce((sum, p) => sum + p.amountCents, 0);
 
+  // Grab the latest 5 messages from this creator's chat (if any) so the
+  // Overview's inline chat panel reflects the real thread instead of mocks.
+  const myChat = (
+    await db
+      .select({ id: chats.id })
+      .from(chats)
+      .where(and(eq(chats.userId, user.id), eq(chats.status, "open")))
+      .limit(1)
+  )[0];
+  const recentChatMessages = myChat
+    ? (
+        await db
+          .select({
+            id: messages.id,
+            sender: messages.sender,
+            body: messages.body,
+            createdAt: messages.createdAt,
+          })
+          .from(messages)
+          .where(eq(messages.chatId, myChat.id))
+          .orderBy(desc(messages.createdAt))
+          .limit(5)
+      )
+        .reverse()
+        .map((m) => ({
+          id: m.id,
+          sender: m.sender,
+          body: m.body,
+          createdAt:
+            typeof m.createdAt === "string"
+              ? m.createdAt
+              : m.createdAt.toISOString(),
+        }))
+    : [];
+
   // Grandfathered creators bypass the activation roadmap entirely — they
   // already have accounts running with AM. Force step 8 (final state) so
   // the roadmap shows complete, and pass an explicit flag so the client
@@ -63,6 +99,7 @@ export default async function DashboardLanding() {
       hasPaid={hasPaid || isExisting}
       activationFeeCents={activationFeeCents}
       isExistingCreator={isExisting}
+      recentChatMessages={recentChatMessages}
     />
   );
 }

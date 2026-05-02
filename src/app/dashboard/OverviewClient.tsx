@@ -49,12 +49,14 @@ export default function OverviewClient({
   hasPaid,
   activationFeeCents,
   isExistingCreator = false,
+  recentChatMessages = [],
 }: {
   firstName: string;
   currentStep: number;
   hasPaid: boolean;
   activationFeeCents: number;
   isExistingCreator?: boolean;
+  recentChatMessages?: { id: string; sender: string; body: string; createdAt: string }[];
 }) {
   const [step] = useState(currentStep);
   const [msgs, setMsgs] = useState<Msg[]>([
@@ -72,7 +74,6 @@ export default function OverviewClient({
       text: "Also include the 6-digit code sent to your TikTok email when we attempt to sign in — we'll let you know when we need it.",
     },
   ]);
-  const [chatInput, setChatInput] = useState("");
   const [credUser, setCredUser] = useState("");
   const [credPass, setCredPass] = useState("");
   const [credCode, setCredCode] = useState("");
@@ -85,24 +86,7 @@ export default function OverviewClient({
     }
   }, [msgs]);
 
-  function sendMsg() {
-    const v = chatInput.trim();
-    if (!v) return;
-    setMsgs((m) => [...m, { who: "me", name: "You", text: v }]);
-    setChatInput("");
-    setTimeout(() => {
-      setMsgs((m) => [
-        ...m,
-        {
-          who: "am",
-          name: "Aragon Media",
-          text: "Thanks for your message — the AM team will respond shortly.",
-        },
-      ]);
-    }, 900);
-  }
-
-  async function submitCreds() {
+async function submitCreds() {
     if (!credUser || !credPass || submittedCreds) return;
     setSubmittedCreds(true);
     setMsgs((m) => [
@@ -266,8 +250,11 @@ export default function OverviewClient({
           )}
 
           <div className="chat-input-row">
-            <input className="chat-input" placeholder="Message the AM team…" value={chatInput} onChange={(e) => setChatInput(e.target.value)} onKeyDown={(e) => e.key === "Enter" && sendMsg()} />
-            <button className="chat-send" onClick={sendMsg}>Send</button>
+            <Link href="/dashboard/chat" className="chat-open-full">
+              {recentChatMessages.length > 0
+                ? "Open full chat to reply →"
+                : "Open chat with AM Team →"}
+            </Link>
           </div>
         </div>
 

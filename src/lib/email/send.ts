@@ -17,7 +17,7 @@
 
 import { Resend } from "resend";
 
-const FROM = "Aragon Media <onboarding@resend.dev>";
+const FROM = "Aragon Media <onboarding@kevin-aragon.com>";
 const PORTAL = "https://aragon-media-portal.vercel.app";
 
 let client: Resend | null = null;
