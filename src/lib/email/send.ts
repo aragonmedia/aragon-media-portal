@@ -65,13 +65,29 @@ export async function sendVerificationEmail(opts: {
     purpose: opts.purpose,
   });
 
-  return getResend().emails.send({
+  const result = await getResend().emails.send({
     from: FROM,
     to: [opts.to],
     subject,
     html,
     text,
   });
+  // Resend returns { data, error } instead of throwing on rejected sends
+  // (e.g. unverified-sender free-tier limit). Surface the error so the
+  // failure shows up in Vercel logs instead of looking like a successful
+  // 200 from the calling endpoint.
+  if (result?.error) {
+    console.error(
+      "[email] sendVerificationEmail rejected:",
+      result.error.name ?? "Error",
+      result.error.message ?? String(result.error),
+      "to:", opts.to
+    );
+    throw new Error(
+      `Resend rejected: ${result.error.message ?? result.error.name ?? "unknown"}`
+    );
+  }
+  return result;
 }
 
 function renderEmail({
