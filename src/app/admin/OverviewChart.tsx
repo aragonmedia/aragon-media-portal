@@ -62,10 +62,17 @@ export default function OverviewChart({ daily }: { daily: Day[] }) {
   const svgRef = useRef<SVGSVGElement | null>(null);
 
   const series = useMemo<Day[]>(() => {
+    // Server now sends a 90-day-minimum window so even a brand-new portal
+    // shows the full date strip. Slice straight off the tail per tab so
+    // the count of days always equals the tab's promise.
     if (range === "7d") return daily.slice(-7);
     if (range === "28d") return daily.slice(-28);
-    if (daily.length > 28) return bucketWeekly(daily);
-    return daily;
+    // Lifetime: if the underlying history is short, still show at least
+    // the last 28 days so the chart doesn't collapse to 1 dot. Past 56
+    // days bucket weekly so the line stays readable.
+    if (daily.length <= 28) return daily.slice(-28);
+    if (daily.length <= 56) return daily;
+    return bucketWeekly(daily);
   }, [daily, range]);
 
   const totals = useMemo(

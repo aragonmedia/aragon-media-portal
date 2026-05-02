@@ -111,49 +111,52 @@ export default async function AdminOverviewPage() {
     .select({ totalAgreements: sql<number>`count(*)::int` })
     .from(agreements);
 
-  // Daily series for the Overview chart — paid revenue (Square purchases)
-  // + AM commissions earned (sum of fee_cents on paid withdrawals).
-  // Bucket by created_at::date for purchases and paid_at::date for
-  // withdrawals so a paid receipt counts on the day it was actually paid.
-  const purchaseDays = (await db.execute(sql`
-    select to_char(date_trunc('day', created_at), 'YYYY-MM-DD') as d,
-           coalesce(sum(amount_cents), 0)::int as cents
-      from purchases
-     where status = 'paid'
-     group by 1
-     order by 1
-  `)) as unknown as { rows: { d: string; cents: number }[] };
-
-  const withdrawalDays = (await db.execute(sql`
-    select to_char(date_trunc('day', paid_at), 'YYYY-MM-DD') as d,
-           coalesce(sum(fee_cents), 0)::int as cents
+  // Daily series for the Overview chart.
+  //   Revenue line     = sum of withdrawals.gross_cents (creator-submitted)
+  //   Commissions line = sum of withdrawals.fee_cents   (AM cut on the same row)
+  // Bucketed by requested_at::date so the chart updates the moment a creator
+  // submits a form, not just when admin marks Paid. We exclude rejected +
+  // late_retained so the trend reflects only active/realized money flow.
+  const wdrDays = (await db.execute(sql`
+    select to_char(date_trunc('day', requested_at), 'YYYY-MM-DD') as d,
+           coalesce(sum(gross_cents), 0)::int as gross_cents,
+           coalesce(sum(fee_cents),   0)::int as fee_cents
       from withdrawals
-     where status = 'paid' and paid_at is not null
+     where status not in ('rejected', 'late_retained')
      group by 1
      order by 1
-  `)) as unknown as { rows: { d: string; cents: number }[] };
+  `)) as unknown as { rows: { d: string; gross_cents: number; fee_cents: number }[] };
 
-  // Walk every day from the earliest event to today so the line has no gaps.
-  const allDates = [
-    ...(purchaseDays.rows ?? []).map((r) => r.d),
-    ...(withdrawalDays.rows ?? []).map((r) => r.d),
-  ];
+  // Always render the FULL window even when most days are \$0 so the trend
+  // is visible from day one. Server sends a 90-day window minimum (extends
+  // earlier if data is older). Client slices to 7d/28d/Lifetime.
   const today = new Date();
   const todayStr = today.toISOString().slice(0, 10);
-  const earliest = allDates.length > 0
-    ? allDates.reduce((min, d) => (d < min ? d : min), allDates[0])
-    : new Date(today.getTime() - 27 * 86400_000).toISOString().slice(0, 10);
-  const purchaseMap = new Map((purchaseDays.rows ?? []).map((r) => [r.d, r.cents]));
-  const withdrawalMap = new Map((withdrawalDays.rows ?? []).map((r) => [r.d, r.cents]));
+  const earliestData = (wdrDays.rows ?? []).reduce<string | null>(
+    (min, r) => (min === null || r.d < min ? r.d : min),
+    null
+  );
+  const minDays = 90; // covers last 7 + last 28 + reasonable Lifetime view
+  const startStr = (() => {
+    const back = new Date(today.getTime() - (minDays - 1) * 86_400_000);
+    const backStr = back.toISOString().slice(0, 10);
+    if (earliestData && earliestData < backStr) return earliestData;
+    return backStr;
+  })();
+
+  const wdrMap = new Map(
+    (wdrDays.rows ?? []).map((r) => [r.d, { gross: r.gross_cents, fee: r.fee_cents }])
+  );
   const dailySeries: { date: string; revenue: number; commissions: number }[] = [];
-  const cur = new Date(earliest + "T00:00:00Z");
+  const cur = new Date(startStr + "T00:00:00Z");
   const end = new Date(todayStr + "T00:00:00Z");
   while (cur <= end) {
     const k = cur.toISOString().slice(0, 10);
+    const v = wdrMap.get(k);
     dailySeries.push({
       date: k,
-      revenue: purchaseMap.get(k) ?? 0,
-      commissions: withdrawalMap.get(k) ?? 0,
+      revenue: v?.gross ?? 0,
+      commissions: v?.fee ?? 0,
     });
     cur.setUTCDate(cur.getUTCDate() + 1);
   }
