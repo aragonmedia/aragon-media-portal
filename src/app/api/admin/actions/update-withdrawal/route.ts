@@ -55,6 +55,7 @@ export async function POST(req: NextRequest) {
     feeCents?: number;
     netCents?: number;
     status?: string;
+    forceEmail?: boolean;
   };
   try {
     body = (await req.json()) as typeof body;
@@ -125,39 +126,80 @@ export async function POST(req: NextRequest) {
     if (newStatus === "paid") patch.paidAt = now;
   }
 
-  if (Object.keys(patch).length === 0) {
+  if (Object.keys(patch).length === 0 && body.forceEmail !== true) {
     return Response.json({ ok: true, noop: true });
   }
 
-  const updated = await db
-    .update(withdrawals)
-    .set(patch)
-    .where(eq(withdrawals.id, body.id))
-    .returning({
-      id: withdrawals.id,
-      receiptNumber: withdrawals.receiptNumber,
-      grossCents: withdrawals.grossCents,
-      feeCents: withdrawals.feeCents,
-      netCents: withdrawals.netCents,
-      status: withdrawals.status,
-      paidAt: withdrawals.paidAt,
-    });
-  const after = updated[0];
-  if (!after) {
-    return Response.json(
-      { ok: false, error: "update_failed" },
-      { status: 500 }
-    );
+  // If patch is empty but forceEmail is set, skip the UPDATE (Drizzle
+  // doesn't accept empty .set()) and use `before` as the source of truth
+  // for the email payload. Otherwise apply the patch and use the returned
+  // row.
+  type WithdrawalRow = {
+    id: string;
+    receiptNumber: string;
+    grossCents: number;
+    feeCents: number;
+    netCents: number;
+    status: WStatus;
+    paidAt: Date | null;
+  };
+  let after: WithdrawalRow;
+  if (Object.keys(patch).length === 0) {
+    // forceEmail-only — re-fetch row to pick up status + amounts
+    const fresh = await db
+      .select({
+        id: withdrawals.id,
+        receiptNumber: withdrawals.receiptNumber,
+        grossCents: withdrawals.grossCents,
+        feeCents: withdrawals.feeCents,
+        netCents: withdrawals.netCents,
+        status: withdrawals.status,
+        paidAt: withdrawals.paidAt,
+      })
+      .from(withdrawals)
+      .where(eq(withdrawals.id, body.id))
+      .limit(1);
+    if (!fresh[0]) {
+      return Response.json({ ok: false, error: "not_found" }, { status: 404 });
+    }
+    after = fresh[0] as WithdrawalRow;
+  } else {
+    const updated = await db
+      .update(withdrawals)
+      .set(patch)
+      .where(eq(withdrawals.id, body.id))
+      .returning({
+        id: withdrawals.id,
+        receiptNumber: withdrawals.receiptNumber,
+        grossCents: withdrawals.grossCents,
+        feeCents: withdrawals.feeCents,
+        netCents: withdrawals.netCents,
+        status: withdrawals.status,
+        paidAt: withdrawals.paidAt,
+      });
+    if (!updated[0]) {
+      return Response.json(
+        { ok: false, error: "update_failed" },
+        { status: 500 }
+      );
+    }
+    after = updated[0] as WithdrawalRow;
   }
 
-  // Per Kevin: ONLY a flip TO 'paid' triggers a creator email. Every other
-  // status transition is portal-only state. Pull net_cents / gross_cents
-  // from `after` so admin edits just before the flip flow into the email.
+  // Email firing logic:
+  //   - On a status TRANSITION to 'paid' (newStatus === 'paid'): auto-fire
+  //   - On forceEmail: true with current status 'paid': fire regardless
+  //     (admin's manual "Send Paid email" button — finalizes the send when
+  //     the status was already paid before the save, e.g. a typo fix).
   // Email failures are caught here so the DB save still returns 200 — but
   // emailSent is honest about whether the message actually shipped.
+  const wantsEmail =
+    newStatus === "paid" ||
+    (body.forceEmail === true && after.status === "paid");
+
   let emailSent = false;
   let emailError: string | null = null;
-  if (newStatus === "paid") {
+  if (wantsEmail) {
     const creator = (
       await db
         .select({ email: users.email, name: users.name })

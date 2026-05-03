@@ -60,6 +60,43 @@ export default function WithdrawalEditPanel({
     setFee(centsToDollarString(g - n));
   }
 
+  async function sendPaidEmail() {
+    if (busy) return;
+    setMsg(null);
+    setBusy(true);
+    try {
+      const res = await fetch("/api/admin/actions/update-withdrawal", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id, forceEmail: true }),
+      });
+      const j = (await res.json()) as {
+        ok: boolean;
+        error?: string;
+        emailSent?: boolean;
+        emailError?: string | null;
+      };
+      if (!res.ok || !j.ok) {
+        setMsg({ kind: "err", text: j.error ?? "Send failed" });
+        setBusy(false);
+        return;
+      }
+      setMsg({
+        kind: j.emailSent ? "ok" : "err",
+        text: j.emailSent
+          ? "Paid email sent to creator."
+          : `Email failed: ${j.emailError ?? "unknown reason"}`,
+      });
+    } catch (err) {
+      setMsg({
+        kind: "err",
+        text: err instanceof Error ? err.message : "Network error",
+      });
+    } finally {
+      setBusy(false);
+    }
+  }
+
   async function save() {
     if (busy) return;
     setMsg(null);
@@ -210,6 +247,24 @@ export default function WithdrawalEditPanel({
         >
           {busy ? "Saving…" : "Save changes"}
         </button>
+        {status === "paid" && (
+          <button
+            onClick={sendPaidEmail}
+            disabled={busy}
+            className="admin-row-btn admin-row-btn-paid"
+            style={{
+              background: "#0F7A3F",
+              color: "#FFFFFF",
+              border: "1px solid #0F7A3F",
+              fontWeight: 700,
+              letterSpacing: "0.06em",
+              textTransform: "uppercase",
+            }}
+            title="Force-send the Paid email to the creator (and BCC AM). Use after a typo fix or to resend if the auto-fire on status change failed."
+          >
+            {busy ? "Sending…" : "Send Paid email →"}
+          </button>
+        )}
         {msg && (
           <span
             className={`admin-edit-msg ${
