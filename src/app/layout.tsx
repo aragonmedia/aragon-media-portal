@@ -1,9 +1,59 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import "./globals.css";
 
+const SITE_URL = "https://aragon-media-portal.vercel.app";
+const SITE_TITLE = "Aragon Media · Creator Partner Program";
+const SITE_DESCRIPTION =
+  "Your TikTok business, professionally managed. We activate your creator account, track your GMV, and move your commissions into your bank — USD income from anywhere in the world.";
+
 export const metadata: Metadata = {
-  title: "Aragon Media · Creator Partner Program",
-  description: "Your TikTok business, professionally managed. We activate your creator account, track your GMV, and move your commissions into your bank — USD income from anywhere in the world.",
+  // metadataBase makes Next.js resolve the auto-generated /opengraph-image
+  // and /twitter-image to absolute URLs. Without it, link previews break.
+  metadataBase: new URL(SITE_URL),
+  title: {
+    default: SITE_TITLE,
+    template: "%s · Aragon Media",
+  },
+  description: SITE_DESCRIPTION,
+  applicationName: "Aragon Media",
+  keywords: [
+    "TikTok Shop",
+    "creator commission",
+    "creator partner program",
+    "GMV tracking",
+    "TikTok affiliate",
+    "Aragon Media",
+  ],
+  authors: [{ name: "Aragon Media" }],
+  openGraph: {
+    type: "website",
+    locale: "en_US",
+    url: SITE_URL,
+    siteName: "Aragon Media",
+    title: SITE_TITLE,
+    description: SITE_DESCRIPTION,
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: SITE_TITLE,
+    description: SITE_DESCRIPTION,
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
+  },
+};
+
+export const viewport: Viewport = {
+  themeColor: "#0F0F0F",
+  width: "device-width",
+  initialScale: 1,
 };
 
 // Inline script — runs before React hydration. Reads localStorage and sets
