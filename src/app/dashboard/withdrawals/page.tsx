@@ -59,8 +59,13 @@ export default async function WithdrawalsPage() {
           </span>
         </div>
         <div className="withdraw-gate">
+          {/* Step 1 — Once contract is signed, this is implicitly done. */}
           <div className="withdraw-gate-step">
-            <div className="withdraw-gate-num">1</div>
+            <div
+              className={`withdraw-gate-num${contractSigned ? " done" : ""}`}
+            >
+              {contractSigned ? "✓" : "1"}
+            </div>
             <div>
               <div className="withdraw-gate-title">Open a chat with AM</div>
               <div className="withdraw-gate-sub">
@@ -68,24 +73,42 @@ export default async function WithdrawalsPage() {
                 They&apos;ll send the contract.
               </div>
             </div>
-            <Link href="/dashboard/chat" className="dash-cta">
-              Open chat with AM →
-            </Link>
+            {contractSigned ? (
+              <span className="mini-tag available">Done</span>
+            ) : (
+              <Link href="/dashboard/chat" className="dash-cta">
+                Open chat with AM &rarr;
+              </Link>
+            )}
           </div>
+
+          {/* Step 2 — Once contract is signed, also marked done. */}
           <div className="withdraw-gate-step">
-            <div className="withdraw-gate-num locked">2</div>
+            <div
+              className={`withdraw-gate-num${
+                contractSigned ? " done" : " locked"
+              }`}
+            >
+              {contractSigned ? "✓" : "2"}
+            </div>
             <div>
               <div className="withdraw-gate-title">
                 Earn your first commission sale
               </div>
               <div className="withdraw-gate-sub">
-                Great — when your account is verified you can begin promoting on
-                TikTok Shop. On your 1st sale, message the AM team here for the
-                next step.
+                Great &mdash; when your account is verified you can begin
+                promoting on TikTok Shop. On your 1st sale, message the AM
+                team here for the next step.
               </div>
             </div>
-            <span className="mini-tag locked">Locked</span>
+            <span
+              className={`mini-tag ${contractSigned ? "available" : "locked"}`}
+            >
+              {contractSigned ? "Done" : "Locked"}
+            </span>
           </div>
+
+          {/* Step 3 — The only step with an active CTA once unlocked. */}
           <div className="withdraw-gate-step">
             <div
               className={`withdraw-gate-num${contractSigned ? "" : " locked"}`}
@@ -101,7 +124,7 @@ export default async function WithdrawalsPage() {
             </div>
             {contractSigned ? (
               <Link href="/dashboard/withdrawals/new" className="dash-cta">
-                Submit a withdrawal →
+                Submit a withdrawal &rarr;
               </Link>
             ) : (
               <span className="mini-tag locked">Locked</span>
