@@ -55,7 +55,7 @@ export default async function WithdrawalsPage() {
         <div className="dash-card-head">
           <h2>Unlock the withdrawal form</h2>
           <span className={`mini-tag ${contractSigned ? "available" : "locked"}`}>
-            {contractSigned ? "Contract signed" : "Locked"}
+            {contractSigned ? "Signed" : "Locked"}
           </span>
         </div>
         <div className="withdraw-gate">

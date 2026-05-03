@@ -32,7 +32,7 @@ export default async function WithdrawalNewPage() {
 
       {!contractSigned && (
         <div className="dash-card preview-banner">
-          <div className="preview-banner-pill">Preview · locked until contract signed</div>
+          <div className="preview-banner-pill">Preview · locked until signed</div>
           <div className="preview-banner-body">This is what the withdrawal form looks like. It only goes live once you&apos;ve earned your first commission, notified the AM team in chat, and signed the operations agreement. Until then, submit attempts won&apos;t process.</div>
         </div>
       )}
