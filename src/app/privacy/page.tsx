@@ -29,7 +29,7 @@ export default function PrivacyPage() {
 
         <p className="legal-intro">
           Aragon Media (&ldquo;we,&rdquo; &ldquo;us,&rdquo; the &ldquo;Agency&rdquo;) operates the
-          Creator Partner Program at kevin-aragon.com and aragon-media-portal.vercel.app
+          Creator Partner Program at kevin-aragon.com and portal.kevin-aragon.com
           (the &ldquo;Portal&rdquo;). This policy explains exactly what creator data we collect,
           where it lives, who can see it, and what control you have over it. We wrote this in
           plain English on purpose — if anything is unclear, email{" "}

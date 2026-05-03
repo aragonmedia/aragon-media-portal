@@ -3,7 +3,7 @@ import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import "./globals.css";
 
-const SITE_URL = "https://aragon-media-portal.vercel.app";
+const SITE_URL = "https://portal.kevin-aragon.com";
 const SITE_TITLE = "Aragon Media · Creator Partner Program";
 const SITE_DESCRIPTION =
   "Your TikTok business, professionally managed. We activate your creator account, track your GMV, and move your commissions into your bank — USD income from anywhere in the world.";

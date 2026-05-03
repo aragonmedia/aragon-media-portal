@@ -30,7 +30,7 @@
 import { Resend } from "resend";
 
 const FROM = "Aragon Media <onboarding@kevin-aragon.com>";
-const PORTAL = "https://aragon-media-portal.vercel.app";
+const PORTAL = "https://portal.kevin-aragon.com";
 
 /**
  * Shared <head> snippet that signals LIGHT theme to all major mail clients.
@@ -195,7 +195,7 @@ function renderEmail({
             </td>
           </tr>
         </table>
-        <p style="color:#8B8278;font-size:11px;margin-top:18px;">aragon-media-portal.vercel.app</p>
+        <p style="color:#8B8278;font-size:11px;margin-top:18px;">portal.kevin-aragon.com</p>
       </td>
     </tr>
   </table>

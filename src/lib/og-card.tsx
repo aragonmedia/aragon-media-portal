@@ -22,7 +22,7 @@ export const OG_CONTENT_TYPE = "image/png";
 
 const GOLD = "#C9A84C";
 const GREEN = "#1F8B53";
-const BG = "#0F0F0F";
+// BG removed (gradient covers outer)
 const BG_CARD = "#1A1A1A";
 const BG_PHONE = "#0B0B0B";
 const TEXT = "#F5F1E6";
@@ -156,7 +156,7 @@ export function renderOGCard(): Promise<ImageResponse> | ImageResponse {
                 display: "flex",
               }}
             >
-              aragon-media-portal.vercel.app
+              portal.kevin-aragon.com
             </div>
             <div
               style={{

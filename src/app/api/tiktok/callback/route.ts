@@ -29,7 +29,7 @@ export async function GET(req: NextRequest) {
 
   if (error) {
     return Response.redirect(
-      `https://aragon-media-portal.vercel.app/dashboard/tiktok-account?error=${encodeURIComponent(error)}`,
+      `https://portal.kevin-aragon.com/dashboard/tiktok-account?error=${encodeURIComponent(error)}`,
       302
     );
   }
@@ -39,7 +39,7 @@ export async function GET(req: NextRequest) {
 
   const user = await getCurrentUser();
   if (!user) {
-    return Response.redirect("https://aragon-media-portal.vercel.app/signin", 302);
+    return Response.redirect("https://portal.kevin-aragon.com/signin", 302);
   }
 
   const appKey = process.env.TIKTOK_CLIENT_KEY;
@@ -98,7 +98,7 @@ export async function GET(req: NextRequest) {
     });
 
     return Response.redirect(
-      `https://aragon-media-portal.vercel.app/dashboard/tiktok-account?connected=1`,
+      `https://portal.kevin-aragon.com/dashboard/tiktok-account?connected=1`,
       302
     );
   } catch (err) {

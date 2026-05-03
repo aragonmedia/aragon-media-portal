@@ -30,7 +30,7 @@ export default function TermsPage() {
         <p className="legal-intro">
           These Terms govern your use of the Aragon Media Creator Partner Program
           (the &ldquo;Program&rdquo;) and the Portal at kevin-aragon.com and
-          aragon-media-portal.vercel.app. By creating an account, paying an activation
+          portal.kevin-aragon.com. By creating an account, paying an activation
           fee, or signing the Operations Agreement, you agree to these Terms. Read them
           carefully — they cover real money, payouts, and your TikTok Shop account.
         </p>

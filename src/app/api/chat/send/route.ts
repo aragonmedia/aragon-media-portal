@@ -135,7 +135,7 @@ export async function POST(req: NextRequest) {
           fromLabel: chatRow.ownerName ?? "A creator",
           fromContext: chatRow.ownerEmail,
           snippet: snippetText.slice(0, 280),
-          openUrl: `https://aragon-media-portal.vercel.app/admin/chats/${chatId}`,
+          openUrl: `https://portal.kevin-aragon.com/admin/chats/${chatId}`,
           recipientIsAdmin: true,
         });
       } else if (sender === "am_team" && chatRow.ownerEmail) {
@@ -145,7 +145,7 @@ export async function POST(req: NextRequest) {
           fromLabel: "Aragon Media",
           fromContext: "AM team",
           snippet: snippetText.slice(0, 280),
-          openUrl: `https://aragon-media-portal.vercel.app/dashboard/chat`,
+          openUrl: `https://portal.kevin-aragon.com/dashboard/chat`,
           recipientIsAdmin: false,
         });
       }
