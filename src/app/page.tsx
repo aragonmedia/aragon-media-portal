@@ -286,61 +286,89 @@ export default function Home() {
 
       <div className="divider"></div>
 
-      <section className="section" style={{ paddingBottom: 32 }}>
-        <p className="section-label">Pricing</p>
-        <h2>Activate one account, or <em>bundle and save.</em></h2>
+      <section className="section" style={{ paddingBottom: 16 }}>
+        <p className="section-label">Aragon Media · Account verification</p>
+        <h2>Scale your TikTok presence, <em>multiply your reach.</em></h2>
         <p className="section-intro">
-          Every account within a 4-account cycle gets the same premium service. Add them one at a time at the incremental rate, or bundle up front and pay less overall.
+          Add up to 4 TikTok accounts per cycle. Pick the path that fits how you want to pay.
         </p>
       </section>
 
+      {/* Replicates /dashboard/add-account exactly per Kevin's spec */}
       <div className="pricing-wrap">
-        <div className="pricing-grid">
-          <div className="ladder-card">
+        <div className="lander-paths">
+          <div className="lander-path lander-path-a">
             <p className="card-label">Path A</p>
-            <h3 className="card-title">Add one at a time</h3>
-            <p className="card-sub">Pay only for the account you&apos;re activating now. You can come back and add up to 4 per cycle.</p>
-            <div className="ladder-list">
-              <div className="ladder-row first-row">
-                <div className="ladder-left"><div className="ladder-num">1</div><div className="ladder-label">1st account<small>First verification</small></div></div>
-                <div className="ladder-price">$100</div>
+            <h3 className="lander-path-title">Add one at a time</h3>
+            <p className="lander-path-sub">Pay only for the account you&apos;re activating now. The next price unlocks once each prior account is verified.</p>
+            <div className="lander-ladder">
+              <div className="lander-rung lander-rung-active">
+                <div className="lander-rung-num">1</div>
+                <div className="lander-rung-label">
+                  <span>1st account</span>
+                  <small>Active &mdash; your next purchase</small>
+                </div>
+                <div className="lander-rung-price lander-rung-price-active">$100</div>
               </div>
-              <a
-                href={SQUARE_LINKS[1]}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="ladder-cta-inline"
-              >
-                PURCHASE &mdash; $100
-              </a>
-              <div className="ladder-row"><div className="ladder-left"><div className="ladder-num">2</div><div className="ladder-label">2nd account<small>+$125 when added</small></div></div><div className="ladder-price">$125</div></div>
-              <div className="ladder-row"><div className="ladder-left"><div className="ladder-num">3</div><div className="ladder-label">3rd account<small>+$150 when added</small></div></div><div className="ladder-price">$150</div></div>
-              <div className="ladder-row"><div className="ladder-left"><div className="ladder-num">4</div><div className="ladder-label">4th account<small>+$175 when added</small></div></div><div className="ladder-price">$175</div></div>
+              <div className="lander-rung lander-rung-locked">
+                <div className="lander-rung-num">2</div>
+                <div className="lander-rung-label">
+                  <span>2nd account</span>
+                  <small>Unlocks after 1st</small>
+                </div>
+                <div className="lander-rung-price">$125</div>
+              </div>
+              <div className="lander-rung lander-rung-locked">
+                <div className="lander-rung-num">3</div>
+                <div className="lander-rung-label">
+                  <span>3rd account</span>
+                  <small>Unlocks after 2nd</small>
+                </div>
+                <div className="lander-rung-price">$150</div>
+              </div>
+              <div className="lander-rung lander-rung-locked">
+                <div className="lander-rung-num">4</div>
+                <div className="lander-rung-label">
+                  <span>4th account</span>
+                  <small>Unlocks after 3rd</small>
+                </div>
+                <div className="lander-rung-price">$175</div>
+              </div>
             </div>
-            <p className="ladder-note">Only the 1st account is purchaseable here. Accounts 2 to 4 unlock after verification. Cycle resets after your 4th. The 5th starts back at $100.</p>
+            <a
+              href={SQUARE_LINKS[1]}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="lander-path-cta"
+            >
+              ACTIVATE 1ST ACCOUNT &mdash; $100
+            </a>
+            <p className="lander-path-foot">Total if added one-by-one: $550 per cycle.</p>
           </div>
 
-          <div className="bundle-card">
+          <div className="lander-path lander-path-b">
             <p className="card-label">Path B &middot; Most popular</p>
-            <h3 className="card-title">Bundle up front</h3>
-            <p className="card-sub">Lock in 2, 3, or all 4 accounts now and save compared to adding them one by one.</p>
+            <h3 className="lander-path-title">Bundle up front</h3>
+            <p className="lander-path-sub">Lock in 2, 3, or all 4 accounts now and save vs adding them one by one.</p>
 
-            <div className="bundle-top">
+            <div className="lander-bundle-top">
               <div>
                 <div className="card-label" style={{ marginBottom: 6 }}>Accounts</div>
-                <div className="bundle-count">{accounts}</div>
-                <div className="bundle-word">{accounts === 1 ? "account" : "accounts"}</div>
+                <div className="lander-bundle-count">{accounts}</div>
+                <div className="lander-bundle-word">{accounts === 1 ? "account" : "accounts"}</div>
               </div>
-              <div className="bundle-price-wrap">
-                <div className="bundle-savings" style={{ visibility: savings > 0 ? "visible" : "hidden" }}>
-                  Save ${savings.toFixed(2)}
-                </div>
-                <div className="bundle-price">{formatPrice(price)}</div>
-                <div className={badge.className}>{badge.label}</div>
+              <div className="lander-bundle-price-wrap">
+                <div className="lander-bundle-price">{formatPrice(price)}</div>
+                {savings > 0 && (
+                  <div className="lander-bundle-best">{badge.label}</div>
+                )}
+                {savings > 0 && (
+                  <div className="lander-bundle-savings">SAVE ${savings.toFixed(0)} VS INCREMENTAL</div>
+                )}
               </div>
             </div>
 
-            <div className="range-wrap">
+            <div className="range-wrap lander-range">
               <input
                 type="range"
                 min={1}
@@ -350,7 +378,7 @@ export default function Home() {
                 onChange={(e) => setAccounts(parseInt(e.target.value))}
                 style={{ background: `linear-gradient(to right, #C9A84C ${pct}%, #2A2A2A ${pct}%)` }}
               />
-              <div className="tier-markers">
+              <div className="tier-markers lander-markers">
                 {[1, 2, 3, 4].map((n) => (
                   <div
                     key={n}
@@ -367,22 +395,44 @@ export default function Home() {
               href={SQUARE_LINKS[accounts]}
               target="_blank"
               rel="noopener noreferrer"
-              className="bundle-cta"
+              className="lander-path-cta lander-path-cta-bundle"
             >
-              PURCHASE &mdash; {formatPrice(price)}
+              BUNDLE ACTIVATE {accounts} {accounts === 1 ? "ACCOUNT" : "ACCOUNTS"} &mdash; {formatPrice(price)}
             </a>
-            <p className="bundle-note">Direct Square checkout &middot; No account required to pay &middot; Secured by Square</p>
+            <p className="lander-path-foot">Direct Square checkout &middot; No portal account required to pay &middot; Secured by Square</p>
           </div>
         </div>
 
-        <p className="paths-note">Valid purchase order per account &middot; one sale equals one verified account &middot; choose <strong>Path A</strong> or <strong>Path B</strong>. Either way, the AM team takes it from here.</p>
+        {/* Both paths include — matches /dashboard/add-account, more padding so text isn't kissing the frame */}
+        <div className="lander-includes-card">
+          <p className="lander-includes-label">Both paths include</p>
+          <ul className="lander-includes-list">
+            <li><span className="lander-include-check">✓</span>Full AM team activation per account, within 24 hours each</li>
+            <li><span className="lander-include-check">✓</span>One AM team chat hub for all your accounts</li>
+            <li><span className="lander-include-check">✓</span>Individual GMV and revenue tracking per account</li>
+            <li><span className="lander-include-check">✓</span>Separate progress tracker and withdrawal form per account</li>
+          </ul>
+        </div>
 
-        <div className="why-wrap">
-          <div className="why-label">Why bundle is the smarter choice</div>
-          <div className="why-grid">
-            <div className="why-card"><div className="why-num">01</div><h4>Multiple niches, multiple income streams</h4><p>Different accounts let you test different audiences, products, and content styles. Each one earns commissions independently.</p></div>
-            <div className="why-card"><div className="why-num">02</div><h4>Protect your primary account</h4><p>If one account hits a restriction or review, your others stay active and earning while the AM team resolves it on your behalf.</p></div>
-            <div className="why-card"><div className="why-num">03</div><h4>All managed in one place</h4><p>Every verified account lives in portal. Separate dashboards, one login, one AM team backing all of them.</p></div>
+        {/* Why verify more accounts? — matches dashboard, more padding */}
+        <div className="lander-why-card">
+          <p className="lander-includes-label">Why verify more accounts?</p>
+          <div className="lander-why-grid">
+            <div className="lander-why-tile">
+              <div className="lander-why-num">01</div>
+              <h4>Multiple niches, multiple income streams</h4>
+              <p>Different TikTok accounts let you test different audiences, products, and content styles. Each one earns commissions independently.</p>
+            </div>
+            <div className="lander-why-tile">
+              <div className="lander-why-num">02</div>
+              <h4>Protect your primary account</h4>
+              <p>If one account faces a restriction, your other verified accounts stay active and earning while AM resolves it on your behalf.</p>
+            </div>
+            <div className="lander-why-tile">
+              <div className="lander-why-num">03</div>
+              <h4>All managed in one place</h4>
+              <p>Every account we verify for you shows up in this portal. One login, one AM team backing all of them.</p>
+            </div>
           </div>
         </div>
       </div>

@@ -39,7 +39,10 @@ const DARK_EMAIL_HEAD = `<head>
     body, table, td { background:#0F0F0F !important; color:#FAF7EE !important; }
     [data-ogsc] body, [data-ogsc] table, [data-ogsc] td { background:#0F0F0F !important; color:#FAF7EE !important; }
     @media (prefers-color-scheme: light) {
-      :root, html, body, table, td { background:#0F0F0F !important; color:#FAF7EE !important; }
+      :root, html, body, table, td { background-color:#0F0F0F !important; color:#FAF7EE !important; }
+    }
+    @media (prefers-color-scheme: dark) {
+      :root, html, body, table, td { background-color:#0F0F0F !important; color:#FAF7EE !important; }
     }
   </style>
 </head>`;
@@ -146,18 +149,21 @@ function renderEmail({
     html, body { background:#0F0F0F !important; color:#F5F1E6 !important; }
     [data-ogsc] body, [data-ogsc] table, [data-ogsc] td { background:#0F0F0F !important; color:#F5F1E6 !important; }
     @media (prefers-color-scheme: light) {
-      html, body, table, td { background:#0F0F0F !important; color:#F5F1E6 !important; }
+      html, body, table, td { background-color:#0F0F0F !important; color:#F5F1E6 !important; }
+    }
+    @media (prefers-color-scheme: dark) {
+      html, body, table, td { background-color:#0F0F0F !important; color:#F5F1E6 !important; }
     }
     a { color:#C9A84C !important; text-decoration:none !important; }
   </style>
 </head>
-<body style="margin:0 !important;padding:0 !important;background:#0F0F0F !important;font-family:'Inter Tight',Helvetica,Arial,sans-serif;color:#F5F1E6 !important;">
+<body bgcolor="#0F0F0F" style="margin:0 !important;padding:0 !important;background-color:#0F0F0F !important;font-family:'Inter Tight',Helvetica,Arial,sans-serif;color:#F5F1E6 !important;-webkit-text-size-adjust:none;mso-hide:all;">
   <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background:#0F0F0F !important;padding:32px 16px;">
     <tr>
       <td align="center" bgcolor="#0F0F0F" style="background:#0F0F0F !important;">
-        <table role="presentation" width="560" cellspacing="0" cellpadding="0" border="0" style="max-width:560px;background:#141414 !important;border:1px solid #2A2A2A;border-radius:14px;overflow:hidden;">
+        <table role="presentation" width="560" cellspacing="0" cellpadding="0" border="0" bgcolor="#0F0F0F" style="max-width:560px;background-color:#0F0F0F !important;border:1px solid #2A2A2A;border-radius:14px;overflow:hidden;">
           <tr>
-            <td bgcolor="#141414" style="padding:28px 32px 0 32px;background:#141414 !important;">
+            <td bgcolor="#0F0F0F" style="padding:28px 32px 0 32px;background-color:#0F0F0F !important;">
               <table role="presentation" cellspacing="0" cellpadding="0" border="0">
                 <tr>
                   <td bgcolor="#0F0F0F" style="background:#0F0F0F !important;border-radius:10px;width:48px;height:48px;text-align:center;font-family:'Inter Tight',Helvetica,Arial,sans-serif;font-weight:800;color:#C9A84C !important;font-size:22px;letter-spacing:-1px;line-height:48px;">AM</td>
@@ -167,13 +173,13 @@ function renderEmail({
             </td>
           </tr>
           <tr>
-            <td bgcolor="#141414" style="padding:28px 32px 0 32px;background:#141414 !important;">
+            <td bgcolor="#0F0F0F" style="padding:28px 32px 0 32px;background-color:#0F0F0F !important;">
               <h1 style="margin:0 0 6px 0;color:#F5F1E6 !important;font-family:'Inter Tight',Helvetica,Arial,sans-serif;font-weight:700;font-size:26px;letter-spacing:-0.02em;line-height:1.15;">${heading}</h1>
               <p style="margin:0 0 22px 0;color:#9A9590 !important;font-size:14px;line-height:1.55;">${greeting} ${purposeLine}</p>
             </td>
           </tr>
           <tr>
-            <td bgcolor="#141414" style="padding:0 32px;background:#141414 !important;">
+            <td bgcolor="#0F0F0F" style="padding:0 32px;background-color:#0F0F0F !important;">
               <div style="background:#0F0F0F !important;border:1px solid #C9A84C;border-radius:10px;padding:22px 28px;text-align:center;">
                 <div style="color:#9A9590 !important;font-size:11px;letter-spacing:0.18em;text-transform:uppercase;margin-bottom:8px;">Your 6-digit code</div>
                 <div style="color:#C9A84C !important;font-family:'Inter Tight',Helvetica,Arial,sans-serif;font-weight:800;font-size:38px;letter-spacing:0.4em;">${code}</div>
@@ -182,7 +188,7 @@ function renderEmail({
             </td>
           </tr>
           <tr>
-            <td bgcolor="#141414" style="padding:24px 32px 18px 32px;background:#141414 !important;">
+            <td bgcolor="#0F0F0F" style="padding:24px 32px 18px 32px;background-color:#0F0F0F !important;">
               <p style="margin:0;color:#9A9590 !important;font-size:13px;line-height:1.6;">If you didn't request this, you can safely ignore this email. Your account stays untouched.</p>
             </td>
           </tr>

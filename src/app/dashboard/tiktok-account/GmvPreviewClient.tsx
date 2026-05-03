@@ -282,11 +282,25 @@ export default function GmvPreviewClient() {
           </div>
         </div>
         <div className="chart-x-axis">
-          <span>28d ago</span>
-          <span>21d</span>
-          <span>14d</span>
-          <span>7d</span>
-          <span>Today</span>
+          {(() => {
+            // 7 evenly-spaced day-level dates across the active window.
+            // 7d view = 7 ticks, 28d / lifetime view = 7 ticks across 28 days.
+            const span = range === "7d" ? 7 : 28;
+            const ticks = 7;
+            const today = new Date();
+            return Array.from({ length: ticks }).map((_, i) => {
+              // Map index 0..ticks-1 to days-back from today.
+              // i=0 → (span-1) days ago, i=ticks-1 → today.
+              const daysBack = Math.round(((ticks - 1 - i) / (ticks - 1)) * (span - 1));
+              const d = new Date(today);
+              d.setDate(d.getDate() - daysBack);
+              return (
+                <span key={i}>
+                  {d.toLocaleDateString("en-US", { month: "short", day: "numeric" })}
+                </span>
+              );
+            });
+          })()}
         </div>
       </div>
     </main>
