@@ -263,8 +263,8 @@
 .ovr-chart-comm{color:#1F8B53;}
 .ovr-chart-dot{width:10px;height:10px;border-radius:50%;background:currentColor;display:inline-block;}
 .ovr-chart-tabs{display:inline-flex;background:#0F0F0F;border:1px solid #2A2A2A;border-radius:6px;overflow:hidden;}
-.ovr-chart-tab{padding:6px 14px;background:transparent;border:none;color:#9A9590;font-family:inherit;font-size:11px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;cursor:pointer;border-right:1px solid #2A2A2A;transition:background 0.12s ease, color 0.12s ease;}
-.ovr-chart-tab:last-child{border-right:none;}
+.ovr-chart-tab{padding:6px 16px;background:transparent;border:none;color:#9A9590;font-family:inherit;font-size:11px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;cursor:pointer;transition:background 0.12s ease, color 0.12s ease;}
+
 .ovr-chart-tab:hover{color:#FAF7EE;}
 .ovr-chart-tab.is-active{background:rgba(201,168,76,0.12);color:#C9A84C;}
 .ovr-chart-svg-wrap{position:relative;background:#0B0B0B;border:1px solid #1F1F1F;padding:12px 14px;}
@@ -414,3 +414,19 @@
   .delete-modal-actions{flex-direction:column-reverse;}
   .delete-modal-actions .admin-row-btn{width:100%;text-align:center;}
 }
+
+/* Tighter framed TikTok-accounts header on the admin creator detail page */
+.admin-section-head h2{padding:6px 0;}
+.admin-section-head{padding:14px 18px;background:#1A1A1A;border:1px solid #2A2A2A;border-bottom:none;border-radius:6px 6px 0 0;margin-bottom:0;}
+.admin-section-head + .acct-add-form,
+.admin-section-head + .acct-list,
+.admin-section-head + .admin-table-wrap,
+.admin-section-head + .wdr-history-empty,
+.admin-section-head + .chats-empty-frame,
+.admin-section-head + .chat-list,
+.admin-section-head + .ovr-chart-card,
+.admin-section-head + .admin-record-grid,
+.admin-section-head + .admin-record-doc,
+.admin-section-head + .admin-edit-panel{border-top:none;border-radius:0 0 6px 6px;}
+.acct-add-form{padding:14px 18px;background:#0F0F0F;border:1px solid #2A2A2A;}
+.acct-add-form + .acct-list{margin-top:10px;}

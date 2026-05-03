@@ -909,3 +909,16 @@
   .acct-add-prefix{border-right:1px solid var(--border);border-bottom:none;justify-content:center;}
   .acct-add-input,.acct-add-status{width:100%;}
 }
+
+/* Receipt thank-you block (creator-side replacement for the $0 amount box) */
+.rcpt-thanks{padding:20px 24px;background:rgba(31,139,83,0.06);border:1px solid rgba(31,139,83,0.45);border-left:3px solid var(--green);border-radius:6px;display:flex;flex-direction:column;gap:10px;}
+.rcpt-thanks-pill{align-self:flex-start;padding:5px 12px;background:rgba(31,139,83,0.16);color:var(--green);font-size:11px;font-weight:700;letter-spacing:0.16em;text-transform:uppercase;border:1px solid rgba(31,139,83,0.45);border-radius:4px;}
+.rcpt-thanks-body{margin:0;font-size:14px;line-height:1.7;color:var(--text-muted);font-weight:300;}
+.rcpt-thanks-body strong{color:var(--text);font-weight:600;}
+
+/* GMV preview range tabs (matches admin chart aesthetic, no divider gaps) */
+.gmv-card-head{display:flex;justify-content:space-between;align-items:flex-start;gap:18px;flex-wrap:wrap;}
+.gmv-range-tabs{display:inline-flex;background:var(--bg-deep);border:1px solid var(--border);border-radius:6px;overflow:hidden;}
+.gmv-range-tab{padding:6px 16px;background:transparent;border:none;color:var(--text-muted);font-family:inherit;font-size:11px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;cursor:pointer;transition:background 0.12s ease, color 0.12s ease;}
+.gmv-range-tab:hover{color:var(--text);}
+.gmv-range-tab.is-active{background:rgba(201,168,76,0.12);color:var(--gold);}

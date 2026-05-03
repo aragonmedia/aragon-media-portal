@@ -69,9 +69,23 @@ export default function GmvPreviewClient() {
   const [account, setAccount] = useState<Account>("all");
   const [statFocus, setStatFocus] = useState<StatKey>("gmv");
   const [hoverIdx, setHoverIdx] = useState<number | null>(null);
+  const [range, setRange] = useState<"7d" | "28d" | "lifetime">("28d");
   const svgRef = useRef<SVGSVGElement>(null);
 
-  const series = SERIES[account];
+  const baseSeries = SERIES[account];
+  // Mock data is 28 days. Slice last 7 for the 7d view, keep full for 28d
+  // and lifetime (same data — mock doesn't have a longer history).
+  const series = (() => {
+    if (range === "7d") {
+      return {
+        gmv: baseSeries.gmv.slice(-7),
+        comm: baseSeries.comm.slice(-7),
+        orders: baseSeries.orders.slice(-7),
+        videos: baseSeries.videos.slice(-7),
+      };
+    }
+    return baseSeries;
+  })();
   const totals = useMemo(() => ({
     gmv: series.gmv.reduce((s, v) => s + v, 0),
     comm: series.comm.reduce((s, v) => s + v, 0),
@@ -155,9 +169,23 @@ export default function GmvPreviewClient() {
 
       {/* Stat cards — 2×2 grid, click to switch chart focus */}
       <div className="dash-card" style={{ marginTop: 16 }}>
-        <div className="dash-card-head">
-          <h2>Last 28 days</h2>
-          <span className="dash-meta">Click any card to focus the chart</span>
+        <div className="dash-card-head gmv-card-head">
+          <div>
+            <h2>{range === "7d" ? "Last 7 days" : range === "28d" ? "Last 28 days" : "Lifetime"}</h2>
+            <span className="dash-meta">Click any card to focus the chart</span>
+          </div>
+          <div className="gmv-range-tabs" role="tablist">
+            {(["7d", "28d", "lifetime"] as const).map((r) => (
+              <button
+                key={r}
+                type="button"
+                className={`gmv-range-tab${range === r ? " is-active" : ""}`}
+                onClick={() => { setRange(r); setHoverIdx(null); }}
+              >
+                {r === "7d" ? "Last 7d" : r === "28d" ? "Last 28d" : "Lifetime"}
+              </button>
+            ))}
+          </div>
         </div>
         <div className="gmv-stat-grid">
           {(["gmv", "comm", "orders", "videos"] as StatKey[]).map((key) => {
@@ -185,7 +213,7 @@ export default function GmvPreviewClient() {
       <div className="dash-card" style={{ marginTop: 16 }}>
         <div className="dash-card-head chart-head-row">
           <div>
-            <h2>{ACCOUNT_LABELS[account]} · Last 28 days · {STAT_LABEL[statFocus]}</h2>
+            <h2>{ACCOUNT_LABELS[account]} · {range === "7d" ? "Last 7 days" : range === "28d" ? "Last 28 days" : "Lifetime"} · {STAT_LABEL[statFocus]}</h2>
             <span className="dash-meta">{statFocus === "gmv" ? "GMV (gold) and creator commission (green) over time" : "Daily totals"}</span>
           </div>
           <div className="chart-legend">

@@ -20,6 +20,31 @@ import { Resend } from "resend";
 const FROM = "Aragon Media <onboarding@kevin-aragon.com>";
 const PORTAL = "https://aragon-media-portal.vercel.app";
 
+/**
+ * Shared <head> snippet that locks every transactional email to DARK theme
+ * regardless of the recipient's device theme. Apple Mail / Outlook / Gmail
+ * all auto-flip emails to light by default — this triple-defends against
+ * that with: (1) color-scheme meta + supported-color-schemes meta,
+ * (2) inline <style> with !important on root + body backgrounds,
+ * (3) @media (prefers-color-scheme: light) override that forces dark anyway,
+ * (4) [data-ogsc] selector targeting Outlook web's own dark-mode flip.
+ */
+const DARK_EMAIL_HEAD = `<head>
+  <meta name="color-scheme" content="dark only" />
+  <meta name="supported-color-schemes" content="dark" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <style type="text/css">
+    :root { color-scheme: dark only !important; supported-color-schemes: dark only !important; }
+    html, body { background:#0F0F0F !important; color:#FAF7EE !important; margin:0 !important; padding:0 !important; }
+    body, table, td { background:#0F0F0F !important; color:#FAF7EE !important; }
+    [data-ogsc] body, [data-ogsc] table, [data-ogsc] td { background:#0F0F0F !important; color:#FAF7EE !important; }
+    @media (prefers-color-scheme: light) {
+      :root, html, body, table, td { background:#0F0F0F !important; color:#FAF7EE !important; }
+    }
+  </style>
+</head>`;
+
+
 let client: Resend | null = null;
 
 function getResend(): Resend {
@@ -256,8 +281,8 @@ export async function sendAgreementSignedNotification(opts: {
       "",
       `Portal: ${PORTAL}/dashboard`,
     ].join("\n");
-    const html = `<!DOCTYPE html><html><body style="font-family:system-ui,sans-serif;background:#0F0F0F;color:#FAF7EE;padding:24px;line-height:1.6;">
-      <h2 style="color:#C9A84C;margin:0 0 16px 0;">Operations Agreement signed</h2>
+    const html = `<!DOCTYPE html><html>${DARK_EMAIL_HEAD}<body bgcolor="#0F0F0F" style="font-family:system-ui,sans-serif;background:#0F0F0F !important;color:#FAF7EE !important;padding:24px;line-height:1.6;margin:0;">
+      <h2 style="color:#C9A84C !important;margin:0 0 16px 0;">Operations Agreement signed</h2>
       <table cellpadding="6" style="font-size:14px;color:#D4CFB6;">
         <tr><td><strong>Creator:</strong></td><td>${opts.creatorName}</td></tr>
         <tr><td><strong>Email:</strong></td><td>${opts.creatorEmail}</td></tr>
@@ -315,11 +340,8 @@ export async function sendWithdrawalPaidEmail(opts: {
     const subject = `${opts.receiptNumber} · Paid · ${fmtUsd(opts.netCents)}`;
     const greeting = (opts.creatorName ?? "").split(" ")[0] || "there";
 
-    const html = `<!DOCTYPE html><html><head>
-      <meta name="color-scheme" content="dark only">
-      <meta name="supported-color-schemes" content="dark">
-    </head>
-    <body style="margin:0;padding:0;background:#0F0F0F !important;color:#FAF7EE !important;font-family:system-ui,-apple-system,'Inter Tight',sans-serif;">
+    const html = `<!DOCTYPE html><html>${DARK_EMAIL_HEAD}
+    <body bgcolor="#0F0F0F" style="margin:0 !important;padding:0 !important;background:#0F0F0F !important;color:#FAF7EE !important;font-family:system-ui,-apple-system,'Inter Tight',sans-serif;">
       <table role="presentation" width="100%" bgcolor="#0F0F0F" style="background:#0F0F0F !important;">
         <tr><td align="center" style="padding:32px 18px;">
           <table role="presentation" width="600" bgcolor="#0F0F0F" style="background:#0F0F0F !important;border:1px solid #2A2A2A;max-width:600px;width:100%;">
@@ -411,11 +433,8 @@ export async function sendChatNotificationEmail(opts: {
       ? `New chat from ${opts.fromLabel} — Aragon Media portal`
       : `New message from Aragon Media`;
 
-    const html = `<!DOCTYPE html><html><head>
-      <meta name="color-scheme" content="dark only">
-      <meta name="supported-color-schemes" content="dark">
-    </head>
-    <body style="margin:0;padding:0;background:#0F0F0F !important;color:#FAF7EE !important;font-family:system-ui,-apple-system,'Inter Tight',sans-serif;">
+    const html = `<!DOCTYPE html><html>${DARK_EMAIL_HEAD}
+    <body bgcolor="#0F0F0F" style="margin:0 !important;padding:0 !important;background:#0F0F0F !important;color:#FAF7EE !important;font-family:system-ui,-apple-system,'Inter Tight',sans-serif;">
       <table role="presentation" width="100%" bgcolor="#0F0F0F" style="background:#0F0F0F !important;">
         <tr><td align="center" style="padding:32px 18px;">
           <table role="presentation" width="600" bgcolor="#0F0F0F" style="background:#0F0F0F !important;border:1px solid #2A2A2A;max-width:600px;width:100%;">

@@ -7,13 +7,6 @@ import { getCurrentUser } from "@/lib/auth/session";
 
 export const dynamic = "force-dynamic";
 
-function fmtCents(cents: number) {
-  return (cents / 100).toLocaleString("en-US", {
-    style: "currency",
-    currency: "USD",
-  });
-}
-
 function statusPill(status: string) {
   if (status === "paid") return { label: "Paid", className: "rcpt-pill-paid" };
   if (status === "late_retained")
@@ -88,15 +81,13 @@ export default async function ReceiptPage({
           <span className={`rcpt-pill ${pill.className}`}>{pill.label}</span>
         </div>
 
-        <div className="rcpt-amount-row rcpt-amount-row-2col">
-          <div className="rcpt-amount-block">
-            <div className="rcpt-amt-label">Withdrawal amount</div>
-            <div className="rcpt-amt-value">{fmtCents(r.grossCents)}</div>
-          </div>
-          <div className="rcpt-amount-block">
-            <div className="rcpt-amt-label">You receive</div>
-            <div className="rcpt-amt-value rcpt-amt-net">{fmtCents(r.netCents)}</div>
-          </div>
+        <div className="rcpt-thanks">
+          <div className="rcpt-thanks-pill">Submitted ✓</div>
+          <p className="rcpt-thanks-body">
+            Thank you for your submission! In a few business days you&apos;ll
+            receive an email receipt confirming the exact amount sent to your
+            payout method.
+          </p>
         </div>
 
         <div className="rcpt-grid">
