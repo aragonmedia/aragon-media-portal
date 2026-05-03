@@ -153,7 +153,10 @@ export async function POST(req: NextRequest) {
   // Per Kevin: ONLY a flip TO 'paid' triggers a creator email. Every other
   // status transition is portal-only state. Pull net_cents / gross_cents
   // from `after` so admin edits just before the flip flow into the email.
+  // Email failures are caught here so the DB save still returns 200 — but
+  // emailSent is honest about whether the message actually shipped.
   let emailSent = false;
+  let emailError: string | null = null;
   if (newStatus === "paid") {
     const creator = (
       await db
@@ -163,16 +166,23 @@ export async function POST(req: NextRequest) {
         .limit(1)
     )[0];
     if (creator?.email) {
-      await sendWithdrawalPaidEmail({
-        to: creator.email,
-        creatorName: creator.name,
-        receiptNumber: after.receiptNumber,
-        netCents: after.netCents,
-        grossCents: after.grossCents,
-      });
-      emailSent = true;
+      try {
+        await sendWithdrawalPaidEmail({
+          to: creator.email,
+          creatorName: creator.name,
+          receiptNumber: after.receiptNumber,
+          netCents: after.netCents,
+          grossCents: after.grossCents,
+        });
+        emailSent = true;
+      } catch (err) {
+        emailError = err instanceof Error ? err.message : String(err);
+        console.error("[update-withdrawal] Paid email failed:", emailError);
+      }
+    } else {
+      emailError = "creator has no email on file";
     }
   }
 
-  return Response.json({ ok: true, withdrawal: after, emailSent });
+  return Response.json({ ok: true, withdrawal: after, emailSent, emailError });
 }

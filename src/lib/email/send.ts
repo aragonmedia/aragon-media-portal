@@ -393,7 +393,7 @@ export async function sendWithdrawalPaidEmail(opts: {
                 <tr><td bgcolor="#F1FBF4" style="padding:24px 28px;background:#F1FBF4;text-align:left;">
                   <div style="font-size:11px;letter-spacing:0.18em;color:#0F7A3F;text-transform:uppercase;font-weight:700;margin-bottom:8px;">Sent to your bank</div>
                   <div style="font-family:'Inter Tight',sans-serif;font-size:42px;font-weight:800;color:#0F7A3F;letter-spacing:-0.02em;line-height:1;">${fmtUsd(opts.netCents)}</div>
-                  <div style="font-size:12px;color:#6B6B6B;margin-top:10px;letter-spacing:0.04em;">From ${fmtUsd(opts.grossCents)} gross · receipt ${opts.receiptNumber}</div>
+                  <div style="font-size:12px;color:#6B6B6B;margin-top:10px;letter-spacing:0.04em;">Receipt ${opts.receiptNumber}</div>
                 </td></tr>
               </table>
             </td></tr>
@@ -424,7 +424,6 @@ export async function sendWithdrawalPaidEmail(opts: {
       `Receipt ${opts.receiptNumber} just cleared.`,
       "",
       `>>> Sent to your bank: ${fmtUsd(opts.netCents)}`,
-      `    From ${fmtUsd(opts.grossCents)} gross`,
       "",
       `View receipt: ${PORTAL}/dashboard/withdrawals`,
       `Chat with AM: ${PORTAL}/dashboard/chat`,
@@ -432,7 +431,7 @@ export async function sendWithdrawalPaidEmail(opts: {
       "Aragon Media · 1309 Coffeen Ave, Sheridan, WY 82801",
     ].join("\n");
 
-    await resend.emails.send({
+    const result = await resend.emails.send({
       from: FROM,
       to: [opts.to],
       bcc: ["aragonkevin239@gmail.com"],
@@ -440,8 +439,24 @@ export async function sendWithdrawalPaidEmail(opts: {
       text,
       html,
     });
+    // Resend returns { data, error } rather than throwing — surface
+    // a rejection (rate limit, deliverability, sender domain, etc.) so
+    // it shows up in Vercel logs and the route can mark emailSent: false
+    // instead of falsely reporting success to the admin.
+    if (result?.error) {
+      console.error(
+        "[email] sendWithdrawalPaidEmail Resend rejected:",
+        result.error.name ?? "Error",
+        result.error.message ?? String(result.error),
+        "to:", opts.to
+      );
+      throw new Error(
+        `Resend rejected: ${result.error.message ?? result.error.name ?? "unknown"}`
+      );
+    }
   } catch (err) {
     console.error("[email] sendWithdrawalPaidEmail failed:", err);
+    throw err;  // re-throw so the route's try/catch sets emailSent=false
   }
 }
 

@@ -87,19 +87,26 @@ export default function WithdrawalEditPanel({
         ok: boolean;
         error?: string;
         emailSent?: boolean;
+        emailError?: string | null;
       };
       if (!res.ok || !j.ok) {
         setMsg({ kind: "err", text: j.error ?? "Save failed" });
         setBusy(false);
         return;
       }
+      // Show the toast first, then defer router.refresh so it stays
+      // visible for ~3.5s. router.refresh() re-renders the parent server
+      // component which unmounts this panel and wipes local state — if we
+      // refresh immediately the toast vanishes within ~50ms.
       setMsg({
         kind: "ok",
         text: j.emailSent
           ? "Saved · Paid email sent to creator."
-          : "Saved.",
+          : j.emailError
+            ? `Saved · email failed: ${j.emailError}`
+            : "Saved.",
       });
-      router.refresh();
+      window.setTimeout(() => router.refresh(), 3500);
     } catch (err) {
       setMsg({
         kind: "err",
