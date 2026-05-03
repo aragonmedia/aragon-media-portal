@@ -6,13 +6,25 @@
  * only deliverable destination is the email tied to the Resend account.
  * Once a domain is verified we'll swap MAIL_FROM to noreply@<domain>.
  *
- * IMPORTANT: this template forces DARK THEME on every email client. We use:
- *   - <meta name="color-scheme" content="dark only">
- *   - <meta name="supported-color-schemes" content="dark">
- *   - !important on every background and color rule
- *   - msoHide / mso conditional comments to keep Outlook from inverting
- * This prevents Apple Mail / Outlook / Gmail from auto-flipping our dark
- * email to light mode and washing out the gold code.
+ * IMPORTANT — LIGHT THEME (2026-05-02 Gmail-iOS fix):
+ * Gmail's iOS app strips most <style> blocks from <head> and applies its
+ * OWN light theme regardless of color-scheme metas, !important rules, or
+ * @media queries. Multiple rounds of dark-lock CSS failed to defeat it,
+ * so we flipped the strategy: build emails LIGHT themed in the first place
+ * with inline-only colors. Same brand (gold accent + green for money),
+ * just on white card / cream outer body. This renders consistently across
+ * Apple Mail, Outlook, Gmail Web, AND Gmail iOS.
+ *
+ * Color palette (AAA contrast on white):
+ *   - Outer body:    #F5F2EA  (warm cream)
+ *   - Card surface:  #FFFFFF
+ *   - Border:        #E8E2D2
+ *   - Primary text:  #1A1A1A
+ *   - Muted text:    #6B6B6B
+ *   - Footer muted:  #8B8278
+ *   - Gold accent:   #A8862E  (darkened from #C9A84C for white-bg contrast)
+ *   - Green accent:  #0F7A3F  (darkened from #1F8B53 for white-bg contrast)
+ *   - Code card bg:  #FFFBF0  (subtle warm tint)
  */
 
 import { Resend } from "resend";
@@ -21,29 +33,20 @@ const FROM = "Aragon Media <onboarding@kevin-aragon.com>";
 const PORTAL = "https://aragon-media-portal.vercel.app";
 
 /**
- * Shared <head> snippet that locks every transactional email to DARK theme
- * regardless of the recipient's device theme. Apple Mail / Outlook / Gmail
- * all auto-flip emails to light by default — this triple-defends against
- * that with: (1) color-scheme meta + supported-color-schemes meta,
- * (2) inline <style> with !important on root + body backgrounds,
- * (3) @media (prefers-color-scheme: light) override that forces dark anyway,
- * (4) [data-ogsc] selector targeting Outlook web's own dark-mode flip.
+ * Shared <head> snippet that signals LIGHT theme to all major mail clients.
+ * Doesn't fight the client — works *with* its default light rendering.
+ * Inline styles do all the actual color work; head is for hint metas only.
  */
-const DARK_EMAIL_HEAD = `<head>
-  <meta name="color-scheme" content="dark only" />
-  <meta name="supported-color-schemes" content="dark" />
+const EMAIL_HEAD = `<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="color-scheme" content="light only" />
+  <meta name="supported-color-schemes" content="light" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <style type="text/css">
-    :root { color-scheme: dark only !important; supported-color-schemes: dark only !important; }
-    html, body { background:#0F0F0F !important; color:#FAF7EE !important; margin:0 !important; padding:0 !important; }
-    body, table, td { background:#0F0F0F !important; color:#FAF7EE !important; }
-    [data-ogsc] body, [data-ogsc] table, [data-ogsc] td { background:#0F0F0F !important; color:#FAF7EE !important; }
-    @media (prefers-color-scheme: light) {
-      :root, html, body, table, td { background-color:#0F0F0F !important; color:#FAF7EE !important; }
-    }
-    @media (prefers-color-scheme: dark) {
-      :root, html, body, table, td { background-color:#0F0F0F !important; color:#FAF7EE !important; }
-    }
+    :root { color-scheme: light only; supported-color-schemes: light; }
+    body { margin:0; padding:0; }
+    a { color:#A8862E; text-decoration:none; }
   </style>
 </head>`;
 
@@ -134,85 +137,65 @@ function renderEmail({
       ? "Use the code below to finish creating your Aragon Media account."
       : "Use the code below to sign in to your Aragon Media portal.";
 
-  // All colors and backgrounds use !important to defeat client dark-mode auto-invert
+  // LIGHT theme — every color is inline so Gmail iOS can't strip it.
   return `<!doctype html>
-<html lang="en">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="color-scheme" content="dark only" />
-  <meta name="supported-color-schemes" content="dark" />
-  <title>${heading}</title>
-  <style type="text/css">
-    /* Force dark on Gmail / Apple Mail / Outlook regardless of OS theme */
-    :root { color-scheme: dark only !important; supported-color-schemes: dark only !important; }
-    html, body { background:#0F0F0F !important; color:#F5F1E6 !important; }
-    [data-ogsc] body, [data-ogsc] table, [data-ogsc] td { background:#0F0F0F !important; color:#F5F1E6 !important; }
-    @media (prefers-color-scheme: light) {
-      html, body, table, td { background-color:#0F0F0F !important; color:#F5F1E6 !important; }
-    }
-    @media (prefers-color-scheme: dark) {
-      html, body, table, td { background-color:#0F0F0F !important; color:#F5F1E6 !important; }
-    }
-    a { color:#C9A84C !important; text-decoration:none !important; }
-  </style>
-</head>
-<body bgcolor="#0F0F0F" style="margin:0 !important;padding:0 !important;background-color:#0F0F0F !important;font-family:'Inter Tight',Helvetica,Arial,sans-serif;color:#F5F1E6 !important;-webkit-text-size-adjust:none;mso-hide:all;">
-  <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background:#0F0F0F !important;padding:32px 16px;">
+<html lang="en">${EMAIL_HEAD}
+<body bgcolor="#F5F2EA" style="margin:0;padding:0;background-color:#F5F2EA;font-family:'Inter Tight',Helvetica,Arial,sans-serif;color:#1A1A1A;-webkit-text-size-adjust:none;">
+  <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" bgcolor="#F5F2EA" style="background:#F5F2EA;padding:32px 16px;">
     <tr>
-      <td align="center" bgcolor="#0F0F0F" style="background:#0F0F0F !important;">
-        <table role="presentation" width="560" cellspacing="0" cellpadding="0" border="0" bgcolor="#0F0F0F" style="max-width:560px;background-color:#0F0F0F !important;border:1px solid #2A2A2A;border-radius:14px;overflow:hidden;">
+      <td align="center" bgcolor="#F5F2EA" style="background:#F5F2EA;">
+        <table role="presentation" width="560" cellspacing="0" cellpadding="0" border="0" bgcolor="#FFFFFF" style="max-width:560px;background-color:#FFFFFF;border:1px solid #E8E2D2;border-radius:14px;overflow:hidden;">
           <tr>
-            <td bgcolor="#0F0F0F" style="padding:28px 32px 0 32px;background-color:#0F0F0F !important;">
+            <td bgcolor="#FFFFFF" style="padding:28px 32px 0 32px;background-color:#FFFFFF;">
               <table role="presentation" cellspacing="0" cellpadding="0" border="0">
                 <tr>
-                  <td bgcolor="#0F0F0F" style="background:#0F0F0F !important;border-radius:10px;width:48px;height:48px;text-align:center;font-family:'Inter Tight',Helvetica,Arial,sans-serif;font-weight:800;color:#C9A84C !important;font-size:22px;letter-spacing:-1px;line-height:48px;">AM</td>
-                  <td style="padding-left:14px;color:#F5F1E6 !important;font-size:14px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;">Aragon Media</td>
+                  <td bgcolor="#FFFBF0" style="background:#FFFBF0;border:1px solid #E8E2D2;border-radius:10px;width:48px;height:48px;text-align:center;font-family:'Inter Tight',Helvetica,Arial,sans-serif;font-weight:800;color:#A8862E;font-size:22px;letter-spacing:-1px;line-height:48px;">AM</td>
+                  <td style="padding-left:14px;color:#1A1A1A;font-size:14px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;">Aragon Media</td>
                 </tr>
               </table>
             </td>
           </tr>
           <tr>
-            <td bgcolor="#0F0F0F" style="padding:28px 32px 0 32px;background-color:#0F0F0F !important;">
-              <h1 style="margin:0 0 6px 0;color:#F5F1E6 !important;font-family:'Inter Tight',Helvetica,Arial,sans-serif;font-weight:700;font-size:26px;letter-spacing:-0.02em;line-height:1.15;">${heading}</h1>
-              <p style="margin:0 0 22px 0;color:#9A9590 !important;font-size:14px;line-height:1.55;">${greeting} ${purposeLine}</p>
+            <td bgcolor="#FFFFFF" style="padding:28px 32px 0 32px;background-color:#FFFFFF;">
+              <h1 style="margin:0 0 6px 0;color:#1A1A1A;font-family:'Inter Tight',Helvetica,Arial,sans-serif;font-weight:700;font-size:26px;letter-spacing:-0.02em;line-height:1.15;">${heading}</h1>
+              <p style="margin:0 0 22px 0;color:#6B6B6B;font-size:14px;line-height:1.55;">${greeting} ${purposeLine}</p>
             </td>
           </tr>
           <tr>
-            <td bgcolor="#0F0F0F" style="padding:0 32px;background-color:#0F0F0F !important;">
-              <div style="background:#0F0F0F !important;border:1px solid #C9A84C;border-radius:10px;padding:22px 28px;text-align:center;">
-                <div style="color:#9A9590 !important;font-size:11px;letter-spacing:0.18em;text-transform:uppercase;margin-bottom:8px;">Your 6-digit code</div>
-                <div style="color:#C9A84C !important;font-family:'Inter Tight',Helvetica,Arial,sans-serif;font-weight:800;font-size:38px;letter-spacing:0.4em;">${code}</div>
-                <div style="color:#9A9590 !important;font-size:12px;margin-top:10px;">Expires in 15 minutes</div>
+            <td bgcolor="#FFFFFF" style="padding:0 32px;background-color:#FFFFFF;">
+              <div style="background:#FFFBF0;border:1px solid #A8862E;border-radius:10px;padding:22px 28px;text-align:center;">
+                <div style="color:#6B6B6B;font-size:11px;letter-spacing:0.18em;text-transform:uppercase;margin-bottom:8px;">Your 6-digit code</div>
+                <div style="color:#A8862E;font-family:'Inter Tight',Helvetica,Arial,sans-serif;font-weight:800;font-size:38px;letter-spacing:0.4em;">${code}</div>
+                <div style="color:#6B6B6B;font-size:12px;margin-top:10px;">Expires in 15 minutes</div>
               </div>
             </td>
           </tr>
           <tr>
-            <td bgcolor="#0F0F0F" style="padding:24px 32px 18px 32px;background-color:#0F0F0F !important;">
-              <p style="margin:0;color:#9A9590 !important;font-size:13px;line-height:1.6;">If you didn't request this, you can safely ignore this email. Your account stays untouched.</p>
+            <td bgcolor="#FFFFFF" style="padding:24px 32px 18px 32px;background-color:#FFFFFF;">
+              <p style="margin:0;color:#6B6B6B;font-size:13px;line-height:1.6;">If you didn't request this, you can safely ignore this email. Your account stays untouched.</p>
             </td>
           </tr>
           <tr>
-            <td bgcolor="#0F0F0F" style="padding:18px 32px;background:#0F0F0F !important;border-top:1px solid #2A2A2A;text-align:center;">
-              <a href="${PORTAL}/signin" style="color:#C9A84C !important;text-decoration:none !important;font-size:13px;font-weight:600;padding:0 14px;">Sign in</a>
-              <span style="color:#5C5750;">·</span>
-              <a href="${PORTAL}/signup" style="color:#C9A84C !important;text-decoration:none !important;font-size:13px;font-weight:600;padding:0 14px;">Sign up</a>
-              <span style="color:#5C5750;">·</span>
-              <a href="${PORTAL}/book-a-demo" style="color:#C9A84C !important;text-decoration:none !important;font-size:13px;font-weight:600;padding:0 14px;">Book a Demo</a>
-              <span style="color:#5C5750;">·</span>
-              <a href="${PORTAL}/privacy" style="color:#C9A84C !important;text-decoration:none !important;font-size:13px;font-weight:600;padding:0 14px;">Privacy</a>
-              <span style="color:#5C5750;">·</span>
-              <a href="${PORTAL}/terms" style="color:#C9A84C !important;text-decoration:none !important;font-size:13px;font-weight:600;padding:0 14px;">Terms</a>
+            <td bgcolor="#FFFFFF" style="padding:18px 32px;background:#FFFFFF;border-top:1px solid #E8E2D2;text-align:center;">
+              <a href="${PORTAL}/signin" style="color:#A8862E;text-decoration:none;font-size:13px;font-weight:600;padding:0 14px;">Sign in</a>
+              <span style="color:#C8C0AC;">·</span>
+              <a href="${PORTAL}/signup" style="color:#A8862E;text-decoration:none;font-size:13px;font-weight:600;padding:0 14px;">Sign up</a>
+              <span style="color:#C8C0AC;">·</span>
+              <a href="${PORTAL}/book-a-demo" style="color:#A8862E;text-decoration:none;font-size:13px;font-weight:600;padding:0 14px;">Book a Demo</a>
+              <span style="color:#C8C0AC;">·</span>
+              <a href="${PORTAL}/privacy" style="color:#A8862E;text-decoration:none;font-size:13px;font-weight:600;padding:0 14px;">Privacy</a>
+              <span style="color:#C8C0AC;">·</span>
+              <a href="${PORTAL}/terms" style="color:#A8862E;text-decoration:none;font-size:13px;font-weight:600;padding:0 14px;">Terms</a>
             </td>
           </tr>
           <tr>
-            <td bgcolor="#0F0F0F" style="padding:14px 32px 26px 32px;border-top:1px solid #2A2A2A;background:#0F0F0F !important;color:#5C5750 !important;font-size:11px;line-height:1.6;text-align:center;">
-              &copy; 2025 Aragon Media &middot; 1309 Coffeen Ave, Sheridan, WY 82801<br />
+            <td bgcolor="#FFFFFF" style="padding:14px 32px 26px 32px;border-top:1px solid #E8E2D2;background:#FFFFFF;color:#8B8278;font-size:11px;line-height:1.6;text-align:center;">
+              &copy; 2026 Aragon Media &middot; 1309 Coffeen Ave, Sheridan, WY 82801<br />
               Activation &middot; Dashboard &middot; TikTok Partner Program
             </td>
           </tr>
         </table>
-        <p style="color:#5C5750 !important;font-size:11px;margin-top:18px;">aragon-media-portal.vercel.app</p>
+        <p style="color:#8B8278;font-size:11px;margin-top:18px;">aragon-media-portal.vercel.app</p>
       </td>
     </tr>
   </table>
@@ -287,19 +270,27 @@ export async function sendAgreementSignedNotification(opts: {
       "",
       `Portal: ${PORTAL}/dashboard`,
     ].join("\n");
-    const html = `<!DOCTYPE html><html>${DARK_EMAIL_HEAD}<body bgcolor="#0F0F0F" style="font-family:system-ui,sans-serif;background:#0F0F0F !important;color:#FAF7EE !important;padding:24px;line-height:1.6;margin:0;">
-      <h2 style="color:#C9A84C !important;margin:0 0 16px 0;">Operations Agreement signed</h2>
-      <table cellpadding="6" style="font-size:14px;color:#D4CFB6;">
-        <tr><td><strong>Creator:</strong></td><td>${opts.creatorName}</td></tr>
-        <tr><td><strong>Email:</strong></td><td>${opts.creatorEmail}</td></tr>
-        <tr><td><strong>Signature:</strong></td><td>${opts.signature}</td></tr>
-        <tr><td><strong>Version:</strong></td><td>${opts.contractVersion}</td></tr>
-        <tr><td><strong>Signed at:</strong></td><td>${opts.signedAt.toISOString()}</td></tr>
+    const html = `<!DOCTYPE html><html>${EMAIL_HEAD}<body bgcolor="#F5F2EA" style="font-family:system-ui,sans-serif;background:#F5F2EA;color:#1A1A1A;padding:24px;line-height:1.6;margin:0;">
+      <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" bgcolor="#F5F2EA" style="background:#F5F2EA;">
+        <tr><td align="center">
+          <table role="presentation" width="560" cellspacing="0" cellpadding="0" border="0" bgcolor="#FFFFFF" style="max-width:560px;background:#FFFFFF;border:1px solid #E8E2D2;border-radius:12px;padding:24px 28px;">
+            <tr><td bgcolor="#FFFFFF" style="background:#FFFFFF;">
+              <h2 style="color:#A8862E;margin:0 0 16px 0;">Operations Agreement signed</h2>
+              <table cellpadding="6" style="font-size:14px;color:#1A1A1A;">
+                <tr><td><strong>Creator:</strong></td><td>${opts.creatorName}</td></tr>
+                <tr><td><strong>Email:</strong></td><td>${opts.creatorEmail}</td></tr>
+                <tr><td><strong>Signature:</strong></td><td>${opts.signature}</td></tr>
+                <tr><td><strong>Version:</strong></td><td>${opts.contractVersion}</td></tr>
+                <tr><td><strong>Signed at:</strong></td><td>${opts.signedAt.toISOString()}</td></tr>
+              </table>
+              <p style="font-size:13px;color:#6B6B6B;margin-top:18px;">
+                Their withdrawal form is now unlocked. Standby for their first submission.
+              </p>
+              <p style="font-size:12px;color:#8B8278;margin-top:14px;">${PORTAL}/dashboard</p>
+            </td></tr>
+          </table>
+        </td></tr>
       </table>
-      <p style="font-size:13px;color:#9A9590;margin-top:18px;">
-        Their withdrawal form is now unlocked. Standby for their first submission.
-      </p>
-      <p style="font-size:12px;color:#5C5750;margin-top:14px;">${PORTAL}/dashboard</p>
     </body></html>`;
     await resend.emails.send({
       from: FROM,
@@ -346,42 +337,42 @@ export async function sendWithdrawalPaidEmail(opts: {
     const subject = `${opts.receiptNumber} · Paid · ${fmtUsd(opts.netCents)}`;
     const greeting = (opts.creatorName ?? "").split(" ")[0] || "there";
 
-    const html = `<!DOCTYPE html><html>${DARK_EMAIL_HEAD}
-    <body bgcolor="#0F0F0F" style="margin:0 !important;padding:0 !important;background:#0F0F0F !important;color:#FAF7EE !important;font-family:system-ui,-apple-system,'Inter Tight',sans-serif;">
-      <table role="presentation" width="100%" bgcolor="#0F0F0F" style="background:#0F0F0F !important;">
+    const html = `<!DOCTYPE html><html>${EMAIL_HEAD}
+    <body bgcolor="#F5F2EA" style="margin:0;padding:0;background:#F5F2EA;color:#1A1A1A;font-family:system-ui,-apple-system,'Inter Tight',sans-serif;">
+      <table role="presentation" width="100%" bgcolor="#F5F2EA" style="background:#F5F2EA;">
         <tr><td align="center" style="padding:32px 18px;">
-          <table role="presentation" width="600" bgcolor="#0F0F0F" style="background:#0F0F0F !important;border:1px solid #2A2A2A;max-width:600px;width:100%;">
+          <table role="presentation" width="600" bgcolor="#FFFFFF" style="background:#FFFFFF;border:1px solid #E8E2D2;border-radius:12px;max-width:600px;width:100%;">
 
-            <tr><td bgcolor="#0F0F0F" style="padding:30px 32px 14px;background:#0F0F0F !important;">
-              <p style="margin:0 0 6px 0;font-size:11px;letter-spacing:0.2em;color:#1F8B53 !important;text-transform:uppercase;font-weight:700;">Withdrawal Paid</p>
-              <h1 style="margin:0;font-size:24px;line-height:1.2;color:#FAF7EE !important;letter-spacing:-0.02em;">Hey ${greeting} — your money is on the way.</h1>
+            <tr><td bgcolor="#FFFFFF" style="padding:30px 32px 14px;background:#FFFFFF;">
+              <p style="margin:0 0 6px 0;font-size:11px;letter-spacing:0.2em;color:#0F7A3F;text-transform:uppercase;font-weight:700;">Withdrawal Paid</p>
+              <h1 style="margin:0;font-size:24px;line-height:1.2;color:#1A1A1A;letter-spacing:-0.02em;">Hey ${greeting} — your money is on the way.</h1>
             </td></tr>
 
-            <tr><td bgcolor="#0F0F0F" style="padding:14px 32px 8px;background:#0F0F0F !important;">
-              <p style="margin:0;color:#D4CFB6 !important;font-size:14px;line-height:1.7;">Receipt <strong style="color:#C9A84C !important;">${opts.receiptNumber}</strong> just cleared. The amount below has been sent to the payout method on file. Depending on your bank or wallet, it should land within minutes (instant rails) to a few business days (ACH/wire).</p>
+            <tr><td bgcolor="#FFFFFF" style="padding:14px 32px 8px;background:#FFFFFF;">
+              <p style="margin:0;color:#3A3A3A;font-size:14px;line-height:1.7;">Receipt <strong style="color:#A8862E;">${opts.receiptNumber}</strong> just cleared. The amount below has been sent to the payout method on file. Depending on your bank or wallet, it should land within minutes (instant rails) to a few business days (ACH/wire).</p>
             </td></tr>
 
             <!-- Headline amount frame -->
-            <tr><td bgcolor="#0F0F0F" style="padding:18px 32px 8px;background:#0F0F0F !important;">
-              <table role="presentation" width="100%" bgcolor="#0B0B0B" style="background:#0B0B0B !important;border:1px solid #1F8B53;border-radius:6px;">
-                <tr><td bgcolor="#0B0B0B" style="padding:24px 28px;background:#0B0B0B !important;text-align:left;">
-                  <div style="font-size:11px;letter-spacing:0.18em;color:#9A9590 !important;text-transform:uppercase;font-weight:600;margin-bottom:8px;">Sent to your bank</div>
-                  <div style="font-family:'Inter Tight',sans-serif;font-size:42px;font-weight:800;color:#1F8B53 !important;letter-spacing:-0.02em;line-height:1;">${fmtUsd(opts.netCents)}</div>
-                  <div style="font-size:12px;color:#5C5750 !important;margin-top:10px;letter-spacing:0.04em;">From ${fmtUsd(opts.grossCents)} gross · receipt ${opts.receiptNumber}</div>
+            <tr><td bgcolor="#FFFFFF" style="padding:18px 32px 8px;background:#FFFFFF;">
+              <table role="presentation" width="100%" bgcolor="#F1FBF4" style="background:#F1FBF4;border:1px solid #0F7A3F;border-radius:8px;">
+                <tr><td bgcolor="#F1FBF4" style="padding:24px 28px;background:#F1FBF4;text-align:left;">
+                  <div style="font-size:11px;letter-spacing:0.18em;color:#0F7A3F;text-transform:uppercase;font-weight:700;margin-bottom:8px;">Sent to your bank</div>
+                  <div style="font-family:'Inter Tight',sans-serif;font-size:42px;font-weight:800;color:#0F7A3F;letter-spacing:-0.02em;line-height:1;">${fmtUsd(opts.netCents)}</div>
+                  <div style="font-size:12px;color:#6B6B6B;margin-top:10px;letter-spacing:0.04em;">From ${fmtUsd(opts.grossCents)} gross · receipt ${opts.receiptNumber}</div>
                 </td></tr>
               </table>
             </td></tr>
 
-            <tr><td bgcolor="#0F0F0F" style="padding:18px 32px 22px;background:#0F0F0F !important;">
-              <a href="${PORTAL}/dashboard/withdrawals" style="display:inline-block;padding:12px 22px;background:#1F8B53 !important;color:#FAF7EE !important;text-decoration:none !important;font-size:13px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;border-radius:3px;">View receipt →</a>
+            <tr><td bgcolor="#FFFFFF" style="padding:18px 32px 22px;background:#FFFFFF;">
+              <a href="${PORTAL}/dashboard/withdrawals" style="display:inline-block;padding:12px 22px;background:#0F7A3F;color:#FFFFFF;text-decoration:none;font-size:13px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;border-radius:4px;">View receipt →</a>
             </td></tr>
 
-            <tr><td bgcolor="#0F0F0F" style="padding:18px 32px;background:#0F0F0F !important;border-top:1px solid #2A2A2A;text-align:center;">
-              <a href="${PORTAL}/dashboard" style="color:#C9A84C !important;text-decoration:none !important;font-size:13px;font-weight:600;padding:0 14px;">Dashboard</a>
-              <span style="color:#5C5750;">·</span>
-              <a href="${PORTAL}/dashboard/chat" style="color:#C9A84C !important;text-decoration:none !important;font-size:13px;font-weight:600;padding:0 14px;">Chat with AM</a>
+            <tr><td bgcolor="#FFFFFF" style="padding:18px 32px;background:#FFFFFF;border-top:1px solid #E8E2D2;text-align:center;">
+              <a href="${PORTAL}/dashboard" style="color:#A8862E;text-decoration:none;font-size:13px;font-weight:600;padding:0 14px;">Dashboard</a>
+              <span style="color:#C8C0AC;">·</span>
+              <a href="${PORTAL}/dashboard/chat" style="color:#A8862E;text-decoration:none;font-size:13px;font-weight:600;padding:0 14px;">Chat with AM</a>
             </td></tr>
-            <tr><td bgcolor="#0F0F0F" style="padding:14px 32px 26px;background:#0F0F0F !important;border-top:1px solid #2A2A2A;color:#5C5750 !important;font-size:11px;line-height:1.6;text-align:center;">
+            <tr><td bgcolor="#FFFFFF" style="padding:14px 32px 26px;background:#FFFFFF;border-top:1px solid #E8E2D2;color:#8B8278;font-size:11px;line-height:1.6;text-align:center;">
               © 2026 Aragon Media · 1309 Coffeen Ave, Sheridan, WY 82801
             </td></tr>
 
@@ -439,23 +430,23 @@ export async function sendChatNotificationEmail(opts: {
       ? `New chat from ${opts.fromLabel} — Aragon Media portal`
       : `New message from Aragon Media`;
 
-    const html = `<!DOCTYPE html><html>${DARK_EMAIL_HEAD}
-    <body bgcolor="#0F0F0F" style="margin:0 !important;padding:0 !important;background:#0F0F0F !important;color:#FAF7EE !important;font-family:system-ui,-apple-system,'Inter Tight',sans-serif;">
-      <table role="presentation" width="100%" bgcolor="#0F0F0F" style="background:#0F0F0F !important;">
+    const html = `<!DOCTYPE html><html>${EMAIL_HEAD}
+    <body bgcolor="#F5F2EA" style="margin:0;padding:0;background:#F5F2EA;color:#1A1A1A;font-family:system-ui,-apple-system,'Inter Tight',sans-serif;">
+      <table role="presentation" width="100%" bgcolor="#F5F2EA" style="background:#F5F2EA;">
         <tr><td align="center" style="padding:32px 18px;">
-          <table role="presentation" width="600" bgcolor="#0F0F0F" style="background:#0F0F0F !important;border:1px solid #2A2A2A;max-width:600px;width:100%;">
-            <tr><td bgcolor="#0F0F0F" style="padding:30px 32px 14px;background:#0F0F0F !important;">
-              <p style="margin:0 0 6px 0;font-size:11px;letter-spacing:0.2em;color:#C9A84C !important;text-transform:uppercase;font-weight:700;">New chat message</p>
-              <h1 style="margin:0;font-size:22px;line-height:1.25;color:#FAF7EE !important;letter-spacing:-0.01em;">${opts.fromLabel} replied</h1>
-              <p style="margin:6px 0 0;font-size:12px;color:#9A9590 !important;">${opts.fromContext}</p>
+          <table role="presentation" width="600" bgcolor="#FFFFFF" style="background:#FFFFFF;border:1px solid #E8E2D2;border-radius:12px;max-width:600px;width:100%;">
+            <tr><td bgcolor="#FFFFFF" style="padding:30px 32px 14px;background:#FFFFFF;">
+              <p style="margin:0 0 6px 0;font-size:11px;letter-spacing:0.2em;color:#A8862E;text-transform:uppercase;font-weight:700;">New chat message</p>
+              <h1 style="margin:0;font-size:22px;line-height:1.25;color:#1A1A1A;letter-spacing:-0.01em;">${opts.fromLabel} replied</h1>
+              <p style="margin:6px 0 0;font-size:12px;color:#6B6B6B;">${opts.fromContext}</p>
             </td></tr>
-            <tr><td bgcolor="#0F0F0F" style="padding:14px 32px;background:#0F0F0F !important;">
-              <div style="background:#0B0B0B;border:1px solid #2A2A2A;border-left:2px solid #C9A84C;padding:14px 16px;font-size:14px;color:#D4CFB6 !important;line-height:1.65;white-space:pre-wrap;word-break:break-word;">${escapeHtml(opts.snippet)}</div>
+            <tr><td bgcolor="#FFFFFF" style="padding:14px 32px;background:#FFFFFF;">
+              <div style="background:#FFFBF0;border:1px solid #E8E2D2;border-left:3px solid #A8862E;padding:14px 16px;font-size:14px;color:#1A1A1A;line-height:1.65;white-space:pre-wrap;word-break:break-word;border-radius:4px;">${escapeHtml(opts.snippet)}</div>
             </td></tr>
-            <tr><td bgcolor="#0F0F0F" style="padding:18px 32px 22px;background:#0F0F0F !important;">
-              <a href="${opts.openUrl}" style="display:inline-block;padding:12px 22px;background:#C9A84C !important;color:#0F0F0F !important;text-decoration:none !important;font-size:13px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;border-radius:3px;">Open chat →</a>
+            <tr><td bgcolor="#FFFFFF" style="padding:18px 32px 22px;background:#FFFFFF;">
+              <a href="${opts.openUrl}" style="display:inline-block;padding:12px 22px;background:#A8862E;color:#FFFFFF;text-decoration:none;font-size:13px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;border-radius:4px;">Open chat →</a>
             </td></tr>
-            <tr><td bgcolor="#0F0F0F" style="padding:14px 32px 26px;background:#0F0F0F !important;border-top:1px solid #2A2A2A;color:#5C5750 !important;font-size:11px;line-height:1.6;text-align:center;">
+            <tr><td bgcolor="#FFFFFF" style="padding:14px 32px 26px;background:#FFFFFF;border-top:1px solid #E8E2D2;color:#8B8278;font-size:11px;line-height:1.6;text-align:center;">
               © 2026 Aragon Media · 1309 Coffeen Ave, Sheridan, WY 82801
             </td></tr>
           </table>
