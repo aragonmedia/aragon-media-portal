@@ -1,4 +1,6 @@
 import type { Metadata, Viewport } from "next";
+import { Analytics } from "@vercel/analytics/next";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 import "./globals.css";
 
 const SITE_URL = "https://aragon-media-portal.vercel.app";
@@ -84,7 +86,18 @@ export default function RootLayout({
       <head>
         <script dangerouslySetInnerHTML={{ __html: themeBootstrap }} />
       </head>
-      <body>{children}</body>
+      <body>
+        {children}
+        {/*
+          Vercel Analytics + Speed Insights — both free on hobby tier.
+          Analytics: page views, top pages, referrers, devices.
+          Speed Insights: real-user Core Web Vitals (LCP, CLS, FID).
+          Kevin needs to flip ON in Vercel dashboard → Project → Analytics
+          + Speed Insights tabs after the next deploy.
+        */}
+        <Analytics />
+        <SpeedInsights />
+      </body>
     </html>
   );
 }

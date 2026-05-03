@@ -253,10 +253,22 @@ export async function sendAgreementSignedNotification(opts: {
   signature: string;
   contractVersion: string;
   signedAt: Date;
+  agreementId?: string;   // when present, embed PDF download + admin view links
 }) {
   try {
     const resend = getResend();
     const subject = `Operations Agreement signed — ${opts.creatorName}`;
+
+    // Build authenticated portal URLs only if we have an agreement id.
+    // Both endpoints require Kevin to be signed into the admin portal —
+    // clicking from email kicks him to /admin/login first if needed.
+    const pdfUrl = opts.agreementId
+      ? `${PORTAL}/api/agreement/${opts.agreementId}/pdf`
+      : null;
+    const adminUrl = opts.agreementId
+      ? `${PORTAL}/admin/agreements/${opts.agreementId}`
+      : null;
+
     const text = [
       "A creator just signed the Operations Agreement.",
       "",
@@ -268,8 +280,16 @@ export async function sendAgreementSignedNotification(opts: {
       "",
       "Action: their withdrawal form is now unlocked. Standby for their first submission.",
       "",
+      ...(pdfUrl
+        ? [
+            `Download signed PDF: ${pdfUrl}`,
+            `View in admin:       ${adminUrl}`,
+            "",
+          ]
+        : []),
       `Portal: ${PORTAL}/dashboard`,
     ].join("\n");
+
     const html = `<!DOCTYPE html><html>${EMAIL_HEAD}<body bgcolor="#F5F2EA" style="font-family:system-ui,sans-serif;background:#F5F2EA;color:#1A1A1A;padding:24px;line-height:1.6;margin:0;">
       <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" bgcolor="#F5F2EA" style="background:#F5F2EA;">
         <tr><td align="center">
@@ -283,9 +303,24 @@ export async function sendAgreementSignedNotification(opts: {
                 <tr><td><strong>Version:</strong></td><td>${opts.contractVersion}</td></tr>
                 <tr><td><strong>Signed at:</strong></td><td>${opts.signedAt.toISOString()}</td></tr>
               </table>
-              <p style="font-size:13px;color:#6B6B6B;margin-top:18px;">
+              <p style="font-size:13px;color:#6B6B6B;margin-top:18px;margin-bottom:18px;">
                 Their withdrawal form is now unlocked. Standby for their first submission.
               </p>
+              ${
+                pdfUrl
+                  ? `<table cellpadding="0" cellspacing="0" border="0" style="margin:6px 0 14px 0;">
+                <tr>
+                  <td style="padding-right:8px;">
+                    <a href="${pdfUrl}" style="display:inline-block;padding:11px 18px;background:#A8862E;color:#FFFFFF;text-decoration:none;font-size:13px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;border-radius:6px;">Download PDF</a>
+                  </td>
+                  <td>
+                    <a href="${adminUrl}" style="display:inline-block;padding:11px 18px;background:transparent;color:#A8862E;text-decoration:none;font-size:13px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;border:1px solid #A8862E;border-radius:6px;">View in admin →</a>
+                  </td>
+                </tr>
+              </table>
+              <p style="font-size:11px;color:#8B8278;margin:0 0 4px 0;">Both links require admin sign-in.</p>`
+                  : ""
+              }
               <p style="font-size:12px;color:#8B8278;margin-top:14px;">${PORTAL}/dashboard</p>
             </td></tr>
           </table>

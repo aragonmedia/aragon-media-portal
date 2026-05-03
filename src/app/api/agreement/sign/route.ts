@@ -76,6 +76,7 @@ export async function POST(req: NextRequest) {
     signature: sig.slice(0, 200),
     contractVersion: CONTRACT_VERSION,
     signedAt: now,
+    agreementId: inserted[0]?.id,
   });
 
   return Response.json({
