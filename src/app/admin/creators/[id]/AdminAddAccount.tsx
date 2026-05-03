@@ -81,11 +81,14 @@ export default function AdminAddAccount({ userId, creatorName }: { userId: strin
           {busy ? "Adding…" : "+ Add account"}
         </button>
       </div>
-      <span className="field-note">
-        Adds to {creatorName}&apos;s profile directly. Use this for grandfathered
-        accounts that were running before the portal launched, or to bypass
-        the standard verification flow.
-      </span>
+      <div className="acct-add-hint">
+        <span className="acct-add-hint-pip">i</span>
+        <span>
+          Adds to <strong>{creatorName}</strong>&apos;s profile directly. Use
+          this for grandfathered accounts that were running before the portal
+          launched, or to bypass the standard verification flow.
+        </span>
+      </div>
       {msg && (
         <div className={`settings-msg ${msg.kind === "ok" ? "ok" : "err"}`}>
           {msg.text}

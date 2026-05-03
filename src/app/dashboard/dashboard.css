@@ -922,3 +922,8 @@
 .gmv-range-tab{padding:6px 16px;background:transparent;border:none;color:var(--text-muted);font-family:inherit;font-size:11px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;cursor:pointer;transition:background 0.12s ease, color 0.12s ease;}
 .gmv-range-tab:hover{color:var(--text);}
 .gmv-range-tab.is-active{background:rgba(201,168,76,0.12);color:var(--gold);}
+
+/* Framed hint inside the admin AdminAddAccount form */
+.acct-add-hint{display:flex;align-items:flex-start;gap:10px;padding:12px 14px;background:rgba(201,168,76,0.06);border:1px solid rgba(201,168,76,0.30);border-left:2px solid var(--gold);border-radius:6px;font-size:12px;line-height:1.6;color:var(--text-muted);}
+.acct-add-hint strong{color:var(--text);font-weight:600;}
+.acct-add-hint-pip{flex:0 0 18px;width:18px;height:18px;border-radius:50%;background:var(--gold);color:#0F0F0F;font-family:'Inter Tight',sans-serif;font-weight:800;font-size:11px;display:inline-flex;align-items:center;justify-content:center;font-style:italic;}
