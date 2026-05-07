@@ -66,6 +66,15 @@ nav.nav-scrolled{background:rgba(15,15,15,0.62);backdrop-filter:saturate(160%) b
 .section h2 em{font-style:italic;color:var(--gold);font-family:'Inter Tight',sans-serif;font-weight:700;}
 .section-intro{font-size:14px;color:var(--text-muted);line-height:1.7;max-width:620px;margin-bottom:48px;font-weight:300;}
 
+/* Process explainer video — sits between partners marquee + journey grid.
+   Center the headline + the 16:9 frame. Frame stays max 1000px so the
+   video doesn't dwarf the rest of the page. */
+.process-video-section{text-align:center;}
+.process-video-section .section-label{margin-left:auto;margin-right:auto;}
+.process-video-section h2{margin-left:auto;margin-right:auto;text-align:center;max-width:880px;}
+.process-video-wrap{margin:32px auto 0;width:100%;max-width:1000px;aspect-ratio:16/9;border:1px solid var(--border-soft);border-radius:14px;overflow:hidden;background:#000;box-shadow:0 24px 60px -28px rgba(0,0,0,0.85), 0 8px 24px -8px rgba(201,168,76,0.14);}
+.process-video{width:100%;height:100%;display:block;object-fit:cover;}
+
 .journey-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:rgba(201,168,76,0.1);}
 .journey-card{background:var(--off-black);padding:32px 28px;display:flex;flex-direction:column;gap:14px;}
 .journey-step{display:flex;align-items:center;gap:12px;}
@@ -378,6 +387,8 @@ footer .logo span{margin-top:4px;}
 
   /* Testimonials */
   .testi-section{padding:60px 20px;}
+  .process-video-section{padding:48px 20px;}
+  .process-video-wrap{border-radius:10px;margin-top:24px;}
   .testi-section h2{font-size:clamp(26px,7vw,36px);}
   .testi-grid{margin-top:32px;gap:14px;}
 

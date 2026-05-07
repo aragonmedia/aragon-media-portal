@@ -237,6 +237,28 @@ export default function Home() {
         </div>
       </div>
 
+      {/* Process explainer — sits between the partners marquee and the
+          4-step journey grid. Hosted on Vercel Blob (107MB MP4 too big
+          for /public + GitHub's 100MB single-file limit). */}
+      <section className="section process-video-section">
+        <p className="section-label">Watch the process</p>
+        <h2>How to do US TikTok Shop from <em>Anywhere.</em></h2>
+        <div className="process-video-wrap">
+          <video
+            className="process-video"
+            controls
+            preload="metadata"
+            playsInline
+          >
+            <source
+              src="https://yhdcwinxuzhzrsc5.public.blob.vercel-storage.com/aragon-process.mp4"
+              type="video/mp4"
+            />
+            Your browser does not support this video format.
+          </video>
+        </div>
+      </section>
+
       <section className="section" id="journey">
         <p className="section-label">Your journey with Aragon Media</p>
         <h2>Four steps from signup to <em>earning commissions.</em></h2>
