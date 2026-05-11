@@ -53,11 +53,17 @@ export default function ChatRoomClient({
   chatId,
   viewer,
   viewerName,
+  creatorName,
   initialMessages,
 }: {
   chatId: string;
   viewer: "user" | "admin";
   viewerName: string;
+  /** The chat owner's display name. Used to label messages with
+   *  `sender === "user"` so admin sees "Sarah Johnson" instead of
+   *  the generic "Creator" pill, and so the creator sees their own
+   *  name on their own messages. */
+  creatorName: string;
   initialMessages: Message[];
 }) {
   const [msgs, setMsgs] = useState<Message[]>(initialMessages);
@@ -229,7 +235,7 @@ export default function ChatRoomClient({
               ? "System"
               : m.sender === "am_team"
                 ? "Aragon Media"
-                : "Creator";
+                : creatorName || "Creator";
             const urls = parseUrls(m.attachmentUrls);
             return (
               <div

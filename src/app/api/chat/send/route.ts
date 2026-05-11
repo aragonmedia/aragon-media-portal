@@ -73,17 +73,27 @@ export async function POST(req: NextRequest) {
     return Response.json({ ok: false, error: "chat_not_found" }, { status: 404 });
   }
 
-  // Sender resolution
+  // Sender resolution — ownership wins over admin cookie.
+  //
+  // Why: if Kevin is logged into BOTH his admin account and a test
+  // creator account in the same browser, both cookies are present.
+  // The previous logic checked admin FIRST and blindly marked every
+  // message as 'am_team', which mislabeled the creator's own messages
+  // as "Aragon Media" AND fired the wrong email (to the creator
+  // instead of the admin team).
+  //
+  // New rule: if the authenticated user owns this chat, treat as
+  // 'user' regardless of whether the admin cookie is also set.
+  // Otherwise fall through to admin auth for replying-as-AM.
+  const me = await getCurrentUser();
   const adminAuthed = await isAdminSession();
   let sender: "am_team" | "user";
-  if (adminAuthed) {
+  if (me && me.id === chatRow.userId) {
+    sender = "user";
+  } else if (adminAuthed) {
     sender = "am_team";
   } else {
-    const me = await getCurrentUser();
-    if (!me || me.id !== chatRow.userId) {
-      return Response.json({ ok: false, error: "unauthorized" }, { status: 401 });
-    }
-    sender = "user";
+    return Response.json({ ok: false, error: "unauthorized" }, { status: 401 });
   }
 
   // Insert message + bump last_message_at

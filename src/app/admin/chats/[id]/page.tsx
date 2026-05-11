@@ -84,6 +84,7 @@ export default async function AdminChatRoom({
           chatId={row.id}
           viewer="admin"
           viewerName="Aragon Media (you)"
+          creatorName={row.creatorName ?? "Creator"}
           initialMessages={initial.map((m) => ({
             id: m.id,
             sender: m.sender,

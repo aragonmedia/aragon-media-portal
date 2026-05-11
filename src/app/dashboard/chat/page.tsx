@@ -78,6 +78,7 @@ export default async function ChatPage() {
         chatId={row.id}
         viewer="user"
         viewerName={user.name}
+        creatorName={user.name}
         initialMessages={initial.map((m) => ({
           id: m.id,
           sender: m.sender,
