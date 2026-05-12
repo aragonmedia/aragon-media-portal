@@ -27,9 +27,9 @@ export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 export async function POST(req: NextRequest) {
-  let body: { chatId?: string; body?: string; attachmentUrls?: string[] };
+  let body: { chatId?: string; body?: string; attachmentUrls?: string[]; senderRole?: "user" | "admin" };
   try {
-    body = (await req.json()) as { chatId?: string; body?: string; attachmentUrls?: string[] };
+    body = (await req.json()) as { chatId?: string; body?: string; attachmentUrls?: string[]; senderRole?: "user" | "admin" };
   } catch {
     return Response.json({ ok: false, error: "invalid_json" }, { status: 400 });
   }
@@ -73,27 +73,53 @@ export async function POST(req: NextRequest) {
     return Response.json({ ok: false, error: "chat_not_found" }, { status: 404 });
   }
 
-  // Sender resolution — ownership wins over admin cookie.
+  // Sender resolution — CLIENT declares role, SERVER validates.
   //
-  // Why: if Kevin is logged into BOTH his admin account and a test
-  // creator account in the same browser, both cookies are present.
-  // The previous logic checked admin FIRST and blindly marked every
-  // message as 'am_team', which mislabeled the creator's own messages
-  // as "Aragon Media" AND fired the wrong email (to the creator
-  // instead of the admin team).
+  // Why this design: cookies alone can't reveal intent. Kevin's admin
+  // browser also holds the test creator's am_session cookie (from
+  // when he signed in to the creator portal earlier in the same
+  // browser). Both the previous "admin-first" and "ownership-first"
+  // versions of this logic guessed wrong in different scenarios.
   //
-  // New rule: if the authenticated user owns this chat, treat as
-  // 'user' regardless of whether the admin cookie is also set.
-  // Otherwise fall through to admin auth for replying-as-AM.
+  // The CLIENT (which knows whether it's rendering /dashboard/chat
+  // vs /admin/chats/[id]) sends an explicit `senderRole` field on
+  // the POST. The server then validates that the corresponding
+  // cookie + permission actually exists. This keeps admin and
+  // creator views cleanly separated even with overlapping cookies.
   const me = await getCurrentUser();
   const adminAuthed = await isAdminSession();
+  const declaredRole = body.senderRole;
+
   let sender: "am_team" | "user";
-  if (me && me.id === chatRow.userId) {
-    sender = "user";
-  } else if (adminAuthed) {
+  if (declaredRole === "admin") {
+    if (!adminAuthed) {
+      return Response.json(
+        { ok: false, error: "admin_required" },
+        { status: 401 }
+      );
+    }
     sender = "am_team";
+  } else if (declaredRole === "user") {
+    if (!me || me.id !== chatRow.userId) {
+      return Response.json(
+        { ok: false, error: "not_chat_owner" },
+        { status: 401 }
+      );
+    }
+    sender = "user";
   } else {
-    return Response.json({ ok: false, error: "unauthorized" }, { status: 401 });
+    // No declared role (legacy clients) — fall back to ownership-first
+    // logic so we don't break anything during the rollout.
+    if (me && me.id === chatRow.userId) {
+      sender = "user";
+    } else if (adminAuthed) {
+      sender = "am_team";
+    } else {
+      return Response.json(
+        { ok: false, error: "unauthorized" },
+        { status: 401 }
+      );
+    }
   }
 
   // Insert message + bump last_message_at

@@ -181,10 +181,17 @@ export default function ChatRoomClient({
     }
 
     try {
+      // Tell the server EXPLICITLY which role we're sending as. The
+      // viewer prop is set by the page wrapping us — /dashboard/chat
+      // passes viewer="user", /admin/chats/[id] passes viewer="admin".
+      // This avoids the cookie-collision bug where admin browsers also
+      // have a creator session cookie left over from testing (or vice
+      // versa) and the server would otherwise have to guess intent.
+      const senderRole = viewer === "admin" ? "admin" : "user";
       const res = await fetch("/api/chat/send", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ chatId, body, attachmentUrls }),
+        body: JSON.stringify({ chatId, body, attachmentUrls, senderRole }),
       });
       const json = (await res.json()) as {
         ok: boolean;
