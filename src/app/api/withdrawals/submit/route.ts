@@ -3,6 +3,7 @@ import { sql } from "drizzle-orm";
 import { db } from "@/db";
 import { withdrawals } from "@/db/schema";
 import { getCurrentUser } from "@/lib/auth/session";
+import { sendWithdrawalSubmittedNotification } from "@/lib/email/send";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -89,6 +90,28 @@ export async function POST(req: NextRequest) {
   const row = inserted[0];
   if (!row) {
     return Response.json({ ok: false, error: "insert_failed" }, { status: 500 });
+  }
+
+  // Notify the AM team that a new withdrawal landed. Caught + logged so
+  // a Resend rejection never blocks the creator's success response —
+  // they still get their receipt page even if the email is delayed.
+  try {
+    await sendWithdrawalSubmittedNotification({
+      withdrawalId: row.id,
+      receiptNumber: row.receiptNumber,
+      creatorName: user.name,
+      creatorEmail: user.email,
+      payoutMethod: body.payoutMethod.trim(),
+      notes: noteLines,
+      proofUrl: body.proofUrl && body.proofUrl.length > 0 ? body.proofUrl : null,
+      submittedAt: new Date(),
+    });
+  } catch (err) {
+    console.error(
+      "[withdrawals/submit] admin notification failed:",
+      err instanceof Error ? err.message : String(err),
+      "for receipt", row.receiptNumber
+    );
   }
 
   return Response.json({

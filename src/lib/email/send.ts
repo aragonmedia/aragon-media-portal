@@ -526,6 +526,127 @@ export async function sendChatNotificationEmail(opts: {
   }
 }
 
+/**
+ * AM-team notification when a creator submits a withdrawal form.
+ *
+ * Fires from /api/withdrawals/submit immediately after the DB insert.
+ * Wrapped in try/catch at the caller so a Resend hiccup never blocks
+ * the creator's success response — but Resend rejections ARE surfaced
+ * so we can spot them in Vercel logs instead of silently dropping.
+ *
+ * Email content:
+ *   - Eyebrow: "New withdrawal request"
+ *   - Headline: creator name
+ *   - Receipt number (links to /admin/withdrawals/{id})
+ *   - Payout method + screenshot link (if uploaded)
+ *   - Creator notes (truncated)
+ *   - Two CTAs: "Review in admin" + "Chat with creator"
+ */
+export async function sendWithdrawalSubmittedNotification(opts: {
+  withdrawalId: string;
+  receiptNumber: string;
+  creatorName: string;
+  creatorEmail: string;
+  payoutMethod: string;
+  notes: string;
+  proofUrl: string | null;
+  submittedAt: Date;
+}) {
+  try {
+    const resend = getResend();
+    const subject = `${opts.receiptNumber} · New withdrawal from ${opts.creatorName}`;
+    const adminUrl = `${PORTAL}/admin/withdrawals/${opts.withdrawalId}`;
+    const chatUrl = `${PORTAL}/admin/chats`;
+
+    const text = [
+      `New withdrawal request: ${opts.receiptNumber}`,
+      "",
+      `Creator:        ${opts.creatorName}`,
+      `Email:          ${opts.creatorEmail}`,
+      `Payout method:  ${opts.payoutMethod}`,
+      `Submitted at:   ${opts.submittedAt.toISOString()}`,
+      "",
+      opts.proofUrl ? `Screenshot:     ${opts.proofUrl}` : "Screenshot:     (not uploaded)",
+      "",
+      opts.notes ? `Creator notes:\n${opts.notes}` : "(no notes provided)",
+      "",
+      `Review in admin: ${adminUrl}`,
+      `Chat with creator: ${chatUrl}`,
+    ].join("\n");
+
+    const notesEscaped = opts.notes ? escapeHtml(opts.notes).replace(/\n/g, "<br/>") : "";
+
+    const html = `<!DOCTYPE html><html>${EMAIL_HEAD}<body bgcolor="#F5F2EA" style="font-family:system-ui,sans-serif;background:#F5F2EA;color:#1A1A1A;padding:24px;line-height:1.6;margin:0;">
+      <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" bgcolor="#F5F2EA" style="background:#F5F2EA;">
+        <tr><td align="center">
+          <table role="presentation" width="560" cellspacing="0" cellpadding="0" border="0" bgcolor="#FFFFFF" style="max-width:560px;background:#FFFFFF;border:1px solid #E8E2D2;border-radius:12px;padding:28px 30px;">
+            <tr><td bgcolor="#FFFFFF" style="background:#FFFFFF;">
+              <p style="margin:0 0 6px 0;font-size:11px;letter-spacing:0.2em;color:#A8862E;text-transform:uppercase;font-weight:700;">New withdrawal request</p>
+              <h2 style="margin:0 0 18px 0;color:#1A1A1A;font-size:22px;letter-spacing:-0.01em;">${escapeHtml(opts.creatorName)}</h2>
+
+              <table cellpadding="6" cellspacing="0" border="0" style="font-size:14px;color:#1A1A1A;width:100%;border-collapse:collapse;">
+                <tr><td style="color:#6B6B6B;width:130px;">Receipt</td><td><strong style="color:#A8862E;">${escapeHtml(opts.receiptNumber)}</strong></td></tr>
+                <tr><td style="color:#6B6B6B;">Creator email</td><td>${escapeHtml(opts.creatorEmail)}</td></tr>
+                <tr><td style="color:#6B6B6B;">Payout method</td><td>${escapeHtml(opts.payoutMethod)}</td></tr>
+                <tr><td style="color:#6B6B6B;">Submitted</td><td>${opts.submittedAt.toISOString()}</td></tr>
+              </table>
+
+              ${
+                opts.proofUrl
+                  ? `<p style="margin:18px 0 8px 0;font-size:13px;color:#6B6B6B;">Screenshot:</p>
+                     <p style="margin:0 0 18px 0;font-size:13px;"><a href="${opts.proofUrl}" style="color:#A8862E;text-decoration:underline;word-break:break-all;">${escapeHtml(opts.proofUrl)}</a></p>`
+                  : '<p style="margin:18px 0;font-size:13px;color:#8B8278;">No screenshot uploaded.</p>'
+              }
+
+              ${
+                notesEscaped
+                  ? `<p style="margin:18px 0 6px 0;font-size:13px;color:#6B6B6B;">Creator notes:</p>
+                     <div style="margin:0 0 18px 0;padding:12px 14px;background:#FFFBF0;border:1px solid #E8E2D2;border-left:3px solid #A8862E;border-radius:6px;font-size:13px;color:#1A1A1A;line-height:1.6;white-space:pre-wrap;word-break:break-word;">${notesEscaped}</div>`
+                  : ""
+              }
+
+              <table cellpadding="0" cellspacing="0" border="0" style="margin:6px 0 4px 0;">
+                <tr>
+                  <td style="padding-right:8px;">
+                    <a href="${adminUrl}" style="display:inline-block;padding:11px 18px;background:#A8862E;color:#FFFFFF;text-decoration:none;font-size:13px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;border-radius:6px;">Review in admin</a>
+                  </td>
+                  <td>
+                    <a href="${chatUrl}" style="display:inline-block;padding:11px 18px;background:transparent;color:#A8862E;text-decoration:none;font-size:13px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;border:1px solid #A8862E;border-radius:6px;">Chat with creator</a>
+                  </td>
+                </tr>
+              </table>
+              <p style="font-size:11px;color:#8B8278;margin:8px 0 0 0;">Both links require admin sign-in.</p>
+            </td></tr>
+          </table>
+        </td></tr>
+      </table>
+    </body></html>`;
+
+    const result = await resend.emails.send({
+      from: FROM,
+      to: ["aragonkevin239@gmail.com"],
+      subject,
+      text,
+      html,
+    });
+    // Surface Resend rejections (rate limit, deliverability, etc.) so the
+    // route can log emailSent=false instead of falsely reporting success.
+    if (result?.error) {
+      console.error(
+        "[email] sendWithdrawalSubmittedNotification Resend rejected:",
+        result.error.name ?? "Error",
+        result.error.message ?? String(result.error)
+      );
+      throw new Error(
+        `Resend rejected: ${result.error.message ?? result.error.name ?? "unknown"}`
+      );
+    }
+  } catch (err) {
+    console.error("[email] sendWithdrawalSubmittedNotification failed:", err);
+    throw err;  // let the route's try/catch decide what to do
+  }
+}
+
 function escapeHtml(s: string): string {
   return s
     .replace(/&/g, "&amp;")
