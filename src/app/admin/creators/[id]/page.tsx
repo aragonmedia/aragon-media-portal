@@ -11,6 +11,7 @@ import {
 import { and, desc, eq, sql } from "drizzle-orm";
 import AccountStatusFlip from "./AccountStatusFlip";
 import ExistingCreatorToggle from "./ExistingCreatorToggle";
+import InitiateChatButton from "./InitiateChatButton";
 import DeleteCreatorButton from "./DeleteCreatorButton";
 import AdminAddAccount from "./AdminAddAccount";
 
@@ -149,10 +150,12 @@ export default async function AdminCreatorDetail({
             initialValue={u.isExistingCreator}
             creatorName={u.name}
           />
-          {chatRow && (
+          {chatRow ? (
             <Link href={`/admin/chats/${chatRow.id}`} className="admin-row-btn">
               Open chat →
             </Link>
+          ) : (
+            <InitiateChatButton userId={u.id} creatorName={u.name} />
           )}
           <Link
             href={`/admin/withdrawals?creator=${u.id}`}
