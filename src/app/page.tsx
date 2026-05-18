@@ -24,7 +24,6 @@ type Partner = { name: string; logo?: string };
 const PARTNERS: Partner[] = [
   { name: "TikTok Shop",       logo: "/partners/tiktok-shop.png" },
   { name: "Kyvo",              logo: "/partners/kyvo.png" },
-  { name: "Creatify",          logo: "/partners/creatify.png" },
   { name: "4orte",             logo: "/partners/4orte.png" },
   { name: "Creators Corner",   logo: "/partners/creators-corner.png" },
   { name: "C&C",               logo: "/partners/cc.png" },
