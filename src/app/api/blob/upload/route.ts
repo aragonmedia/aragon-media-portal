@@ -17,6 +17,7 @@
 import { NextRequest } from "next/server";
 import { put } from "@vercel/blob";
 import { getCurrentUser } from "@/lib/auth/session";
+import { isAdminSession } from "@/lib/auth/admin";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -34,8 +35,17 @@ const ALLOWED_TYPES = new Set([
 ]);
 
 export async function POST(req: NextRequest) {
+  // Accept either a creator session OR an admin session. The same
+  // route is used by both surfaces:
+  //   - /dashboard/withdrawals/new — creator screenshot upload
+  //   - /dashboard/chat            — creator image/video upload
+  //   - /admin/chats/[id]          — admin image/video upload
+  // Previously only creator session was checked, so admin chat uploads
+  // failed with 401 on mobile (where dual-cookie collision didn't save
+  // the day like on desktop).
   const user = await getCurrentUser();
-  if (!user) {
+  const adminAuthed = await isAdminSession();
+  if (!user && !adminAuthed) {
     return Response.json({ ok: false, error: "unauthorized" }, { status: 401 });
   }
 
@@ -86,11 +96,13 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  // Path the file under the user's id so creators can never collide with
-  // each other and admin can spot which folder maps to which row.
+  // Path the file under the owner so files don't collide.
+  // Creators → uploads/<userId>/  (keeps per-creator isolation)
+  // Admin    → uploads/admin/     (admin replies from /admin/chats)
   const safeName = file.name.replace(/[^a-zA-Z0-9._-]+/g, "_").slice(0, 80);
   const stamp = Date.now();
-  const key = `withdrawals/${user.id}/${stamp}-${safeName}`;
+  const ownerSlug = user?.id ?? "admin";
+  const key = `uploads/${ownerSlug}/${stamp}-${safeName}`;
 
   try {
     const blob = await put(key, file, {
