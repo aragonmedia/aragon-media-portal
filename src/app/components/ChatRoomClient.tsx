@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { upload } from "@vercel/blob/client";
 import "./chat-room.css";
 
 type Message = {
@@ -20,7 +21,7 @@ type Pending = {
 };
 
 const POLL_MS = 5000;
-const MAX_ATTACHMENTS = 4;
+const MAX_ATTACHMENTS = 5;
 
 function fmtTime(iso: string): string {
   const d = new Date(iso);
@@ -124,7 +125,7 @@ export default function ChatRoomClient({
     if (!picked) return;
     const remaining = MAX_ATTACHMENTS - pending.length;
     if (remaining <= 0) {
-      setErr(`Max ${MAX_ATTACHMENTS} images per message.`);
+      setErr(`Max ${MAX_ATTACHMENTS} attachments per message.`);
       return;
     }
     const next: Pending[] = [];
@@ -134,7 +135,7 @@ export default function ChatRoomClient({
       next.push({ file: f, preview: URL.createObjectURL(f) });
     }
     if (picked.length > remaining) {
-      setErr(`Only the first ${remaining} image(s) added — max ${MAX_ATTACHMENTS} per message.`);
+      setErr(`Only the first ${remaining} added — max ${MAX_ATTACHMENTS} attachments per message.`);
     }
     setPending((cur) => [...cur, ...next]);
     // Reset the file input so picking the same file again still fires onChange
@@ -150,14 +151,26 @@ export default function ChatRoomClient({
   }
 
   async function uploadOne(p: Pending): Promise<string | null> {
-    const fd = new FormData();
-    fd.append("file", p.file);
-    const res = await fetch("/api/blob/upload", { method: "POST", body: fd });
-    const json = (await res.json()) as { ok: boolean; url?: string; error?: string };
-    if (!res.ok || !json.ok || !json.url) {
-      throw new Error(json.error ?? "upload_failed");
+    // Direct-to-Blob client upload via @vercel/blob/client. The file
+    // streams from the browser straight to Vercel Blob's CDN, bypassing
+    // the 4.5MB serverless function body limit that previously killed
+    // mobile video uploads (iPhone clips routinely exceed that cap).
+    // Our /api/blob/client-upload endpoint only issues the signed
+    // token + validates the auth — it never sees the file bytes.
+    const safeName = p.file.name.replace(/[^a-zA-Z0-9._-]+/g, "_").slice(0, 80);
+    const stamp = Date.now();
+    const filename = `chat/${stamp}-${safeName}`;
+    try {
+      const blob = await upload(filename, p.file, {
+        access: "public",
+        handleUploadUrl: "/api/blob/client-upload",
+        contentType: p.file.type || undefined,
+      });
+      return blob.url;
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
+      throw new Error(msg || "upload_failed");
     }
-    return json.url;
   }
 
   async function send(e: React.FormEvent) {
