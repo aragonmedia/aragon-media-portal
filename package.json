@@ -18,7 +18,7 @@
     "@vercel/blob": "^2.3.3",
     "@vercel/speed-insights": "^2.0.0",
     "drizzle-orm": "^0.36.4",
-    "next": "15.5.15",
+    "next": "15.5.20",
     "pdf-lib": "^1.17.1",
     "postgres": "^3.4.5",
     "react": "19.1.0",
