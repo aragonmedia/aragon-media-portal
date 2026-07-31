@@ -50,6 +50,13 @@
       "when": 1777752700000,
       "tag": "0006_existing_creator_flag",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1782000000000,
+      "tag": "0007_demo_reviewer_columns",
+      "breakpoints": true
     }
   ]
 }

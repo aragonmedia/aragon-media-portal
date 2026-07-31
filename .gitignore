@@ -40,3 +40,6 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# TikTok review credentials — never commit
+docs/tiktok-review-credentials.md

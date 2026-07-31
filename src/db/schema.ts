@@ -86,6 +86,8 @@ export const users = pgTable(
     contractUnlocked: boolean("contract_unlocked").default(false).notNull(),
     contractUnlockedAt: timestamp("contract_unlocked_at", { withTimezone: true }),
     isExistingCreator: boolean("is_existing_creator").default(false).notNull(),
+    isDemo: boolean("is_demo").default(false).notNull(),
+    passwordHash: varchar("password_hash", { length: 500 }),
     existingCreatorMarkedAt: timestamp("existing_creator_marked_at", { withTimezone: true }),
     createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
     verifiedAt: timestamp("verified_at", { withTimezone: true }),
