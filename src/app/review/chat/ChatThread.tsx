@@ -97,39 +97,55 @@ export default function ChatThread({
 
       <style jsx>{`
         .rv-chat {
-          background: #141414;
-          border: 1px solid #1F1F1F;
-          border-radius: 12px;
+          background: var(--bg-2);
+          border: 1px solid var(--border-soft);
+          border-radius: 14px;
           overflow: hidden;
-          display: flex;
-          flex-direction: column;
+          box-shadow: var(--shadow-card);
+          display: flex; flex-direction: column;
         }
         .rv-chat-feed {
           max-height: 460px;
           overflow-y: auto;
           padding: 20px;
-          display: flex;
-          flex-direction: column;
+          display: flex; flex-direction: column;
           gap: 14px;
         }
         .rv-msg { max-width: 78%; padding: 12px 14px; border-radius: 12px; }
-        .rv-msg.mine { margin-left: auto; background: rgba(201, 168, 76, 0.14); border: 1px solid rgba(201, 168, 76, 0.28); }
-        .rv-msg.them { background: #0B0B0B; border: 1px solid #1F1F1F; }
-        .rv-msg.sys { background: transparent; text-align: center; color: #6B6660; font-size: 11.5px; border: none; max-width: 100%; }
-        .rv-msg-body { margin: 0; font-size: 14px; line-height: 1.5; color: #F5F1E6; white-space: pre-wrap; }
-        .rv-msg-meta { margin: 6px 0 0; font-size: 11px; color: #6B6660; display: flex; gap: 5px; }
+        .rv-msg.mine {
+          margin-left: auto;
+          background: rgba(201, 168, 76, 0.14);
+          border: 1px solid rgba(201, 168, 76, 0.32);
+        }
+        .rv-msg.them {
+          background: var(--bg-deep);
+          border: 1px solid var(--border-soft);
+        }
+        .rv-msg.sys {
+          background: transparent; text-align: center;
+          color: var(--text-sub); font-size: 11.5px;
+          border: none; max-width: 100%;
+        }
+        .rv-msg-body {
+          margin: 0; font-size: 14px; line-height: 1.5;
+          color: var(--text); white-space: pre-wrap;
+        }
+        .rv-msg-meta {
+          margin: 6px 0 0; font-size: 11px;
+          color: var(--text-sub);
+          display: flex; gap: 5px;
+        }
         .rv-chat-input {
-          display: flex;
-          gap: 10px;
-          padding: 14px;
-          border-top: 1px solid #1F1F1F;
+          display: flex; gap: 10px; padding: 14px;
+          border-top: 1px solid var(--border-soft);
+          background: var(--bg-2);
         }
         .rv-chat-input textarea {
           flex: 1;
-          background: #0B0B0B;
-          border: 1px solid #2A2A2A;
+          background: var(--bg-deep);
+          border: 1px solid var(--border);
           border-radius: 8px;
-          color: #F5F1E6;
+          color: var(--text);
           padding: 10px 12px;
           font-family: inherit;
           font-size: 13.5px;
@@ -137,10 +153,10 @@ export default function ChatThread({
           min-height: 46px;
           outline: none;
         }
-        .rv-chat-input textarea:focus { border-color: #C9A84C; }
+        .rv-chat-input textarea:focus { border-color: var(--gold); }
         .rv-chat-input button {
-          background: #C9A84C;
-          color: #0F0F0F;
+          background: var(--gold);
+          color: #0B0B0B;
           border: none;
           border-radius: 8px;
           font-weight: 700;
@@ -155,7 +171,7 @@ export default function ChatThread({
         .rv-chat-err {
           margin: 8px 14px 14px;
           font-size: 12.5px;
-          color: #E38A8A;
+          color: var(--red);
         }
       `}</style>
     </div>

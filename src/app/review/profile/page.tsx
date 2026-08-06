@@ -1,7 +1,5 @@
 /**
  * /review/profile — Profile & Settings for the reviewer creator.
- * Read-only creator profile + real client-side notification toggles +
- * "Add TikTok Account" jump-off from the TikTok handles section.
  */
 
 import { asc, eq } from "drizzle-orm";
@@ -10,6 +8,7 @@ import { accounts } from "@/db/schema";
 import { getCurrentReviewer } from "@/lib/auth/review-session";
 import LogoutButton from "../LogoutButton";
 import ProfileClient from "./ProfileClient";
+import ProfilePicUpload from "./ProfilePicUpload";
 
 export const dynamic = "force-dynamic";
 
@@ -27,6 +26,13 @@ export default async function ProfilePage() {
     .where(eq(accounts.userId, user.id))
     .orderBy(asc(accounts.createdAt));
   const extraHandles = linked.map((a) => a.tiktokHandle).filter((h) => h !== user.handle);
+
+  const initials =
+    (user.name || user.email)
+      .split(/\s+/)
+      .map((p) => p[0]?.toUpperCase() ?? "")
+      .slice(0, 2)
+      .join("") || "AM";
 
   return (
     <div className="pf-wrap">
@@ -49,6 +55,7 @@ export default async function ProfilePage() {
             <dd>{user.contractSignedAt ? `Signed ${fmtDate(user.contractSignedAt)}` : "Not signed"}</dd>
           </div>
         </dl>
+        <ProfilePicUpload initials={initials} />
       </section>
 
       <ProfileClient handle={user.handle} extraHandles={extraHandles} />

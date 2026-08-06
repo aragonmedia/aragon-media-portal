@@ -31,7 +31,7 @@ function accountSeries(handle: string, len: number) {
   const scale = 0.65 + (s % 1) * 0.55; // 0.65 .. 1.2 relative size
   return {
     gmv: genSeries(s, len, 900 * scale, 260 * scale),
-    comm: genSeries(s + 0.3, len, 720 * scale, 200 * scale),
+    comm: genSeries(s + 0.3, len, 270 * scale, 80 * scale),
     orders: genSeries(s + 0.5, len, 16 * scale, 6 * scale),
     videos: genSeries(s + 0.7, len, 3 * scale, 1.4 * scale),
   };

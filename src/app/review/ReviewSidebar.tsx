@@ -1,15 +1,14 @@
 "use client";
 
 /**
- * Reviewer sidebar — uses the exact same `.dash-*` classes as the
- * real /dashboard sidebar so the visual matches 1:1 in both light and
- * dark modes (styling lives in dashboard.css). Scope is locked to the
- * four creator-facing routes the TikTok Partner Center reviewer needs:
+ * Reviewer sidebar — uses the exact same .dash-* classes as the real
+ * /dashboard sidebar so the visual matches 1:1 in both light and dark
+ * modes (styling lives in dashboard.css). Scope locked to the four
+ * creator-facing routes the TikTok Partner Center reviewer needs.
  *
- *   Overview · Chat with AM Team · Add TikTok Accounts · Profile & Settings
- *
- * Bottom of the foot holds a Day/Night toggle (same `.theme-card`
- * pattern the real portal's Settings uses).
+ * Brand mark is inline SVG (no hardcoded fills) so it flips with theme.
+ * Profile-chip avatar reads am_profile_pic from localStorage — if the
+ * creator uploaded a photo on /review/profile it renders here.
  */
 
 import Link from "next/link";
@@ -26,6 +25,8 @@ const NAV: NavItem[] = [
 ];
 
 type Theme = "light" | "dark";
+const PIC_KEY = "am_profile_pic";
+const PIC_EVENT = "am_profile_pic_changed";
 
 export default function ReviewSidebar({
   userName,
@@ -38,6 +39,7 @@ export default function ReviewSidebar({
   const [open, setOpen] = useState(false);
   const [theme, setTheme] = useState<Theme>("dark");
   const [mounted, setMounted] = useState(false);
+  const [pic, setPic] = useState<string | null>(null);
 
   useEffect(() => {
     setMounted(true);
@@ -46,6 +48,26 @@ export default function ReviewSidebar({
     const t: Theme = stored === "light" ? "light" : "dark";
     setTheme(t);
     document.documentElement.setAttribute("data-theme", t);
+
+    try {
+      const p = localStorage.getItem(PIC_KEY);
+      if (p) setPic(p);
+    } catch {}
+
+    function onPicChange(e: Event) {
+      const url = (e as CustomEvent).detail as string | null;
+      setPic(url ?? null);
+    }
+    window.addEventListener(PIC_EVENT, onPicChange as EventListener);
+    // Cross-tab
+    function onStorage(e: StorageEvent) {
+      if (e.key === PIC_KEY) setPic(e.newValue);
+    }
+    window.addEventListener("storage", onStorage);
+    return () => {
+      window.removeEventListener(PIC_EVENT, onPicChange as EventListener);
+      window.removeEventListener("storage", onStorage);
+    };
   }, []);
 
   function pick(t: Theme) {
@@ -80,21 +102,30 @@ export default function ReviewSidebar({
       </button>
 
       <aside className={`dash-sidebar${open ? " open" : ""}`}>
+        {/* Brand — theme-aware inline SVG (no img/logo-am.svg) */}
         <Link href="/review" className="dash-brand" onClick={() => setOpen(false)}>
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/logo-am.svg" alt="" width={32} height={32} />
+          <BrandMark />
           <div>
             <div className="dash-brand-name">Aragon Media</div>
             <div className="dash-brand-sub">Creator Portal</div>
           </div>
         </Link>
 
+        {/* Profile chip — clickable, links to profile & settings */}
         <Link
           href="/review/profile"
           className="dash-profile-chip"
           onClick={() => setOpen(false)}
+          aria-label="Profile & settings"
         >
-          <div className="dash-profile-avatar">{initials}</div>
+          <div className="dash-profile-avatar">
+            {pic ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={pic} alt="" />
+            ) : (
+              <span>{initials}</span>
+            )}
+          </div>
           <div className="dash-profile-meta">
             <div className="dash-profile-name">{firstName}</div>
             <div className="dash-profile-status">
@@ -128,7 +159,6 @@ export default function ReviewSidebar({
         </nav>
 
         <div className="dash-foot">
-          {/* Day / Night — same .theme-card visual pattern as Settings */}
           <div className="theme-toggle rv-theme-compact" role="group" aria-label="Theme">
             <button
               type="button"
@@ -168,8 +198,6 @@ export default function ReviewSidebar({
       />
 
       <style jsx global>{`
-        /* Compact theme cards inside the sidebar foot — scale down the
-           full-size Settings variant so it fits at the bottom */
         .rv-theme-compact.theme-toggle { padding: 0 0 10px; gap: 8px; }
         .rv-theme-compact .theme-card {
           padding: 10px 8px;
@@ -178,8 +206,40 @@ export default function ReviewSidebar({
         }
         .rv-theme-compact .theme-card svg { width: 16px; height: 16px; }
         .rv-theme-compact .theme-card-label { font-size: 11px; letter-spacing: 0.08em; }
+
+        /* Profile avatar can now hold an uploaded image */
+        .dash-profile-avatar { overflow: hidden; }
+        .dash-profile-avatar img {
+          width: 100%; height: 100%;
+          object-fit: cover;
+          display: block;
+        }
       `}</style>
     </>
+  );
+}
+
+/* Theme-aware brand mark — uses currentColor + a themed background box */
+function BrandMark() {
+  return (
+    <span className="rv-brand-mark" aria-hidden="true">
+      <span>AM</span>
+      <style jsx>{`
+        .rv-brand-mark {
+          width: 32px; height: 32px;
+          border-radius: 8px;
+          background: var(--bg-deep);
+          border: 1px solid var(--gold);
+          color: var(--gold);
+          display: inline-flex; align-items: center; justify-content: center;
+          font-family: 'Inter Tight', sans-serif;
+          font-weight: 800;
+          font-size: 12.5px;
+          letter-spacing: -0.02em;
+          flex-shrink: 0;
+        }
+      `}</style>
+    </span>
   );
 }
 
