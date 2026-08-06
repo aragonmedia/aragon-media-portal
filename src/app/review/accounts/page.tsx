@@ -1,5 +1,6 @@
 /**
  * /review/accounts — "Add TikTok Accounts" (creator POV).
+ * Uses the same theme tokens as the real dashboard (via dashboard.css).
  */
 
 import Link from "next/link";
@@ -7,6 +8,7 @@ import { asc, eq } from "drizzle-orm";
 import { db } from "@/db";
 import { accounts } from "@/db/schema";
 import { getCurrentReviewer } from "@/lib/auth/review-session";
+import AddAccountButton from "./AddAccountButton";
 
 export const dynamic = "force-dynamic";
 
@@ -41,9 +43,7 @@ export default async function AccountsPage() {
             flow into <Link href="/review">Overview</Link> automatically.
           </p>
         </div>
-        <button className="ac-cta" disabled title="Available after TikTok Partner Center production approval">
-          + Add another account
-        </button>
+        <AddAccountButton />
       </header>
 
       {rows.length === 0 ? (
@@ -54,6 +54,9 @@ export default async function AccountsPage() {
             Once you add an account, its GMV, orders, and videos will
             appear on your Overview within minutes.
           </p>
+          <div className="ac-empty-cta">
+            <AddAccountButton label="+ Add your first TikTok account" />
+          </div>
         </div>
       ) : (
         <ul className="ac-list">
@@ -102,103 +105,95 @@ export default async function AccountsPage() {
           margin: 0 0 6px;
           font-size: 11px; letter-spacing: 0.18em;
           text-transform: uppercase;
-          color: var(--rv-gold); font-weight: 700;
+          color: var(--gold); font-weight: 700;
         }
         .ac-head h1 {
           margin: 0;
           font-size: 30px; font-weight: 700;
           letter-spacing: -0.02em;
-          color: var(--rv-text);
+          color: var(--text);
         }
         .ac-sub {
           margin: 8px 0 0;
-          font-size: 13px; color: var(--rv-muted);
+          font-size: 13px; color: var(--text-muted);
           max-width: 640px; line-height: 1.55;
         }
-        .ac-sub a { color: var(--rv-gold); text-decoration: none; border-bottom: 1px dashed var(--rv-gold-soft); }
-
-        .ac-cta {
-          background: var(--rv-gold);
-          border: 1px solid var(--rv-gold);
-          color: #0B0B0B;
-          font: inherit; font-size: 13px; font-weight: 700;
-          padding: 10px 18px; border-radius: 10px;
-          cursor: not-allowed; opacity: 0.75;
-        }
+        .ac-sub a { color: var(--gold); text-decoration: none; border-bottom: 1px dashed rgba(201,168,76,0.34); }
 
         .ac-empty {
-          background: var(--rv-card-bg);
-          border: 1px dashed var(--rv-border);
+          background: var(--bg-2);
+          border: 1px dashed var(--border);
           border-radius: 14px;
           padding: 40px 24px;
-          text-align: center; color: var(--rv-muted);
-          box-shadow: var(--rv-shadow);
+          text-align: center; color: var(--text-muted);
+          box-shadow: var(--shadow-card);
         }
-        .ac-empty-icon { font-size: 32px; color: var(--rv-gold); font-weight: 300; margin-bottom: 6px; }
-        .ac-empty-title { margin: 0 0 4px; color: var(--rv-text); font-weight: 600; }
-        .ac-empty-sub { margin: 0; font-size: 13px; }
+        .ac-empty-icon { font-size: 32px; color: var(--gold); font-weight: 300; margin-bottom: 6px; }
+        .ac-empty-title { margin: 0 0 4px; color: var(--text); font-weight: 600; }
+        .ac-empty-sub { margin: 0 0 18px; font-size: 13px; }
+        .ac-empty-cta { display: inline-flex; }
 
         .ac-list { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 12px; }
         .ac-item {
           display: grid; grid-template-columns: 52px 1fr auto;
           gap: 16px;
-          background: var(--rv-card-bg);
-          border: 1px solid var(--rv-border);
+          background: var(--bg-2);
+          border: 1px solid var(--border-soft);
           border-radius: 14px;
           padding: 16px 18px;
           align-items: center;
-          box-shadow: var(--rv-shadow);
+          box-shadow: var(--shadow-card);
         }
         .ac-mark {
           width: 52px; height: 52px; border-radius: 12px;
-          background: var(--rv-mark-bg);
-          border: 1px solid var(--rv-gold);
-          color: var(--rv-gold);
+          background: var(--bg-deep);
+          border: 1px solid var(--gold);
+          color: var(--gold);
           font-size: 22px; font-weight: 700;
           display: flex; align-items: center; justify-content: center;
         }
-        .ac-handle { margin: 0; font-size: 15px; font-weight: 700; color: var(--rv-text); }
+        .ac-handle { margin: 0; font-size: 15px; font-weight: 700; color: var(--text); }
         .ac-meta {
           margin: 4px 0 0;
-          font-size: 12.5px; color: var(--rv-muted);
+          font-size: 12.5px; color: var(--text-muted);
           display: flex; gap: 8px; flex-wrap: wrap;
         }
         .ac-status {
-          color: var(--rv-good); font-weight: 700;
+          color: var(--green); font-weight: 700;
           text-transform: uppercase; letter-spacing: 0.08em;
           font-size: 11px;
         }
         .ac-item-pending .ac-status,
-        .ac-item-two_factor_pending .ac-status { color: var(--rv-gold); }
+        .ac-item-two_factor_pending .ac-status { color: var(--gold); }
         .ac-notes {
           margin: 8px 0 0;
-          font-size: 12.5px; color: var(--rv-muted);
+          font-size: 12.5px; color: var(--text-muted);
           font-style: italic;
         }
         .ac-pill {
           font-size: 10.5px;
-          color: var(--rv-gold);
-          background: var(--rv-preview);
-          border: 1px solid var(--rv-gold-soft);
+          color: var(--gold);
+          background: rgba(201, 168, 76, 0.08);
+          border: 1px solid rgba(201, 168, 76, 0.28);
           padding: 5px 10px; border-radius: 999px;
           letter-spacing: 0.1em; text-transform: uppercase;
           font-weight: 700;
         }
 
         .ac-info {
-          background: var(--rv-preview);
-          border: 1px solid var(--rv-gold-soft);
+          background: rgba(201, 168, 76, 0.06);
+          border: 1px solid rgba(201, 168, 76, 0.28);
           border-radius: 14px;
           padding: 18px 22px;
-          font-size: 13px; color: var(--rv-muted);
+          font-size: 13px; color: var(--text-muted);
           line-height: 1.65;
         }
-        .ac-info strong { color: var(--rv-text); }
-        .ac-info em { color: var(--rv-text); font-style: normal; font-weight: 600; }
+        .ac-info strong { color: var(--text); }
+        .ac-info em { color: var(--text); font-style: normal; font-weight: 600; }
         .ac-info code {
           font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
           font-size: 12.5px;
-          color: var(--rv-gold);
+          color: var(--gold);
           background: rgba(201, 168, 76, 0.08);
           padding: 1px 6px; border-radius: 4px;
         }

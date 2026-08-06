@@ -1,7 +1,6 @@
 /**
  * /review/chat — Direct line between the creator and the Aragon Media
- * team. Read-only in demo mode (writes safe — nothing external fires).
- * Attachments blocked via middleware since they'd hit Vercel Blob.
+ * team. Read-only in demo mode. Attachments blocked via middleware.
  */
 
 import { asc, eq } from "drizzle-orm";
@@ -30,8 +29,8 @@ export default async function ChatPage() {
         <h1>Chat with the AM Team</h1>
         <p>No thread yet. Once the seed script runs, a welcome thread will appear here.</p>
         <style>{`
-          .ch-empty { padding: 24px; color: var(--rv-muted); }
-          .ch-empty h1 { color: var(--rv-text); margin: 0 0 8px; }
+          .ch-empty { padding: 24px; color: var(--text-muted); }
+          .ch-empty h1 { color: var(--text); margin: 0 0 8px; }
         `}</style>
       </div>
     );
@@ -68,9 +67,9 @@ export default async function ChatPage() {
       <style>{`
         .ch-wrap { display: flex; flex-direction: column; gap: 18px; max-width: 820px; }
         .ch-head { display: flex; flex-direction: column; gap: 4px; }
-        .ch-eyebrow { margin: 0; font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--rv-gold); font-weight: 700; }
-        .ch-head h1 { margin: 0; font-size: 26px; font-weight: 700; letter-spacing: -0.02em; color: var(--rv-text); }
-        .ch-sub { margin: 0; font-size: 13px; color: var(--rv-muted); line-height: 1.55; }
+        .ch-eyebrow { margin: 0; font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--gold); font-weight: 700; }
+        .ch-head h1 { margin: 0; font-size: 26px; font-weight: 700; letter-spacing: -0.02em; color: var(--text); }
+        .ch-sub { margin: 0; font-size: 13px; color: var(--text-muted); line-height: 1.55; }
       `}</style>
     </div>
   );

@@ -19,14 +19,14 @@ export default function LogoutButton() {
       <style jsx>{`
         .rv-logout-btn {
           background: transparent;
-          border: 1px solid var(--rv-border);
-          color: var(--rv-text);
+          border: 1px solid var(--border);
+          color: var(--text);
           font-family: inherit; font-size: 12.5px;
           padding: 8px 14px; border-radius: 8px;
           cursor: pointer;
           transition: border-color 120ms ease, color 120ms ease;
         }
-        .rv-logout-btn:hover:not(:disabled) { border-color: var(--rv-gold); color: var(--rv-gold); }
+        .rv-logout-btn:hover:not(:disabled) { border-color: var(--gold); color: var(--gold); }
         .rv-logout-btn:disabled { opacity: 0.6; cursor: not-allowed; }
       `}</style>
     </button>

@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useMemo, useRef, useState } from "react";
 
 type Range = "7d" | "28d" | "lifetime";
@@ -131,6 +132,7 @@ export default function CreatorOverviewClient() {
         </div>
       </header>
 
+      {/* Connection status */}
       <section className="ov-card">
         <div className="ov-card-head">
           <h2>Connection Status</h2>
@@ -144,9 +146,13 @@ export default function CreatorOverviewClient() {
           <select id="ov-view" className="ov-select" defaultValue="all">
             <option value="all">All accounts (combined)</option>
           </select>
+          <Link href="/review/accounts" className="ov-connect-cta">
+            <span aria-hidden>+</span> Add TikTok account
+          </Link>
         </div>
       </section>
 
+      {/* Last N days summary */}
       <section className="ov-card">
         <div className="ov-card-head">
           <h2>
@@ -204,6 +210,7 @@ export default function CreatorOverviewClient() {
         </div>
       </section>
 
+      {/* Chart */}
       <section className="ov-card">
         <div className="ov-card-head">
           <h2>
@@ -246,12 +253,12 @@ export default function CreatorOverviewClient() {
                 <g key={i}>
                   <line
                     x1={padL} y1={y} x2={W - padR} y2={y}
-                    stroke="var(--rv-border)" strokeWidth="1"
+                    stroke="var(--border-soft)" strokeWidth="1"
                     strokeDasharray={i === yTicks ? "" : "2,4"} opacity="0.7"
                   />
                   <text
                     x={padL - 8} y={y + 4}
-                    fontSize="10" fill="var(--rv-muted)" textAnchor="end"
+                    fontSize="10" fill="var(--text-muted)" textAnchor="end"
                     fontFamily="ui-monospace, SFMono-Regular, Menlo, monospace"
                   >
                     {statFocus === "gmv" || statFocus === "comm"
@@ -283,18 +290,18 @@ export default function CreatorOverviewClient() {
                 <line
                   x1={padL + hoverIdx * dx} y1={padT}
                   x2={padL + hoverIdx * dx} y2={padT + chartH}
-                  stroke="var(--rv-muted)" strokeDasharray="3,3" strokeWidth="1"
+                  stroke="var(--text-muted)" strokeDasharray="3,3" strokeWidth="1"
                 />
                 <circle
                   cx={padL + hoverIdx * dx}
                   cy={padT + chartH - (focusData[hoverIdx] / (maxV * 1.08)) * chartH}
-                  r="4" fill="#C9A84C" stroke="#0F0F0F" strokeWidth="2"
+                  r="4" fill="#C9A84C" stroke="var(--bg)" strokeWidth="2"
                 />
                 {overlay && (
                   <circle
                     cx={padL + hoverIdx * dx}
                     cy={padT + chartH - (overlay[hoverIdx] / (maxV * 1.08)) * chartH}
-                    r="4" fill="#2BA567" stroke="#0F0F0F" strokeWidth="2"
+                    r="4" fill="#2BA567" stroke="var(--bg)" strokeWidth="2"
                   />
                 )}
               </>
@@ -328,26 +335,26 @@ export default function CreatorOverviewClient() {
           margin: 0 0 6px;
           font-size: 11px; letter-spacing: 0.18em;
           text-transform: uppercase;
-          color: var(--rv-gold); font-weight: 700;
+          color: var(--gold); font-weight: 700;
         }
         .ov-head h1 {
           margin: 0;
           font-size: 30px; font-weight: 700;
           letter-spacing: -0.02em;
-          color: var(--rv-text);
+          color: var(--text);
         }
         .ov-sub {
           margin: 8px 0 0;
-          font-size: 13px; color: var(--rv-muted);
+          font-size: 13px; color: var(--text-muted);
           max-width: 640px;
         }
 
         .ov-card {
-          background: var(--rv-card-bg);
-          border: 1px solid var(--rv-border);
+          background: var(--bg-2);
+          border: 1px solid var(--border-soft);
           border-radius: 14px;
           padding: 22px 22px 18px;
-          box-shadow: var(--rv-shadow);
+          box-shadow: var(--shadow-card);
         }
         .ov-card-head {
           display: flex; justify-content: space-between; align-items: center;
@@ -356,13 +363,13 @@ export default function CreatorOverviewClient() {
         .ov-card-head h2 {
           margin: 0; font-size: 15px; font-weight: 700;
           letter-spacing: 0.02em;
-          color: var(--rv-text); text-transform: uppercase;
+          color: var(--text); text-transform: uppercase;
         }
 
         .ov-connected {
           display: inline-flex; align-items: center; gap: 8px;
           font-size: 12px; font-weight: 700;
-          color: var(--rv-good);
+          color: var(--green);
           padding: 6px 12px;
           background: rgba(43, 165, 103, 0.1);
           border: 1px solid rgba(43, 165, 103, 0.32);
@@ -370,46 +377,65 @@ export default function CreatorOverviewClient() {
         }
         .ov-connected-dot {
           width: 6px; height: 6px; border-radius: 50%;
-          background: var(--rv-good);
+          background: var(--green);
           box-shadow: 0 0 0 3px rgba(43, 165, 103, 0.22);
         }
 
-        .ov-view-row { display: flex; align-items: center; gap: 14px; }
+        .ov-view-row {
+          display: flex; align-items: center; gap: 14px;
+          flex-wrap: wrap;
+        }
         .ov-view-label {
           font-size: 11px; letter-spacing: 0.16em;
           text-transform: uppercase;
-          color: var(--rv-muted); font-weight: 700;
+          color: var(--text-muted); font-weight: 700;
         }
         .ov-select {
-          background: var(--rv-chip-bg);
-          border: 1px solid var(--rv-border);
-          color: var(--rv-text);
+          background: var(--bg-deep);
+          border: 1px solid var(--border);
+          color: var(--text);
           font: inherit; font-size: 13px;
           padding: 9px 14px; border-radius: 8px;
           min-width: 260px;
         }
+        .ov-connect-cta {
+          margin-left: auto;
+          display: inline-flex; align-items: center; gap: 6px;
+          font-size: 12.5px; font-weight: 700;
+          color: #0B0B0B;
+          background: var(--gold);
+          border: 1px solid var(--gold);
+          padding: 8px 14px; border-radius: 8px;
+          text-decoration: none;
+          transition: transform 120ms ease, box-shadow 120ms ease;
+        }
+        .ov-connect-cta:hover {
+          transform: translateY(-1px);
+          box-shadow: 0 6px 18px -8px rgba(201, 168, 76, 0.6);
+        }
+        .ov-connect-cta span { font-size: 15px; line-height: 1; }
 
         .ov-range {
           display: inline-flex; padding: 3px;
-          background: var(--rv-chip-bg);
-          border: 1px solid var(--rv-border);
+          background: var(--bg-deep);
+          border: 1px solid var(--border-soft);
           border-radius: 10px; gap: 2px;
         }
         .ov-range-btn {
           background: transparent; border: none;
-          color: var(--rv-muted);
+          color: var(--text-muted);
           font: inherit; font-size: 11.5px; font-weight: 700;
           letter-spacing: 0.05em;
           padding: 6px 12px; border-radius: 7px;
           cursor: pointer; text-transform: uppercase;
           transition: background 120ms ease, color 120ms ease;
         }
-        .ov-range-btn:hover { color: var(--rv-text); }
-        .ov-range-btn.active { background: var(--rv-gold); color: #0B0B0B; }
+        .ov-range-btn:hover { color: var(--text); }
+        .ov-range-btn.active { background: var(--gold); color: #0B0B0B; }
 
         .ov-hint {
           margin: 0 0 14px;
-          font-size: 12px; color: var(--rv-muted-2);
+          font-size: 12px; color: var(--text-sub);
         }
 
         .ov-stat-grid {
@@ -417,86 +443,87 @@ export default function CreatorOverviewClient() {
         }
         .ov-stat {
           text-align: left;
-          background: var(--rv-chip-bg);
-          border: 1px solid var(--rv-border);
+          background: var(--bg-deep);
+          border: 1px solid var(--border-soft);
           border-radius: 12px;
           padding: 18px 20px 16px;
-          font-family: inherit; color: var(--rv-text);
+          font-family: inherit; color: var(--text);
           cursor: pointer;
           transition: border-color 120ms ease, background 120ms ease, transform 120ms ease;
           position: relative;
         }
-        .ov-stat:hover { border-color: var(--rv-gold-soft); transform: translateY(-1px); }
-        .ov-stat.focused { border-color: var(--rv-gold); background: var(--rv-chip-hover); }
+        .ov-stat:hover { border-color: rgba(201, 168, 76, 0.4); transform: translateY(-1px); }
+        .ov-stat.focused { border-color: var(--gold); background: var(--bg-grad); }
         .ov-stat-label {
           display: flex; justify-content: space-between; align-items: center;
           font-size: 10.5px; letter-spacing: 0.16em;
           text-transform: uppercase;
-          color: var(--rv-muted); font-weight: 700;
+          color: var(--text-muted); font-weight: 700;
         }
-        .ov-stat-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--rv-muted-2); }
-        .ov-stat.green .ov-stat-dot { background: var(--rv-good); }
-        .ov-stat.gold .ov-stat-dot { background: var(--rv-gold); }
+        .ov-stat-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--text-sub); }
+        .ov-stat.green .ov-stat-dot { background: var(--green); }
+        .ov-stat.gold .ov-stat-dot { background: var(--gold); }
         .ov-stat-val {
           margin: 8px 0 6px;
           font-size: 28px; font-weight: 700;
           letter-spacing: -0.02em;
           font-variant-numeric: tabular-nums;
         }
-        .ov-stat-val.green { color: var(--rv-good); }
-        .ov-stat-val.gold { color: var(--rv-gold); }
-        .ov-stat-sub { font-size: 12px; color: var(--rv-muted); }
-        .ov-stat-cta { margin-top: 10px; font-size: 11px; color: var(--rv-muted-2); letter-spacing: 0.04em; }
-        .ov-stat.focused .ov-stat-cta { color: var(--rv-gold); }
+        .ov-stat-val.green { color: var(--green); }
+        .ov-stat-val.gold { color: var(--gold); }
+        .ov-stat-sub { font-size: 12px; color: var(--text-muted); }
+        .ov-stat-cta { margin-top: 10px; font-size: 11px; color: var(--text-sub); letter-spacing: 0.04em; }
+        .ov-stat.focused .ov-stat-cta { color: var(--gold); }
 
         .ov-legend { display: inline-flex; gap: 18px; }
         .ov-legend-item {
-          font-size: 11.5px; color: var(--rv-muted);
+          font-size: 11.5px; color: var(--text-muted);
           display: inline-flex; align-items: center; gap: 7px;
           font-weight: 600;
         }
         .ov-legend-swatch { width: 10px; height: 10px; border-radius: 50%; }
-        .ov-legend-swatch.gold { background: var(--rv-gold); }
-        .ov-legend-swatch.green { background: var(--rv-good); }
+        .ov-legend-swatch.gold { background: var(--gold); }
+        .ov-legend-swatch.green { background: var(--green); }
 
         .ov-chart-wrap { position: relative; padding: 4px 0 0; }
         .ov-chart { width: 100%; height: 260px; display: block; }
         .ov-xaxis {
           display: flex; justify-content: space-between;
           padding: 2px 6px 0 52px;
-          font-size: 10.5px; color: var(--rv-muted-2);
+          font-size: 10.5px; color: var(--text-sub);
           font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
         }
 
         .ov-tip {
           position: absolute; top: 4px;
           transform: translateX(-50%);
-          background: var(--rv-side-bg);
-          border: 1px solid var(--rv-border);
+          background: var(--bg-2);
+          border: 1px solid var(--border);
           border-radius: 10px;
           padding: 10px 12px;
-          box-shadow: var(--rv-shadow);
-          font-size: 12px; color: var(--rv-text);
+          box-shadow: var(--shadow-card);
+          font-size: 12px; color: var(--text);
           pointer-events: none; min-width: 160px;
         }
         .ov-tip-title {
-          font-size: 10.5px; color: var(--rv-muted);
+          font-size: 10.5px; color: var(--text-muted);
           letter-spacing: 0.12em; text-transform: uppercase;
           font-weight: 700; margin-bottom: 6px;
         }
         .ov-tip-row {
           display: flex; align-items: center; gap: 6px;
-          font-size: 12px; color: var(--rv-muted); margin-top: 3px;
+          font-size: 12px; color: var(--text-muted); margin-top: 3px;
         }
-        .ov-tip-row b { margin-left: auto; color: var(--rv-text); font-variant-numeric: tabular-nums; }
+        .ov-tip-row b { margin-left: auto; color: var(--text); font-variant-numeric: tabular-nums; }
         .ov-tip-dot { width: 8px; height: 8px; border-radius: 50%; }
-        .ov-tip-dot.gold { background: var(--rv-gold); }
-        .ov-tip-dot.green { background: var(--rv-good); }
+        .ov-tip-dot.gold { background: var(--gold); }
+        .ov-tip-dot.green { background: var(--green); }
 
         @media (max-width: 900px) {
           .ov-head h1 { font-size: 24px; }
           .ov-stat-grid { grid-template-columns: 1fr; }
           .ov-stat-val { font-size: 24px; }
+          .ov-connect-cta { margin-left: 0; }
         }
       `}</style>
     </div>

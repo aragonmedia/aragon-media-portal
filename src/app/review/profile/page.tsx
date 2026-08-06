@@ -1,9 +1,15 @@
 /**
  * /review/profile — Profile & Settings for the reviewer creator.
+ * Read-only creator profile + real client-side notification toggles +
+ * "Add TikTok Account" jump-off from the TikTok handles section.
  */
 
+import { asc, eq } from "drizzle-orm";
+import { db } from "@/db";
+import { accounts } from "@/db/schema";
 import { getCurrentReviewer } from "@/lib/auth/review-session";
 import LogoutButton from "../LogoutButton";
+import ProfileClient from "./ProfileClient";
 
 export const dynamic = "force-dynamic";
 
@@ -15,6 +21,12 @@ function fmtDate(d: Date | string | null): string {
 
 export default async function ProfilePage() {
   const user = (await getCurrentReviewer())!;
+  const linked = await db
+    .select()
+    .from(accounts)
+    .where(eq(accounts.userId, user.id))
+    .orderBy(asc(accounts.createdAt));
+  const extraHandles = linked.map((a) => a.tiktokHandle).filter((h) => h !== user.handle);
 
   return (
     <div className="pf-wrap">
@@ -39,31 +51,7 @@ export default async function ProfilePage() {
         </dl>
       </section>
 
-      <section className="pf-card">
-        <h2>Notifications</h2>
-        <div className="pf-setting">
-          <div>
-            <p className="pf-setting-title">Email notifications</p>
-            <p className="pf-setting-sub">You&apos;ll receive chat, withdrawal, and system updates by email.</p>
-          </div>
-          <span className="pf-toggle on">On</span>
-        </div>
-        <div className="pf-setting">
-          <div>
-            <p className="pf-setting-title">Weekly performance digest</p>
-            <p className="pf-setting-sub">Summary of GMV, orders, and top videos every Monday.</p>
-          </div>
-          <span className="pf-toggle on">On</span>
-        </div>
-        <div className="pf-setting">
-          <div>
-            <p className="pf-setting-title">TikTok connection alerts</p>
-            <p className="pf-setting-sub">Ping me when a connected account needs re-authorization.</p>
-          </div>
-          <span className="pf-toggle on">On</span>
-        </div>
-        <p className="pf-note">Notification preferences are read-only in preview mode.</p>
-      </section>
+      <ProfileClient handle={user.handle} extraHandles={extraHandles} />
 
       <section className="pf-card">
         <h2>Session</h2>
@@ -77,47 +65,30 @@ export default async function ProfilePage() {
       <style>{`
         .pf-wrap { display: flex; flex-direction: column; gap: 18px; max-width: 820px; }
         .pf-head { display: flex; flex-direction: column; gap: 4px; }
-        .pf-eyebrow { margin: 0; font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--rv-gold); font-weight: 700; }
-        .pf-head h1 { margin: 0; font-size: 30px; font-weight: 700; letter-spacing: -0.02em; color: var(--rv-text); }
-        .pf-sub { margin: 4px 0 0; font-size: 13px; color: var(--rv-muted); }
+        .pf-eyebrow { margin: 0; font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--gold); font-weight: 700; }
+        .pf-head h1 { margin: 0; font-size: 30px; font-weight: 700; letter-spacing: -0.02em; color: var(--text); }
+        .pf-sub { margin: 4px 0 0; font-size: 13px; color: var(--text-muted); }
 
         .pf-card {
-          background: var(--rv-card-bg);
-          border: 1px solid var(--rv-border);
+          background: var(--bg-2);
+          border: 1px solid var(--border-soft);
           border-radius: 14px;
           padding: 22px 24px;
-          box-shadow: var(--rv-shadow);
+          box-shadow: var(--shadow-card);
         }
         .pf-card h2 {
           margin: 0 0 14px;
           font-size: 12px; font-weight: 700;
           letter-spacing: 0.16em; text-transform: uppercase;
-          color: var(--rv-gold);
+          color: var(--gold);
         }
         .pf-dl { display: grid; grid-template-columns: 1fr 1fr; gap: 14px 24px; margin: 0; }
         .pf-dl > div { display: flex; flex-direction: column; gap: 3px; }
-        .pf-dl dt { font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--rv-muted-2); font-weight: 600; }
-        .pf-dl dd { margin: 0; font-size: 14.5px; color: var(--rv-text); font-weight: 500; }
+        .pf-dl dt { font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-sub); font-weight: 600; }
+        .pf-dl dd { margin: 0; font-size: 14.5px; color: var(--text); font-weight: 500; }
 
-        .pf-setting {
-          display: flex; justify-content: space-between; align-items: center;
-          gap: 20px; padding: 14px 0;
-          border-top: 1px solid var(--rv-border);
-        }
-        .pf-setting:first-of-type { border-top: none; padding-top: 0; }
-        .pf-setting-title { margin: 0; font-size: 14px; font-weight: 600; color: var(--rv-text); }
-        .pf-setting-sub { margin: 3px 0 0; font-size: 12.5px; color: var(--rv-muted); }
-        .pf-toggle {
-          padding: 6px 12px; border-radius: 20px;
-          font-size: 11.5px; font-weight: 700;
-          text-transform: uppercase; letter-spacing: 0.08em;
-          background: rgba(43, 165, 103, 0.12);
-          color: var(--rv-good);
-          border: 1px solid rgba(43, 165, 103, 0.28);
-        }
-        .pf-note { margin: 12px 0 0; font-size: 12px; color: var(--rv-muted-2); font-style: italic; }
-        .pf-body { margin: 0 0 16px; font-size: 13.5px; color: var(--rv-muted); line-height: 1.6; }
-        .pf-body strong { color: var(--rv-text); }
+        .pf-body { margin: 0 0 16px; font-size: 13.5px; color: var(--text-muted); line-height: 1.6; }
+        .pf-body strong { color: var(--text); }
         .pf-row { display: flex; }
 
         @media (max-width: 640px) { .pf-dl { grid-template-columns: 1fr; } }

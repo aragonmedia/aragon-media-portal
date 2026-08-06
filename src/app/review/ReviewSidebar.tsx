@@ -1,14 +1,15 @@
 "use client";
 
 /**
- * Reviewer sidebar — mirrors the real /dashboard Sidebar look (icon
- * nav + brand block + profile chip) but locked to the 4 creator-facing
- * routes the TikTok Partner Center reviewer needs to see:
+ * Reviewer sidebar — uses the exact same `.dash-*` classes as the
+ * real /dashboard sidebar so the visual matches 1:1 in both light and
+ * dark modes (styling lives in dashboard.css). Scope is locked to the
+ * four creator-facing routes the TikTok Partner Center reviewer needs:
+ *
  *   Overview · Chat with AM Team · Add TikTok Accounts · Profile & Settings
  *
- * Bottom-left holds a light/dark toggle so reviewers can preview both
- * themes (writes `data-theme` on <html> + persists in localStorage,
- * same key `am_theme` the real portal uses).
+ * Bottom of the foot holds a Day/Night toggle (same `.theme-card`
+ * pattern the real portal's Settings uses).
  */
 
 import Link from "next/link";
@@ -71,40 +72,41 @@ export default function ReviewSidebar({
     <>
       <button
         type="button"
-        className="rv-mobile-toggle"
+        className="dash-mobile-toggle"
         aria-label="Toggle menu"
         onClick={() => setOpen((v) => !v)}
       >
         <span /><span /><span />
       </button>
 
-      <aside className={`rv-side${open ? " open" : ""}`}>
-        <Link href="/review" className="rv-brand" onClick={() => setOpen(false)}>
-          <span className="rv-mark">AM</span>
-          <span className="rv-brand-text">
-            Aragon Media
-            <small>Creator Portal</small>
-          </span>
+      <aside className={`dash-sidebar${open ? " open" : ""}`}>
+        <Link href="/review" className="dash-brand" onClick={() => setOpen(false)}>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/logo-am.svg" alt="" width={32} height={32} />
+          <div>
+            <div className="dash-brand-name">Aragon Media</div>
+            <div className="dash-brand-sub">Creator Portal</div>
+          </div>
         </Link>
 
         <Link
           href="/review/profile"
-          className="rv-profile-chip"
+          className="dash-profile-chip"
           onClick={() => setOpen(false)}
         >
-          <div className="rv-profile-avatar">{initials}</div>
-          <div className="rv-profile-meta">
-            <div className="rv-profile-name">{firstName}</div>
-            <div className="rv-profile-status">
-              <span className="rv-profile-dot" />
+          <div className="dash-profile-avatar">{initials}</div>
+          <div className="dash-profile-meta">
+            <div className="dash-profile-name">{firstName}</div>
+            <div className="dash-profile-status">
+              <span className="dash-profile-dot" />
               Active
             </div>
           </div>
         </Link>
 
-        <nav className="rv-nav" aria-label="Reviewer navigation">
-          <div className="rv-nav-section">
-            <div className="rv-nav-section-label">Dashboard</div>
+        <nav className="dash-nav" aria-label="Reviewer navigation">
+          <div className="dash-nav-section">
+            <div className="dash-nav-section-label">Dashboard</div>
             {NAV.map((item) => {
               const active =
                 item.href === "/review"
@@ -114,248 +116,68 @@ export default function ReviewSidebar({
                 <Link
                   key={item.href}
                   href={item.href}
-                  className={`rv-nav-item${active ? " active" : ""}`}
+                  className={`dash-nav-item${active ? " active" : ""}`}
                   onClick={() => setOpen(false)}
                 >
-                  <span className="rv-nav-icon" aria-hidden>{item.icon}</span>
-                  <span className="rv-nav-label">{item.label}</span>
+                  <span className="dash-nav-icon" aria-hidden>{item.icon}</span>
+                  <span className="dash-nav-label">{item.label}</span>
                 </Link>
               );
             })}
           </div>
         </nav>
 
-        <div className="rv-foot">
-          <div className="rv-theme" role="group" aria-label="Theme">
+        <div className="dash-foot">
+          {/* Day / Night — same .theme-card visual pattern as Settings */}
+          <div className="theme-toggle rv-theme-compact" role="group" aria-label="Theme">
             <button
               type="button"
-              className={`rv-theme-btn${activeTheme === "light" ? " active" : ""}`}
+              className={`theme-card${activeTheme === "light" ? " active" : ""}`}
               onClick={() => pick("light")}
               aria-pressed={activeTheme === "light"}
               aria-label="Light mode"
-              title="Light mode"
             >
-              <SunIcon /><span>Day</span>
+              <SunIcon />
+              <div className="theme-card-label">Day</div>
             </button>
             <button
               type="button"
-              className={`rv-theme-btn${activeTheme === "dark" ? " active" : ""}`}
+              className={`theme-card${activeTheme === "dark" ? " active" : ""}`}
               onClick={() => pick("dark")}
               aria-pressed={activeTheme === "dark"}
               aria-label="Dark mode"
-              title="Dark mode"
             >
-              <MoonIcon /><span>Night</span>
+              <MoonIcon />
+              <div className="theme-card-label">Night</div>
             </button>
           </div>
-          <div className="rv-foot-email" title={userEmail}>{userEmail}</div>
-          <button onClick={signOut} className="rv-logout" aria-label="Sign out">
-            <SignOutIcon />
-            <span>Sign out</span>
-          </button>
+
+          <div className="dash-foot-email" title={userEmail}>{userEmail}</div>
+          <div className="dash-foot-row">
+            <button onClick={signOut} className="dash-logout" aria-label="Sign out">
+              <SignOutIcon /><span>Sign out</span>
+            </button>
+          </div>
         </div>
       </aside>
 
       <div
-        className={`rv-overlay${open ? " visible" : ""}`}
+        className={`dash-overlay${open ? " visible" : ""}`}
         onClick={() => setOpen(false)}
         aria-hidden="true"
       />
 
-      <style jsx>{`
-        .rv-mobile-toggle {
-          display: none;
-          position: fixed;
-          top: 14px; left: 14px;
-          z-index: 60;
-          width: 40px; height: 40px;
-          border-radius: 10px;
-          background: var(--rv-side-bg);
-          border: 1px solid var(--rv-border);
-          flex-direction: column;
-          align-items: center; justify-content: center;
-          gap: 4px; cursor: pointer;
+      <style jsx global>{`
+        /* Compact theme cards inside the sidebar foot — scale down the
+           full-size Settings variant so it fits at the bottom */
+        .rv-theme-compact.theme-toggle { padding: 0 0 10px; gap: 8px; }
+        .rv-theme-compact .theme-card {
+          padding: 10px 8px;
+          gap: 4px;
+          border-radius: 8px;
         }
-        .rv-mobile-toggle span {
-          display: block; width: 18px; height: 2px;
-          background: var(--rv-text); border-radius: 2px;
-        }
-
-        .rv-side {
-          background: var(--rv-side-bg);
-          border-right: 1px solid var(--rv-border);
-          padding: 22px 18px 18px;
-          display: flex; flex-direction: column;
-          gap: 18px;
-          position: sticky; top: 0;
-          height: 100vh; width: 248px;
-          box-sizing: border-box; overflow-y: auto;
-        }
-
-        .rv-brand {
-          display: flex; align-items: center; gap: 12px;
-          text-decoration: none; color: inherit;
-          padding: 4px 6px 12px;
-          border-bottom: 1px solid var(--rv-border);
-        }
-        .rv-mark {
-          display: inline-flex; align-items: center; justify-content: center;
-          width: 38px; height: 38px;
-          background: var(--rv-mark-bg);
-          border: 1px solid var(--rv-gold);
-          border-radius: 9px;
-          color: var(--rv-gold);
-          font-weight: 800; font-size: 15px;
-          letter-spacing: -0.5px;
-        }
-        .rv-brand-text {
-          display: flex; flex-direction: column;
-          font-size: 14px; font-weight: 700;
-          letter-spacing: -0.01em;
-        }
-        .rv-brand-text small {
-          font-size: 10.5px; color: var(--rv-muted);
-          font-weight: 500; letter-spacing: 0.1em;
-          text-transform: uppercase;
-        }
-
-        .rv-profile-chip {
-          display: flex; align-items: center; gap: 12px;
-          padding: 10px 10px;
-          border-radius: 10px;
-          border: 1px solid var(--rv-border);
-          background: var(--rv-chip-bg);
-          text-decoration: none; color: inherit;
-          transition: border-color 120ms ease, background 120ms ease;
-        }
-        .rv-profile-chip:hover {
-          border-color: var(--rv-gold-soft);
-          background: var(--rv-chip-hover);
-        }
-        .rv-profile-avatar {
-          width: 32px; height: 32px; border-radius: 50%;
-          background: var(--rv-mark-bg);
-          border: 1px solid var(--rv-gold);
-          color: var(--rv-gold);
-          font-size: 12px; font-weight: 700;
-          display: inline-flex; align-items: center; justify-content: center;
-        }
-        .rv-profile-meta { display: flex; flex-direction: column; gap: 2px; }
-        .rv-profile-name { font-size: 13.5px; font-weight: 600; color: var(--rv-text); }
-        .rv-profile-status {
-          font-size: 11px; color: var(--rv-good);
-          display: inline-flex; align-items: center; gap: 5px;
-          font-weight: 600;
-        }
-        .rv-profile-dot {
-          width: 6px; height: 6px; border-radius: 50%;
-          background: var(--rv-good);
-        }
-
-        .rv-nav {
-          display: flex; flex-direction: column; gap: 4px;
-          overflow-y: auto; min-height: 0;
-        }
-        .rv-nav-section { display: flex; flex-direction: column; gap: 2px; }
-        .rv-nav-section-label {
-          font-size: 10.5px; letter-spacing: 0.16em;
-          text-transform: uppercase;
-          color: var(--rv-muted);
-          font-weight: 600;
-          padding: 4px 12px 6px;
-        }
-        .rv-nav-item {
-          display: flex; align-items: center; gap: 10px;
-          padding: 9px 12px; border-radius: 8px;
-          font-size: 13.5px; color: var(--rv-muted);
-          text-decoration: none;
-          transition: background 120ms ease, color 120ms ease;
-        }
-        .rv-nav-item:hover {
-          background: var(--rv-nav-hover);
-          color: var(--rv-text);
-        }
-        .rv-nav-item.active {
-          background: rgba(201, 168, 76, 0.1);
-          color: var(--rv-gold);
-          font-weight: 600;
-        }
-        .rv-nav-icon {
-          display: inline-flex; width: 18px; height: 18px;
-          align-items: center; justify-content: center;
-        }
-        .rv-nav-label { flex: 1; }
-
-        .rv-foot {
-          margin-top: auto;
-          display: flex; flex-direction: column; gap: 12px;
-          padding-top: 14px;
-          border-top: 1px solid var(--rv-border);
-        }
-        .rv-theme {
-          display: grid; grid-template-columns: 1fr 1fr;
-          gap: 6px; padding: 4px;
-          border: 1px solid var(--rv-border);
-          border-radius: 10px;
-          background: var(--rv-chip-bg);
-        }
-        .rv-theme-btn {
-          display: flex; align-items: center; justify-content: center;
-          gap: 6px; padding: 7px 10px;
-          font-size: 11.5px; font-weight: 600;
-          border-radius: 7px; border: none;
-          background: transparent;
-          color: var(--rv-muted);
-          font-family: inherit; cursor: pointer;
-          transition: background 120ms ease, color 120ms ease;
-        }
-        .rv-theme-btn:hover { color: var(--rv-text); }
-        .rv-theme-btn.active {
-          background: var(--rv-mark-bg);
-          color: var(--rv-gold);
-        }
-        .rv-theme-btn :global(svg) { width: 14px; height: 14px; }
-
-        .rv-foot-email {
-          font-size: 11.5px; color: var(--rv-muted);
-          padding: 0 4px;
-          overflow: hidden; text-overflow: ellipsis;
-          white-space: nowrap;
-        }
-        .rv-logout {
-          display: inline-flex; align-items: center; justify-content: center;
-          gap: 8px; padding: 9px 12px;
-          font-size: 12.5px; border-radius: 8px;
-          background: transparent;
-          border: 1px solid var(--rv-border);
-          color: var(--rv-text);
-          font-family: inherit; cursor: pointer;
-          transition: border-color 120ms ease, color 120ms ease;
-        }
-        .rv-logout:hover { border-color: var(--rv-gold); color: var(--rv-gold); }
-        .rv-logout :global(svg) { width: 14px; height: 14px; }
-
-        .rv-overlay {
-          position: fixed; inset: 0;
-          background: rgba(0, 0, 0, 0.5);
-          z-index: 40; opacity: 0;
-          pointer-events: none;
-          transition: opacity 200ms ease;
-        }
-        .rv-overlay.visible { opacity: 1; pointer-events: auto; }
-
-        @media (max-width: 900px) {
-          .rv-mobile-toggle { display: flex; }
-          .rv-side {
-            position: fixed; top: 0; left: 0;
-            height: 100vh;
-            transform: translateX(-100%);
-            transition: transform 220ms ease;
-            z-index: 50;
-            box-shadow: 4px 0 24px rgba(0, 0, 0, 0.4);
-          }
-          .rv-side.open { transform: translateX(0); }
-        }
+        .rv-theme-compact .theme-card svg { width: 16px; height: 16px; }
+        .rv-theme-compact .theme-card-label { font-size: 11px; letter-spacing: 0.08em; }
       `}</style>
     </>
   );
