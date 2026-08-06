@@ -155,8 +155,8 @@ async function seedReview() {
 
   const sellerId = await upsertReviewUser({
     email: SELLER_EMAIL,
-    name: "Verdant Wellness — TikTok Review",
-    handle: "verdant.wellness",
+    name: "Aragon Creator — TikTok Review",
+    handle: "aragoncreator.tt",
     isAdmin: false,
     passwordHash,
   });

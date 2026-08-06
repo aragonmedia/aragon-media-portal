@@ -14,22 +14,20 @@ export default function LogoutButton() {
     }
   }
   return (
-    <button className="rv-logout" onClick={signOut} disabled={loading}>
+    <button className="rv-logout-btn" onClick={signOut} disabled={loading}>
       {loading ? "Signing out..." : "Sign out"}
       <style jsx>{`
-        .rv-logout {
+        .rv-logout-btn {
           background: transparent;
-          border: 1px solid #2A2A2A;
-          color: #F5F1E6;
-          font-family: inherit;
-          font-size: 12.5px;
-          padding: 8px 14px;
-          border-radius: 8px;
+          border: 1px solid var(--rv-border);
+          color: var(--rv-text);
+          font-family: inherit; font-size: 12.5px;
+          padding: 8px 14px; border-radius: 8px;
           cursor: pointer;
           transition: border-color 120ms ease, color 120ms ease;
         }
-        .rv-logout:hover:not(:disabled) { border-color: #C9A84C; color: #C9A84C; }
-        .rv-logout:disabled { opacity: 0.6; cursor: not-allowed; }
+        .rv-logout-btn:hover:not(:disabled) { border-color: var(--rv-gold); color: var(--rv-gold); }
+        .rv-logout-btn:disabled { opacity: 0.6; cursor: not-allowed; }
       `}</style>
     </button>
   );

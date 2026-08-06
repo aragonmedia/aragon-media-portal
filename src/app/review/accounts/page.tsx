@@ -1,12 +1,8 @@
 /**
- * /review/accounts — Connected TikTok Shop accounts (demo).
- *
- * Shows the demo user's TikTok Shop connections. In demo mode we render
- * pre-seeded verified accounts. A "Connect another account" button is
- * shown but disabled with a tooltip — real OAuth requires production
- * Partner Center credentials.
+ * /review/accounts — "Add TikTok Accounts" (creator POV).
  */
 
+import Link from "next/link";
 import { asc, eq } from "drizzle-orm";
 import { db } from "@/db";
 import { accounts } from "@/db/schema";
@@ -33,182 +29,184 @@ export default async function AccountsPage() {
     .orderBy(asc(accounts.createdAt));
 
   return (
-    <div className="rv-accts">
-      <header className="rv-accts-head">
+    <div className="ac-wrap">
+      <header className="ac-head">
         <div>
-          <p className="rv-eyebrow">TikTok Shop</p>
-          <h1>Connected Accounts</h1>
-          <p className="rv-sub">
-            Accounts linked to your Aragon Media profile. Each connection
-            authorizes the TikTok Shop Analytics API via TikTok Partner Center OAuth.
+          <p className="ac-eyebrow">TikTok Shop</p>
+          <h1>Add TikTok Accounts</h1>
+          <p className="ac-sub">
+            Link a TikTok account to your Aragon Media profile. Each
+            connection authorizes the TikTok Shop Analytics API via
+            TikTok Partner Center OAuth so your GMV + creator commission
+            flow into <Link href="/review">Overview</Link> automatically.
           </p>
         </div>
-        <button className="rv-connect" disabled title="Available after TikTok Partner Center production approval">
-          + Connect another
+        <button className="ac-cta" disabled title="Available after TikTok Partner Center production approval">
+          + Add another account
         </button>
       </header>
 
       {rows.length === 0 ? (
-        <div className="rv-empty">
-          <p>No TikTok accounts linked yet.</p>
-          <p className="rv-empty-hint">Run the seed script to populate a demo account.</p>
+        <div className="ac-empty">
+          <div className="ac-empty-icon" aria-hidden>+</div>
+          <p className="ac-empty-title">No TikTok accounts linked yet</p>
+          <p className="ac-empty-sub">
+            Once you add an account, its GMV, orders, and videos will
+            appear on your Overview within minutes.
+          </p>
         </div>
       ) : (
-        <ul className="rv-acct-list">
+        <ul className="ac-list">
           {rows.map((a) => (
-            <li key={a.id} className={`rv-acct rv-acct-${a.status}`}>
-              <div className="rv-acct-mark" aria-hidden="true">
-                <span>@</span>
-              </div>
-              <div className="rv-acct-body">
-                <p className="rv-acct-handle">@{a.tiktokHandle}</p>
-                <p className="rv-acct-meta">
-                  <span className="rv-acct-status">{STATUS_LABEL[a.status] ?? a.status}</span>
+            <li key={a.id} className={`ac-item ac-item-${a.status}`}>
+              <div className="ac-mark" aria-hidden="true">@</div>
+              <div className="ac-body">
+                <p className="ac-handle">@{a.tiktokHandle}</p>
+                <p className="ac-meta">
+                  <span className="ac-status">{STATUS_LABEL[a.status] ?? a.status}</span>
                   <span>·</span>
                   <span>
-                    Connected {new Date(a.verifiedAt || a.createdAt).toLocaleDateString("en-US", {
-                      month: "short",
-                      day: "numeric",
-                      year: "numeric",
+                    Connected{" "}
+                    {new Date(a.verifiedAt || a.createdAt).toLocaleDateString("en-US", {
+                      month: "short", day: "numeric", year: "numeric",
                     })}
                   </span>
-                  <span>·</span>
-                  <span>Cycle #{a.cycleNumber}, position {a.cyclePosition}</span>
                 </p>
-                {a.notes && <p className="rv-acct-notes">{a.notes}</p>}
+                {a.notes && <p className="ac-notes">{a.notes}</p>}
+              </div>
+              <div className="ac-right">
+                <span className="ac-pill">TikTok Shop</span>
               </div>
             </li>
           ))}
         </ul>
       )}
 
-      <div className="rv-oauth-info">
-        <p className="rv-eyebrow">OAuth integration</p>
+      <section className="ac-info">
         <p>
-          Aragon Media uses TikTok Partner Center OAuth 2.0 to link Shop accounts:
-          creators authorize <code>shop.analytics.read</code> and{" "}
-          <code>shop.products.read</code>, and the portal never sees passwords or
-          long-lived credentials — only refresh tokens scoped to the granted permissions.
+          <strong>How the OAuth handshake works.</strong> When you click
+          <em> Add another account</em>, we redirect you to TikTok Shop
+          Partner Center to authorize Aragon Media. TikTok returns a
+          scoped token that lets us call{" "}
+          <code>/analytics/v1/shop/performance</code> and{" "}
+          <code>/analytics/v1/products/performance</code> for that shop.
+          Tokens are stored encrypted per-account and revocable from this
+          page at any time.
         </p>
-      </div>
+      </section>
 
       <style>{`
-        .rv-accts { display: flex; flex-direction: column; gap: 22px; max-width: 900px; }
-        .rv-accts-head {
-          display: flex;
-          justify-content: space-between;
-          align-items: flex-end;
-          gap: 20px;
-        }
-        .rv-eyebrow {
+        .ac-wrap { display: flex; flex-direction: column; gap: 18px; max-width: 1180px; }
+        .ac-head { display: flex; justify-content: space-between; align-items: flex-end; gap: 18px; flex-wrap: wrap; }
+        .ac-eyebrow {
           margin: 0 0 6px;
-          font-size: 11px;
-          letter-spacing: 0.18em;
+          font-size: 11px; letter-spacing: 0.18em;
           text-transform: uppercase;
-          color: #C9A84C;
-          font-weight: 700;
+          color: var(--rv-gold); font-weight: 700;
         }
-        .rv-accts h1 {
+        .ac-head h1 {
           margin: 0;
-          font-size: 26px;
-          font-weight: 700;
+          font-size: 30px; font-weight: 700;
           letter-spacing: -0.02em;
+          color: var(--rv-text);
         }
-        .rv-sub { margin: 6px 0 0; font-size: 13px; color: #9A9590; max-width: 620px; }
-        .rv-connect {
-          background: transparent;
-          border: 1px solid #2A2A2A;
-          color: #9A9590;
-          font-family: inherit;
-          font-size: 12.5px;
-          padding: 9px 16px;
-          border-radius: 8px;
-          cursor: not-allowed;
+        .ac-sub {
+          margin: 8px 0 0;
+          font-size: 13px; color: var(--rv-muted);
+          max-width: 640px; line-height: 1.55;
         }
-        .rv-empty {
-          background: #141414;
-          border: 1px dashed #2A2A2A;
-          border-radius: 12px;
-          padding: 32px;
-          text-align: center;
-          color: #9A9590;
+        .ac-sub a { color: var(--rv-gold); text-decoration: none; border-bottom: 1px dashed var(--rv-gold-soft); }
+
+        .ac-cta {
+          background: var(--rv-gold);
+          border: 1px solid var(--rv-gold);
+          color: #0B0B0B;
+          font: inherit; font-size: 13px; font-weight: 700;
+          padding: 10px 18px; border-radius: 10px;
+          cursor: not-allowed; opacity: 0.75;
         }
-        .rv-empty-hint { font-size: 12.5px; color: #6B6660; margin-top: 4px; }
-        .rv-acct-list { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 12px; }
-        .rv-acct {
-          display: grid;
-          grid-template-columns: 52px 1fr;
+
+        .ac-empty {
+          background: var(--rv-card-bg);
+          border: 1px dashed var(--rv-border);
+          border-radius: 14px;
+          padding: 40px 24px;
+          text-align: center; color: var(--rv-muted);
+          box-shadow: var(--rv-shadow);
+        }
+        .ac-empty-icon { font-size: 32px; color: var(--rv-gold); font-weight: 300; margin-bottom: 6px; }
+        .ac-empty-title { margin: 0 0 4px; color: var(--rv-text); font-weight: 600; }
+        .ac-empty-sub { margin: 0; font-size: 13px; }
+
+        .ac-list { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 12px; }
+        .ac-item {
+          display: grid; grid-template-columns: 52px 1fr auto;
           gap: 16px;
-          background: #141414;
-          border: 1px solid #1F1F1F;
-          border-radius: 12px;
+          background: var(--rv-card-bg);
+          border: 1px solid var(--rv-border);
+          border-radius: 14px;
           padding: 16px 18px;
           align-items: center;
+          box-shadow: var(--rv-shadow);
         }
-        .rv-acct-mark {
-          width: 52px;
-          height: 52px;
-          border-radius: 12px;
-          background: #0B0B0B;
-          border: 1px solid #C9A84C;
-          color: #C9A84C;
-          font-size: 22px;
-          font-weight: 700;
-          display: flex;
-          align-items: center;
-          justify-content: center;
+        .ac-mark {
+          width: 52px; height: 52px; border-radius: 12px;
+          background: var(--rv-mark-bg);
+          border: 1px solid var(--rv-gold);
+          color: var(--rv-gold);
+          font-size: 22px; font-weight: 700;
+          display: flex; align-items: center; justify-content: center;
         }
-        .rv-acct-handle {
-          margin: 0;
-          font-size: 15px;
-          font-weight: 700;
-          color: #F5F1E6;
-        }
-        .rv-acct-meta {
+        .ac-handle { margin: 0; font-size: 15px; font-weight: 700; color: var(--rv-text); }
+        .ac-meta {
           margin: 4px 0 0;
-          font-size: 12.5px;
-          color: #9A9590;
-          display: flex;
-          gap: 8px;
-          flex-wrap: wrap;
+          font-size: 12.5px; color: var(--rv-muted);
+          display: flex; gap: 8px; flex-wrap: wrap;
         }
-        .rv-acct-status {
-          color: #2BA567;
-          font-weight: 600;
-          text-transform: uppercase;
-          letter-spacing: 0.08em;
+        .ac-status {
+          color: var(--rv-good); font-weight: 700;
+          text-transform: uppercase; letter-spacing: 0.08em;
           font-size: 11px;
         }
-        .rv-acct-verified .rv-acct-status,
-        .rv-acct-active .rv-acct-status { color: #2BA567; }
-        .rv-acct-pending .rv-acct-status,
-        .rv-acct-two_factor_pending .rv-acct-status { color: #C9A84C; }
-        .rv-acct-notes {
+        .ac-item-pending .ac-status,
+        .ac-item-two_factor_pending .ac-status { color: var(--rv-gold); }
+        .ac-notes {
           margin: 8px 0 0;
-          font-size: 12.5px;
-          color: #9A9590;
+          font-size: 12.5px; color: var(--rv-muted);
           font-style: italic;
         }
-        .rv-oauth-info {
-          background: rgba(201, 168, 76, 0.05);
-          border: 1px solid rgba(201, 168, 76, 0.18);
-          border-radius: 12px;
-          padding: 18px 20px;
-          font-size: 13px;
-          color: #9A9590;
+        .ac-pill {
+          font-size: 10.5px;
+          color: var(--rv-gold);
+          background: var(--rv-preview);
+          border: 1px solid var(--rv-gold-soft);
+          padding: 5px 10px; border-radius: 999px;
+          letter-spacing: 0.1em; text-transform: uppercase;
+          font-weight: 700;
+        }
+
+        .ac-info {
+          background: var(--rv-preview);
+          border: 1px solid var(--rv-gold-soft);
+          border-radius: 14px;
+          padding: 18px 22px;
+          font-size: 13px; color: var(--rv-muted);
           line-height: 1.65;
         }
-        .rv-oauth-info code {
-          font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+        .ac-info strong { color: var(--rv-text); }
+        .ac-info em { color: var(--rv-text); font-style: normal; font-weight: 600; }
+        .ac-info code {
+          font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
           font-size: 12.5px;
-          color: #C9A84C;
+          color: var(--rv-gold);
           background: rgba(201, 168, 76, 0.08);
-          padding: 1px 6px;
-          border-radius: 4px;
+          padding: 1px 6px; border-radius: 4px;
         }
 
         @media (max-width: 900px) {
-          .rv-accts-head { flex-direction: column; align-items: flex-start; }
+          .ac-head { flex-direction: column; align-items: flex-start; }
+          .ac-item { grid-template-columns: 44px 1fr; }
+          .ac-item .ac-right { grid-column: 1 / -1; }
         }
       `}</style>
     </div>

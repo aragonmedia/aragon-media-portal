@@ -1,11 +1,7 @@
 /**
- * /review/chat — AM Team ↔ creator chat, read-only send in demo mode.
- *
- * Reads from the existing chats + messages tables so reviewers see the
- * real production chat UX. The seed script populates one thread with a
- * short back-and-forth. Sending new messages IS allowed (writes are
- * safe — nothing external triggers). Attachments are demo-blocked by
- * middleware since they'd hit Vercel Blob.
+ * /review/chat — Direct line between the creator and the Aragon Media
+ * team. Read-only in demo mode (writes safe — nothing external fires).
+ * Attachments blocked via middleware since they'd hit Vercel Blob.
  */
 
 import { asc, eq } from "drizzle-orm";
@@ -19,7 +15,6 @@ export const dynamic = "force-dynamic";
 export default async function ChatPage() {
   const user = (await getCurrentReviewer())!;
 
-  // Grab the newest thread for this reviewer.
   const threads = await db
     .select()
     .from(chats)
@@ -31,12 +26,12 @@ export default async function ChatPage() {
 
   if (!thread) {
     return (
-      <div className="rv-chat-empty">
-        <h1>Chat with the AM team</h1>
+      <div className="ch-empty">
+        <h1>Chat with the AM Team</h1>
         <p>No thread yet. Once the seed script runs, a welcome thread will appear here.</p>
         <style>{`
-          .rv-chat-empty { padding: 24px; color: #9A9590; }
-          .rv-chat-empty h1 { color: #F5F1E6; margin: 0 0 8px; }
+          .ch-empty { padding: 24px; color: var(--rv-muted); }
+          .ch-empty h1 { color: var(--rv-text); margin: 0 0 8px; }
         `}</style>
       </div>
     );
@@ -49,13 +44,14 @@ export default async function ChatPage() {
     .orderBy(asc(messages.createdAt));
 
   return (
-    <div className="rv-chat-page">
-      <header className="rv-chat-head">
-        <p className="rv-chat-eyebrow">Direct line</p>
-        <h1>{thread.subject || "Chat with the AM team"}</h1>
-        <p className="rv-chat-sub">
-          Replies are answered by an Aragon Media operator within
-          business hours. Attachments are disabled in demo mode.
+    <div className="ch-wrap">
+      <header className="ch-head">
+        <p className="ch-eyebrow">Direct line</p>
+        <h1>{thread.subject || "Chat with the AM Team"}</h1>
+        <p className="ch-sub">
+          A creator&apos;s direct line to their Aragon Media operator.
+          Replies land in your inbox within business hours. Attachments
+          are disabled in preview mode.
         </p>
       </header>
 
@@ -70,27 +66,11 @@ export default async function ChatPage() {
       />
 
       <style>{`
-        .rv-chat-page { display: flex; flex-direction: column; gap: 18px; max-width: 820px; }
-        .rv-chat-head { display: flex; flex-direction: column; gap: 4px; }
-        .rv-chat-eyebrow {
-          margin: 0;
-          font-size: 11px;
-          letter-spacing: 0.18em;
-          text-transform: uppercase;
-          color: #C9A84C;
-          font-weight: 700;
-        }
-        .rv-chat-head h1 {
-          margin: 0;
-          font-size: 26px;
-          font-weight: 700;
-          letter-spacing: -0.02em;
-        }
-        .rv-chat-sub {
-          margin: 0;
-          font-size: 13px;
-          color: #9A9590;
-        }
+        .ch-wrap { display: flex; flex-direction: column; gap: 18px; max-width: 820px; }
+        .ch-head { display: flex; flex-direction: column; gap: 4px; }
+        .ch-eyebrow { margin: 0; font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--rv-gold); font-weight: 700; }
+        .ch-head h1 { margin: 0; font-size: 26px; font-weight: 700; letter-spacing: -0.02em; color: var(--rv-text); }
+        .ch-sub { margin: 0; font-size: 13px; color: var(--rv-muted); line-height: 1.55; }
       `}</style>
     </div>
   );
