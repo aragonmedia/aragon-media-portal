@@ -1,6 +1,6 @@
 /**
  * /review/accounts — "Add TikTok Accounts" (creator POV).
- * Uses the same theme tokens as the real dashboard (via dashboard.css).
+ * Creators can add + disconnect their own accounts inline.
  */
 
 import Link from "next/link";
@@ -9,6 +9,7 @@ import { db } from "@/db";
 import { accounts } from "@/db/schema";
 import { getCurrentReviewer } from "@/lib/auth/review-session";
 import AddAccountButton from "./AddAccountButton";
+import RemoveAccountButton from "./RemoveAccountButton";
 
 export const dynamic = "force-dynamic";
 
@@ -79,6 +80,7 @@ export default async function AccountsPage() {
               </div>
               <div className="ac-right">
                 <span className="ac-pill">TikTok Shop</span>
+                <RemoveAccountButton id={a.id} handle={a.tiktokHandle} />
               </div>
             </li>
           ))}
@@ -170,6 +172,11 @@ export default async function AccountsPage() {
           font-size: 12.5px; color: var(--text-muted);
           font-style: italic;
         }
+        .ac-right {
+          display: flex; align-items: center; gap: 10px;
+          flex-wrap: wrap;
+          justify-content: flex-end;
+        }
         .ac-pill {
           font-size: 10.5px;
           color: var(--gold);
@@ -201,7 +208,7 @@ export default async function AccountsPage() {
         @media (max-width: 900px) {
           .ac-head { flex-direction: column; align-items: flex-start; }
           .ac-item { grid-template-columns: 44px 1fr; }
-          .ac-item .ac-right { grid-column: 1 / -1; }
+          .ac-item .ac-right { grid-column: 1 / -1; justify-content: flex-start; }
         }
       `}</style>
     </div>

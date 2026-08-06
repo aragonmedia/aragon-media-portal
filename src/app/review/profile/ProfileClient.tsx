@@ -32,42 +32,68 @@ const PREF_META: Record<
   },
 };
 
-function loadPrefs(): Record<PrefKey, boolean> {
-  const out = {} as Record<PrefKey, boolean>;
+type Prefs = Record<PrefKey, boolean>;
+function defaultPrefs(): Prefs {
+  const out = {} as Prefs;
+  for (const k of PREF_KEYS) out[k] = PREF_META[k].defaultOn;
+  return out;
+}
+function loadPrefs(): Prefs {
+  const out = defaultPrefs();
+  if (typeof window === "undefined") return out;
   for (const k of PREF_KEYS) {
-    let v = PREF_META[k].defaultOn;
-    if (typeof window !== "undefined") {
-      const raw = localStorage.getItem(`am_pref_${k}`);
-      if (raw === "on") v = true;
-      else if (raw === "off") v = false;
-    }
-    out[k] = v;
+    const raw = localStorage.getItem(`am_pref_${k}`);
+    if (raw === "on") out[k] = true;
+    else if (raw === "off") out[k] = false;
   }
   return out;
 }
+function equalPrefs(a: Prefs, b: Prefs) {
+  return PREF_KEYS.every((k) => a[k] === b[k]);
+}
 
 export default function ProfileClient({ handle, extraHandles }: ProfileClientProps) {
-  const [prefs, setPrefs] = useState<Record<PrefKey, boolean>>(() => {
-    const out = {} as Record<PrefKey, boolean>;
-    for (const k of PREF_KEYS) out[k] = PREF_META[k].defaultOn;
-    return out;
-  });
+  // saved = what's persisted; draft = what's in the UI right now
+  const [saved, setSaved] = useState<Prefs>(defaultPrefs());
+  const [draft, setDraft] = useState<Prefs>(defaultPrefs());
+  const [saving, setSaving] = useState(false);
+  const [savedFlash, setSavedFlash] = useState(false);
 
   useEffect(() => {
-    setPrefs(loadPrefs());
+    const p = loadPrefs();
+    setSaved(p);
+    setDraft(p);
   }, []);
 
+  const dirty = !equalPrefs(saved, draft);
+
   function toggle(k: PrefKey) {
-    setPrefs((prev) => {
-      const next = { ...prev, [k]: !prev[k] };
-      try { localStorage.setItem(`am_pref_${k}`, next[k] ? "on" : "off"); } catch {}
-      return next;
-    });
+    setDraft((d) => ({ ...d, [k]: !d[k] }));
+  }
+
+  async function save() {
+    setSaving(true);
+    try {
+      for (const k of PREF_KEYS) {
+        localStorage.setItem(`am_pref_${k}`, draft[k] ? "on" : "off");
+      }
+      // Simulate a short network write so the button state feels real.
+      await new Promise((r) => setTimeout(r, 400));
+      setSaved({ ...draft });
+      setSavedFlash(true);
+      setTimeout(() => setSavedFlash(false), 1800);
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  function revert() {
+    setDraft({ ...saved });
   }
 
   return (
     <>
-      {/* TikTok handles row */}
+      {/* TikTok handles */}
       <section className="pf-handles-card">
         <div className="pf-handles-head">
           <h2>TikTok Handles</h2>
@@ -105,9 +131,15 @@ export default function ProfileClient({ handle, extraHandles }: ProfileClientPro
         </ul>
       </section>
 
-      {/* Notification toggles */}
+      {/* Notifications */}
       <section className="pf-card">
-        <h2>Notifications</h2>
+        <div className="pf-notif-head">
+          <h2>Notifications</h2>
+          <div className="pf-notif-status">
+            {savedFlash && <span className="pf-flash">✓ Saved</span>}
+            {!savedFlash && dirty && <span className="pf-dirty">Unsaved changes</span>}
+          </div>
+        </div>
         {PREF_KEYS.map((k) => (
           <div key={k} className="pf-setting">
             <div>
@@ -117,16 +149,35 @@ export default function ProfileClient({ handle, extraHandles }: ProfileClientPro
             <button
               type="button"
               role="switch"
-              aria-checked={prefs[k]}
+              aria-checked={draft[k]}
               onClick={() => toggle(k)}
-              className={`pf-switch${prefs[k] ? " on" : ""}`}
+              className={`pf-switch${draft[k] ? " on" : ""}`}
             >
               <span className="pf-switch-track" />
               <span className="pf-switch-thumb" />
-              <span className="pf-switch-label">{prefs[k] ? "On" : "Off"}</span>
+              <span className="pf-switch-label">{draft[k] ? "On" : "Off"}</span>
             </button>
           </div>
         ))}
+        <div className="pf-notif-actions">
+          <button
+            type="button"
+            className="pf-revert"
+            onClick={revert}
+            disabled={!dirty || saving}
+          >
+            Reset
+          </button>
+          <button
+            type="button"
+            className="pf-save"
+            onClick={save}
+            disabled={!dirty || saving}
+            aria-busy={saving}
+          >
+            {saving ? "Saving…" : "Save changes"}
+          </button>
+        </div>
       </section>
 
       <style jsx>{`
@@ -206,12 +257,35 @@ export default function ProfileClient({ handle, extraHandles }: ProfileClientPro
         }
         .pf-handle-empty a { color: var(--gold); text-decoration: none; margin-left: 4px; }
 
-        .pf-card h2 {
-          margin: 0 0 14px;
+        /* Notifications */
+        .pf-notif-head {
+          display: flex; justify-content: space-between; align-items: center;
+          margin: 0 0 14px; gap: 12px;
+        }
+        .pf-notif-head h2 {
+          margin: 0;
           font-size: 12px; font-weight: 700;
           letter-spacing: 0.16em; text-transform: uppercase;
           color: var(--gold);
         }
+        .pf-notif-status { display: inline-flex; align-items: center; }
+        .pf-dirty {
+          font-size: 11.5px; font-weight: 700;
+          color: var(--gold);
+          background: rgba(201, 168, 76, 0.08);
+          border: 1px solid rgba(201, 168, 76, 0.28);
+          padding: 4px 10px; border-radius: 999px;
+          letter-spacing: 0.06em;
+        }
+        .pf-flash {
+          font-size: 11.5px; font-weight: 700;
+          color: var(--green);
+          background: rgba(43, 165, 103, 0.1);
+          border: 1px solid rgba(43, 165, 103, 0.32);
+          padding: 4px 10px; border-radius: 999px;
+          letter-spacing: 0.06em;
+        }
+
         .pf-setting {
           display: flex; justify-content: space-between; align-items: center;
           gap: 20px; padding: 14px 0;
@@ -261,6 +335,40 @@ export default function ProfileClient({ handle, extraHandles }: ProfileClientPro
         .pf-switch.on .pf-switch-thumb { left: calc(100% - 21px - 3px); background: #FFFFFF; }
         .pf-switch.on { color: var(--green); }
         .pf-switch-label { min-width: 26px; text-align: left; }
+
+        .pf-notif-actions {
+          display: flex; gap: 10px; justify-content: flex-end;
+          padding-top: 16px;
+          border-top: 1px solid var(--border-soft);
+          margin-top: 4px;
+        }
+        .pf-revert, .pf-save {
+          font: inherit;
+          font-size: 12.5px;
+          font-weight: 700;
+          padding: 9px 16px;
+          border-radius: 8px;
+          cursor: pointer;
+          transition: transform 120ms ease, box-shadow 120ms ease, border-color 120ms ease, color 120ms ease;
+        }
+        .pf-revert {
+          background: transparent;
+          border: 1px solid var(--border);
+          color: var(--text-muted);
+        }
+        .pf-revert:hover:not(:disabled) { border-color: var(--gold); color: var(--gold); }
+        .pf-revert:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        .pf-save {
+          background: var(--gold);
+          border: 1px solid var(--gold);
+          color: #0B0B0B;
+        }
+        .pf-save:hover:not(:disabled) {
+          transform: translateY(-1px);
+          box-shadow: 0 6px 18px -8px rgba(201, 168, 76, 0.6);
+        }
+        .pf-save:disabled { opacity: 0.55; cursor: not-allowed; transform: none; box-shadow: none; }
       `}</style>
     </>
   );

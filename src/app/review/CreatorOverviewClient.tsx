@@ -6,6 +6,15 @@ import { useMemo, useRef, useState } from "react";
 type Range = "7d" | "28d" | "lifetime";
 type StatKey = "gmv" | "comm" | "orders" | "videos";
 
+type LinkedAccount = { id: string; handle: string; status: string };
+
+// Deterministic per-account mock series — seed derives from handle so
+// each account gets a stable but distinct earnings curve.
+function seedFromHandle(h: string) {
+  let s = 0;
+  for (let i = 0; i < h.length; i++) s = (s * 31 + h.charCodeAt(i)) % 10007;
+  return 1.1 + (s % 400) / 100; // 1.1 .. 5.1
+}
 function genSeries(seed: number, len: number, base: number, variance: number) {
   const out: number[] = [];
   for (let i = 0; i < len; i++) {
@@ -17,13 +26,34 @@ function genSeries(seed: number, len: number, base: number, variance: number) {
   }
   return out;
 }
-
-const SERIES = {
-  gmv: genSeries(2.1, 28, 1200, 380),
-  comm: genSeries(2.2, 28, 960, 280),
-  orders: genSeries(2.3, 28, 22, 8),
-  videos: genSeries(2.4, 28, 5, 2),
-};
+function accountSeries(handle: string, len: number) {
+  const s = seedFromHandle(handle);
+  const scale = 0.65 + (s % 1) * 0.55; // 0.65 .. 1.2 relative size
+  return {
+    gmv: genSeries(s, len, 900 * scale, 260 * scale),
+    comm: genSeries(s + 0.3, len, 720 * scale, 200 * scale),
+    orders: genSeries(s + 0.5, len, 16 * scale, 6 * scale),
+    videos: genSeries(s + 0.7, len, 3 * scale, 1.4 * scale),
+  };
+}
+function sumSeries(all: ReturnType<typeof accountSeries>[]) {
+  const len = all[0]?.gmv.length ?? 0;
+  const out = {
+    gmv: new Array<number>(len).fill(0),
+    comm: new Array<number>(len).fill(0),
+    orders: new Array<number>(len).fill(0),
+    videos: new Array<number>(len).fill(0),
+  };
+  for (const s of all) {
+    for (let i = 0; i < len; i++) {
+      out.gmv[i] += s.gmv[i];
+      out.comm[i] += s.comm[i];
+      out.orders[i] += s.orders[i];
+      out.videos[i] += s.videos[i];
+    }
+  }
+  return out;
+}
 
 const STAT_LABEL: Record<StatKey, string> = {
   gmv: "Total GMV",
@@ -33,30 +63,31 @@ const STAT_LABEL: Record<StatKey, string> = {
 };
 
 function money(n: number) {
-  return n.toLocaleString("en-US", {
-    style: "currency",
-    currency: "USD",
-    maximumFractionDigits: 0,
-  });
+  return n.toLocaleString("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 0 });
 }
 
-export default function CreatorOverviewClient() {
+export default function CreatorOverviewClient({ accounts }: { accounts: LinkedAccount[] }) {
   const [range, setRange] = useState<Range>("28d");
   const [statFocus, setStatFocus] = useState<StatKey>("gmv");
+  const [view, setView] = useState<string>("all"); // "all" or a handle
   const [hoverIdx, setHoverIdx] = useState<number | null>(null);
   const svgRef = useRef<SVGSVGElement>(null);
 
-  const series = useMemo(() => {
-    if (range === "7d") {
-      return {
-        gmv: SERIES.gmv.slice(-7),
-        comm: SERIES.comm.slice(-7),
-        orders: SERIES.orders.slice(-7),
-        videos: SERIES.videos.slice(-7),
-      };
-    }
-    return SERIES;
-  }, [range]);
+  const LEN = range === "7d" ? 7 : 28;
+
+  // Per-account series (map handle → series) and the combined "all"
+  const perAccount = useMemo(() => {
+    const map: Record<string, ReturnType<typeof accountSeries>> = {};
+    for (const a of accounts) map[a.handle] = accountSeries(a.handle, LEN);
+    return map;
+  }, [accounts, LEN]);
+
+  const allSeries = useMemo(
+    () => sumSeries(Object.values(perAccount).length ? Object.values(perAccount) : [accountSeries("empty", LEN)]),
+    [perAccount, LEN]
+  );
+
+  const series = view === "all" ? allSeries : perAccount[view] ?? allSeries;
 
   const totals = useMemo(
     () => ({
@@ -119,6 +150,22 @@ export default function CreatorOverviewClient() {
   }
   function handleLeave() { setHoverIdx(null); }
 
+  // Per-account earnings breakdown (below chart)
+  const breakdownRows = useMemo(() => {
+    return accounts.map((a) => {
+      const s = perAccount[a.handle];
+      const gmv = s.gmv.reduce((x, v) => x + v, 0);
+      const comm = s.comm.reduce((x, v) => x + v, 0);
+      const orders = s.orders.reduce((x, v) => x + v, 0);
+      const videos = s.videos.reduce((x, v) => x + v, 0);
+      return { ...a, gmv, comm, orders, videos };
+    });
+  }, [accounts, perAccount]);
+
+  const viewLabel = view === "all"
+    ? "All accounts"
+    : `@${view}`;
+
   return (
     <div className="ov-wrap">
       <header className="ov-head">
@@ -143,8 +190,16 @@ export default function CreatorOverviewClient() {
         </div>
         <div className="ov-view-row">
           <label className="ov-view-label" htmlFor="ov-view">View</label>
-          <select id="ov-view" className="ov-select" defaultValue="all">
+          <select
+            id="ov-view"
+            className="ov-select"
+            value={view}
+            onChange={(e) => setView(e.target.value)}
+          >
             <option value="all">All accounts (combined)</option>
+            {accounts.map((a) => (
+              <option key={a.id} value={a.handle}>@{a.handle}</option>
+            ))}
           </select>
           <Link href="/review/accounts" className="ov-connect-cta">
             <span aria-hidden>+</span> Add TikTok account
@@ -214,7 +269,7 @@ export default function CreatorOverviewClient() {
       <section className="ov-card">
         <div className="ov-card-head">
           <h2>
-            All Accounts &middot;{" "}
+            {viewLabel} &middot;{" "}
             {range === "7d" ? "Last 7 Days" : range === "28d" ? "Last 28 Days" : "Lifetime"}{" "}
             &middot; {STAT_LABEL[statFocus]}
           </h2>
@@ -328,6 +383,62 @@ export default function CreatorOverviewClient() {
         </div>
       </section>
 
+      {/* Per-account earnings breakdown */}
+      <section className="ov-card">
+        <div className="ov-card-head">
+          <h2>Per-Account Earnings</h2>
+          <span className="ov-hint" style={{ margin: 0 }}>
+            {range === "7d" ? "Last 7 Days" : range === "28d" ? "Last 28 Days" : "Lifetime"}
+          </span>
+        </div>
+        {breakdownRows.length === 0 ? (
+          <div className="ov-empty">
+            <p>No TikTok accounts linked yet.</p>
+            <Link href="/review/accounts" className="ov-connect-cta">
+              <span aria-hidden>+</span> Add your first account
+            </Link>
+          </div>
+        ) : (
+          <div className="ov-breakdown">
+            <div className="ov-breakdown-head">
+              <span>Account</span>
+              <span>GMV</span>
+              <span>Commission</span>
+              <span>Orders</span>
+              <span>Videos</span>
+            </div>
+            {breakdownRows.map((row) => {
+              const shareOfCommission = totals.comm > 0
+                ? Math.round((row.comm / totals.comm) * 100)
+                : 0;
+              return (
+                <button
+                  type="button"
+                  key={row.id}
+                  className={`ov-breakdown-row${view === row.handle ? " focused" : ""}`}
+                  onClick={() => setView(view === row.handle ? "all" : row.handle)}
+                  aria-pressed={view === row.handle}
+                >
+                  <div className="ov-breakdown-acc">
+                    <span className="ov-breakdown-mark">@</span>
+                    <div>
+                      <p className="ov-breakdown-handle">@{row.handle}</p>
+                      <p className="ov-breakdown-share">
+                        {shareOfCommission}% of your commission
+                      </p>
+                    </div>
+                  </div>
+                  <span className="ov-breakdown-cell gold">{money(row.gmv)}</span>
+                  <span className="ov-breakdown-cell green">{money(row.comm)}</span>
+                  <span className="ov-breakdown-cell">{row.orders.toLocaleString()}</span>
+                  <span className="ov-breakdown-cell">{row.videos.toLocaleString()}</span>
+                </button>
+              );
+            })}
+          </div>
+        )}
+      </section>
+
       <style jsx>{`
         .ov-wrap { display: flex; flex-direction: column; gap: 22px; max-width: 1180px; }
         .ov-head { display: flex; justify-content: space-between; align-items: flex-end; gap: 18px; }
@@ -438,9 +549,7 @@ export default function CreatorOverviewClient() {
           font-size: 12px; color: var(--text-sub);
         }
 
-        .ov-stat-grid {
-          display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px;
-        }
+        .ov-stat-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; }
         .ov-stat {
           text-align: left;
           background: var(--bg-deep);
@@ -519,11 +628,79 @@ export default function CreatorOverviewClient() {
         .ov-tip-dot.gold { background: var(--gold); }
         .ov-tip-dot.green { background: var(--green); }
 
+        /* Per-account breakdown table */
+        .ov-empty {
+          padding: 24px;
+          text-align: center;
+          background: var(--bg-deep);
+          border: 1px dashed var(--border-soft);
+          border-radius: 12px;
+          color: var(--text-muted);
+          display: flex; flex-direction: column; gap: 12px; align-items: center;
+        }
+        .ov-empty p { margin: 0; font-size: 13px; }
+
+        .ov-breakdown { display: flex; flex-direction: column; gap: 8px; }
+        .ov-breakdown-head {
+          display: grid;
+          grid-template-columns: minmax(200px, 2fr) 1fr 1fr 100px 100px;
+          gap: 12px;
+          padding: 0 14px 6px;
+          font-size: 10.5px;
+          letter-spacing: 0.14em;
+          text-transform: uppercase;
+          color: var(--text-sub);
+          font-weight: 700;
+        }
+        .ov-breakdown-row {
+          display: grid;
+          grid-template-columns: minmax(200px, 2fr) 1fr 1fr 100px 100px;
+          gap: 12px;
+          align-items: center;
+          padding: 12px 14px;
+          background: var(--bg-deep);
+          border: 1px solid var(--border-soft);
+          border-radius: 10px;
+          text-align: left;
+          font-family: inherit;
+          color: var(--text);
+          cursor: pointer;
+          transition: border-color 120ms ease, background 120ms ease, transform 120ms ease;
+        }
+        .ov-breakdown-row:hover { border-color: rgba(201, 168, 76, 0.4); transform: translateY(-1px); }
+        .ov-breakdown-row.focused { border-color: var(--gold); background: var(--bg-grad); }
+        .ov-breakdown-acc { display: flex; align-items: center; gap: 10px; min-width: 0; }
+        .ov-breakdown-mark {
+          width: 32px; height: 32px; border-radius: 8px;
+          background: var(--bg);
+          border: 1px solid var(--gold);
+          color: var(--gold);
+          display: inline-flex; align-items: center; justify-content: center;
+          font-weight: 700; font-size: 14px;
+          flex-shrink: 0;
+        }
+        .ov-breakdown-handle { margin: 0; font-size: 13.5px; font-weight: 700; color: var(--text); }
+        .ov-breakdown-share { margin: 2px 0 0; font-size: 11px; color: var(--text-muted); }
+        .ov-breakdown-cell {
+          font-size: 13.5px;
+          font-weight: 600;
+          color: var(--text);
+          font-variant-numeric: tabular-nums;
+        }
+        .ov-breakdown-cell.gold { color: var(--gold); }
+        .ov-breakdown-cell.green { color: var(--green); }
+
         @media (max-width: 900px) {
           .ov-head h1 { font-size: 24px; }
           .ov-stat-grid { grid-template-columns: 1fr; }
           .ov-stat-val { font-size: 24px; }
           .ov-connect-cta { margin-left: 0; }
+          .ov-breakdown-head { display: none; }
+          .ov-breakdown-row {
+            grid-template-columns: 1fr 1fr;
+            grid-auto-rows: auto;
+          }
+          .ov-breakdown-acc { grid-column: 1 / -1; }
         }
       `}</style>
     </div>
