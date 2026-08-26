@@ -237,3 +237,39 @@ export const agreements = pgTable(
     signedAtIdx: index("agreements_signed_at_idx").on(t.signedAt),
   })
 );
+
+// ===== accelerator_accounts (Discord-fed) =====
+export const acceleratorAccounts = pgTable(
+  "accelerator_accounts",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    handle: varchar("handle", { length: 200 }).notNull().unique(),
+    tiktokUrl: varchar("tiktok_url", { length: 500 }).notNull(),
+    accountType: varchar("account_type", { length: 100 })
+      .notNull()
+      .default("USA Shop Affiliate"),
+    followers: integer("followers"),
+    priceCents: integer("price_cents").notNull(),
+    originalPriceCents: integer("original_price_cents"),
+    rawLine: text("raw_line").notNull(),
+    position: integer("position").notNull().default(0),
+    lastSeenAt: timestamp("last_seen_at", { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+  }
+);
+
+export const acceleratorSyncs = pgTable("accelerator_syncs", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  source: varchar("source", { length: 50 }).notNull().default("manual"),
+  rowsParsed: integer("rows_parsed").notNull().default(0),
+  rowsUpserted: integer("rows_upserted").notNull().default(0),
+  rowsRemoved: integer("rows_removed").notNull().default(0),
+  error: text("error"),
+  createdAt: timestamp("created_at", { withTimezone: true })
+    .defaultNow()
+    .notNull(),
+});

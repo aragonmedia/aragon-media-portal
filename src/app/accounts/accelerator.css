@@ -1,0 +1,490 @@
+/* ============================================================
+   TikTok Affiliate Accelerator — /accounts styling
+   ============================================================
+   Aesthetic: dark black, red accents (#DC1E2E), sharp geometric
+   type, subtle grid + radar backdrop, red-glowing hover states.
+   Completely separate from Aragon Media portal styles.
+   ============================================================ */
+
+:root {
+  --taa-bg: #050505;
+  --taa-bg-2: #0B0B0C;
+  --taa-bg-card: #101012;
+  --taa-bg-elev: #17171A;
+  --taa-border: rgba(255, 255, 255, 0.06);
+  --taa-border-strong: rgba(255, 255, 255, 0.1);
+  --taa-text: #F5F5F7;
+  --taa-muted: #7A7A82;
+  --taa-sub: #4A4A52;
+  --taa-red: #DC1E2E;
+  --taa-red-bright: #FF3542;
+  --taa-red-glow: rgba(220, 30, 46, 0.35);
+  --taa-white: #FFFFFF;
+}
+
+.taa-shell {
+  position: relative;
+  min-height: 100vh;
+  background: var(--taa-bg);
+  color: var(--taa-text);
+  font-family: 'Inter Tight', 'Helvetica Neue', Arial, sans-serif;
+  font-feature-settings: "ss01", "cv02";
+  overflow: hidden;
+}
+
+/* ============================================================
+   Backdrop: grid + radar rings
+   ============================================================ */
+.taa-bg {
+  position: absolute; inset: 0;
+  pointer-events: none;
+  z-index: 0;
+}
+.taa-grid {
+  position: absolute; inset: 0;
+  background-image:
+    linear-gradient(rgba(220, 30, 46, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(220, 30, 46, 0.05) 1px, transparent 1px);
+  background-size: 60px 60px;
+  mask-image: radial-gradient(ellipse at 70% 20%, rgba(0,0,0,0.9) 0%, transparent 65%);
+  -webkit-mask-image: radial-gradient(ellipse at 70% 20%, rgba(0,0,0,0.9) 0%, transparent 65%);
+}
+.taa-radar {
+  position: absolute;
+  top: -280px; right: -280px;
+  width: 900px; height: 900px;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle, transparent 0 40%, rgba(220,30,46,0.06) 40% 41%, transparent 42% 60%, rgba(220,30,46,0.04) 60% 61%, transparent 62% 80%, rgba(220,30,46,0.03) 80% 81%, transparent 82%);
+  filter: blur(0.5px);
+}
+.taa-shell > *:not(.taa-bg) {
+  position: relative;
+  z-index: 1;
+}
+
+/* ============================================================
+   Header
+   ============================================================ */
+.taa-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 22px 40px;
+  border-bottom: 1px solid var(--taa-border);
+  backdrop-filter: blur(8px);
+  background: rgba(5, 5, 5, 0.65);
+  position: sticky;
+  top: 0;
+  z-index: 20;
+}
+.taa-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 14px;
+  text-decoration: none;
+  color: inherit;
+}
+.taa-brand img {
+  display: block;
+  width: 44px; height: 44px;
+  filter: drop-shadow(0 0 12px rgba(220, 30, 46, 0.4));
+}
+.taa-brand-text {
+  display: flex;
+  flex-direction: column;
+  line-height: 1;
+  gap: 3px;
+}
+.taa-brand-tag {
+  font-size: 10px;
+  letter-spacing: 0.28em;
+  color: var(--taa-muted);
+  font-weight: 700;
+  text-transform: uppercase;
+}
+.taa-brand-name {
+  font-size: 18px;
+  font-weight: 900;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: var(--taa-white);
+}
+
+.taa-header-actions { display: inline-flex; align-items: center; gap: 12px; }
+.taa-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 22px;
+  background: var(--taa-red);
+  color: var(--taa-white);
+  font-weight: 700;
+  font-size: 13.5px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  text-decoration: none;
+  border-radius: 6px;
+  border: 1px solid var(--taa-red);
+  box-shadow: 0 0 0 0 var(--taa-red-glow), 0 8px 24px -12px var(--taa-red-glow);
+  transition: box-shadow 200ms ease, transform 120ms ease, background 120ms ease;
+}
+.taa-cta:hover {
+  background: var(--taa-red-bright);
+  box-shadow: 0 0 0 4px var(--taa-red-glow), 0 12px 30px -10px var(--taa-red-glow);
+  transform: translateY(-1px);
+}
+
+/* ============================================================
+   Hero band
+   ============================================================ */
+.taa-hero {
+  padding: 56px 40px 40px;
+  max-width: 1180px;
+  margin: 0 auto;
+}
+.taa-hero-eyebrow {
+  display: inline-block;
+  font-size: 11px;
+  letter-spacing: 0.28em;
+  color: var(--taa-red);
+  font-weight: 700;
+  padding: 5px 12px;
+  border: 1px solid rgba(220, 30, 46, 0.32);
+  border-radius: 999px;
+  background: rgba(220, 30, 46, 0.06);
+  text-transform: uppercase;
+  margin-bottom: 22px;
+}
+.taa-hero h1 {
+  margin: 0 0 16px;
+  font-size: clamp(38px, 6vw, 72px);
+  line-height: 0.98;
+  letter-spacing: -0.03em;
+  font-weight: 900;
+  text-transform: uppercase;
+  color: var(--taa-white);
+}
+.taa-hero-accent {
+  color: var(--taa-red);
+  text-shadow: 0 0 40px rgba(220, 30, 46, 0.5);
+}
+.taa-hero-sub {
+  margin: 0 0 34px;
+  max-width: 620px;
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--taa-muted);
+}
+.taa-hero-sub b { color: var(--taa-text); font-weight: 600; }
+
+.taa-hero-stats {
+  display: inline-flex;
+  align-items: center;
+  gap: 24px;
+  padding: 18px 26px;
+  background: var(--taa-bg-card);
+  border: 1px solid var(--taa-border);
+  border-radius: 12px;
+}
+.taa-stat { display: flex; flex-direction: column; gap: 4px; min-width: 90px; }
+.taa-stat-val {
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--taa-white);
+  letter-spacing: -0.02em;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+.taa-stat-val[data-refreshing] { color: var(--taa-red); animation: pulse 1.2s ease-in-out infinite; }
+.taa-stat-val-red { color: var(--taa-red); }
+.taa-stat-label {
+  font-size: 10.5px;
+  letter-spacing: 0.16em;
+  color: var(--taa-muted);
+  text-transform: uppercase;
+  font-weight: 600;
+}
+.taa-stat-sep {
+  width: 1px;
+  height: 34px;
+  background: var(--taa-border-strong);
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.55; }
+}
+
+/* ============================================================
+   Toolbar
+   ============================================================ */
+.taa-toolbar {
+  padding: 0 40px 20px;
+  max-width: 1180px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+.taa-search {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 14px;
+  background: var(--taa-bg-card);
+  border: 1px solid var(--taa-border);
+  border-radius: 8px;
+  color: var(--taa-muted);
+  min-width: 320px;
+  flex: 1;
+  max-width: 500px;
+}
+.taa-search:focus-within { border-color: var(--taa-red); }
+.taa-search input {
+  background: none;
+  border: none;
+  color: var(--taa-text);
+  font: inherit;
+  font-size: 13.5px;
+  flex: 1;
+  outline: none;
+  min-width: 0;
+}
+.taa-search input::placeholder { color: var(--taa-sub); }
+.taa-search-clear {
+  background: none;
+  border: none;
+  color: var(--taa-muted);
+  font-size: 18px;
+  cursor: pointer;
+  padding: 0 4px;
+  line-height: 1;
+}
+.taa-search-clear:hover { color: var(--taa-red); }
+
+.taa-refresh {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  background: var(--taa-bg-card);
+  border: 1px solid var(--taa-border-strong);
+  color: var(--taa-text);
+  font-family: inherit;
+  font-size: 12.5px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: border-color 150ms ease, color 150ms ease, background 150ms ease;
+}
+.taa-refresh:hover:not(:disabled) {
+  border-color: var(--taa-red);
+  color: var(--taa-red);
+}
+.taa-refresh:disabled { opacity: 0.7; cursor: progress; }
+.taa-refresh svg.spin { animation: spin 900ms linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ============================================================
+   Account list + cards
+   ============================================================ */
+.taa-list {
+  list-style: none;
+  padding: 0 40px 60px;
+  max-width: 1180px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.taa-card {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 24px;
+  align-items: center;
+  padding: 18px 22px;
+  background: var(--taa-bg-card);
+  border: 1px solid var(--taa-border);
+  border-radius: 10px;
+  overflow: hidden;
+  transition: border-color 180ms ease, transform 180ms ease, background 180ms ease;
+}
+.taa-card::before {
+  content: "";
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 3px;
+  background: var(--taa-red);
+  opacity: 0.55;
+  transition: opacity 180ms ease, width 180ms ease;
+}
+.taa-card:hover {
+  border-color: rgba(220, 30, 46, 0.4);
+  background: var(--taa-bg-elev);
+  transform: translateY(-1px);
+}
+.taa-card:hover::before { opacity: 1; width: 4px; }
+.taa-card-glow {
+  position: absolute;
+  right: -80px; top: 50%;
+  width: 200px; height: 200px;
+  transform: translateY(-50%);
+  background: radial-gradient(circle, var(--taa-red-glow) 0%, transparent 60%);
+  opacity: 0;
+  transition: opacity 300ms ease;
+  pointer-events: none;
+}
+.taa-card:hover .taa-card-glow { opacity: 0.6; }
+
+.taa-card-left { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+.taa-handle {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: 'Inter Tight', sans-serif;
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--taa-white);
+  text-decoration: none;
+  letter-spacing: -0.01em;
+  width: fit-content;
+  transition: color 150ms ease;
+}
+.taa-handle:hover { color: var(--taa-red); }
+.taa-handle svg { opacity: 0.4; transition: opacity 150ms ease; }
+.taa-handle:hover svg { opacity: 1; }
+
+.taa-meta {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.taa-badge {
+  padding: 4px 10px;
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--taa-red);
+  background: rgba(220, 30, 46, 0.08);
+  border: 1px solid rgba(220, 30, 46, 0.28);
+  border-radius: 999px;
+}
+.taa-followers {
+  font-size: 12.5px;
+  color: var(--taa-muted);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.02em;
+}
+
+.taa-card-right {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  justify-content: flex-end;
+}
+.taa-save-pill {
+  padding: 5px 11px;
+  font-size: 10.5px;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--taa-white);
+  background: var(--taa-red);
+  border-radius: 4px;
+  box-shadow: 0 0 12px rgba(220, 30, 46, 0.4);
+}
+.taa-price-block { display: flex; align-items: baseline; gap: 10px; }
+.taa-price-strike {
+  font-size: 15px;
+  color: var(--taa-sub);
+  text-decoration: line-through;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+.taa-price {
+  font-size: 28px;
+  font-weight: 800;
+  color: var(--taa-white);
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+
+/* ============================================================
+   Empty state
+   ============================================================ */
+.taa-empty {
+  max-width: 1180px;
+  margin: 40px auto;
+  padding: 60px 40px;
+  text-align: center;
+  border: 1px dashed var(--taa-border-strong);
+  border-radius: 12px;
+  background: var(--taa-bg-card);
+}
+.taa-empty-title {
+  margin: 0 0 6px;
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--taa-text);
+}
+.taa-empty-sub { margin: 0; color: var(--taa-muted); font-size: 13.5px; }
+
+/* ============================================================
+   Footer
+   ============================================================ */
+.taa-footer {
+  border-top: 1px solid var(--taa-border);
+  padding: 20px 40px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: var(--taa-muted);
+  font-size: 12.5px;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.taa-footer b { color: var(--taa-text); font-weight: 700; }
+.taa-footer a { color: var(--taa-red); text-decoration: none; font-weight: 700; }
+.taa-footer-dot {
+  display: inline-block;
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--taa-red);
+  margin-right: 6px;
+  box-shadow: 0 0 0 3px rgba(220, 30, 46, 0.2);
+  animation: pulse 1.6s ease-in-out infinite;
+}
+
+/* ============================================================
+   Responsive
+   ============================================================ */
+@media (max-width: 780px) {
+  .taa-header { padding: 16px 22px; }
+  .taa-brand-tag { font-size: 9px; }
+  .taa-brand-name { font-size: 15px; }
+  .taa-cta { padding: 10px 16px; font-size: 12px; }
+  .taa-hero { padding: 40px 22px 30px; }
+  .taa-hero-stats { flex-wrap: wrap; gap: 14px 20px; padding: 14px 18px; }
+  .taa-stat-sep { display: none; }
+  .taa-toolbar { padding: 0 22px 16px; }
+  .taa-search { min-width: 0; max-width: none; width: 100%; }
+  .taa-list { padding: 0 22px 40px; }
+  .taa-card {
+    grid-template-columns: 1fr;
+    gap: 14px;
+    padding: 16px 18px;
+  }
+  .taa-card-right { justify-content: flex-start; }
+  .taa-price { font-size: 24px; }
+  .taa-footer { padding: 18px 22px; flex-direction: column; align-items: flex-start; }
+}
