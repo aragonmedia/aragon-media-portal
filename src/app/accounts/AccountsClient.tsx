@@ -187,7 +187,7 @@ export default function AccountsClient({
           >
             <div className="taa-verify-cta-label">Chat with us to verify</div>
             <div className="taa-verify-cta-sub">
-              Open a ticket &middot; AM Team + Nick G verify &amp; activate
+              Send us a message &middot; AM Team activate
               <span aria-hidden> →</span>
             </div>
           </a>

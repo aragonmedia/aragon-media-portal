@@ -21,7 +21,20 @@ export const revalidate = 0;
 export const metadata = {
   title: "TikTok Affiliate Accelerator · Live Accounts",
   description:
-    "Live listings of TikTok Shop affiliate accounts available through the Accelerator program.",
+    "Live listings of US TikTok Shop affiliate accounts available through the Accelerator program. Powered by Aragon Media × Accelerator.",
+  openGraph: {
+    title: "US TikTok Shop From Anywhere · TikTok Affiliate Accelerator",
+    description:
+      "The operating system for creators outside the US to earn USD commissions. 500+ creators activated. 100% activation rate. 24hr setup.",
+    type: "website",
+    siteName: "TikTok Affiliate Accelerator",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "US TikTok Shop From Anywhere · TikTok Affiliate Accelerator",
+    description:
+      "The operating system for creators outside the US to earn USD commissions. 500+ creators activated. 100% activation rate.",
+  },
 };
 
 // Ticket channel URL (Nick G's Discord). Env override wins so we
