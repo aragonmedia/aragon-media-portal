@@ -194,14 +194,14 @@ export default function AccountsClient({
             <>
               <p className="taa-empty-title">No accounts loaded yet</p>
               <p className="taa-empty-sub">
-                The Discord sync hasn't run. Roni will authorize the bot
+                The Discord sync hasn&apos;t run. Roni will authorize the bot
                 soon, or paste the message into the admin console to
                 populate.
               </p>
             </>
           ) : (
             <>
-              <p className="taa-empty-title">No matches for "{query}"</p>
+              <p className="taa-empty-title">No matches for &quot;{query}&quot;</p>
               <p className="taa-empty-sub">Try clearing the search.</p>
             </>
           )}

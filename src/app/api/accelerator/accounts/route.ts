@@ -7,7 +7,7 @@
  */
 
 import { NextResponse } from "next/server";
-import { asc, desc, isNull, and } from "drizzle-orm";
+import { asc, desc, isNull } from "drizzle-orm";
 import { db } from "@/db";
 import { acceleratorAccounts, acceleratorSyncs } from "@/db/schema";
 

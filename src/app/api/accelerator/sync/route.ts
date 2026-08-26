@@ -24,7 +24,7 @@
  */
 
 import { NextResponse } from "next/server";
-import { inArray, notInArray, sql } from "drizzle-orm";
+import { notInArray } from "drizzle-orm";
 import { db } from "@/db";
 import { acceleratorAccounts, acceleratorSyncs } from "@/db/schema";
 import { isAdminSession } from "@/lib/auth/admin";
