@@ -2,12 +2,10 @@
 
 import { useEffect, useMemo, useState } from "react";
 
-type FollowerBucket = "all" | "lt50" | "50-100" | "100-200" | "gt200";
+type FollowerBucket = "all" | "100-200" | "gt200";
 
 const FOLLOWER_BUCKETS: { key: FollowerBucket; label: string; test: (n: number | null) => boolean }[] = [
   { key: "all",      label: "All",         test: () => true },
-  { key: "lt50",     label: "< 50K",       test: (n) => n !== null && n < 50_000 },
-  { key: "50-100",   label: "50K – 100K",  test: (n) => n !== null && n >= 50_000 && n < 100_000 },
   { key: "100-200",  label: "100K – 200K", test: (n) => n !== null && n >= 100_000 && n < 200_000 },
   { key: "gt200",    label: "200K +",      test: (n) => n !== null && n >= 200_000 },
 ];
@@ -107,7 +105,7 @@ export default function AccountsClient({
   // Per-bucket count for the pill badge
   const bucketCounts = useMemo(() => {
     const out: Record<FollowerBucket, number> = {
-      all: accounts.length, lt50: 0, "50-100": 0, "100-200": 0, gt200: 0,
+      all: accounts.length, "100-200": 0, gt200: 0,
     };
     for (const a of accounts) {
       for (const b of FOLLOWER_BUCKETS) {
@@ -163,17 +161,12 @@ export default function AccountsClient({
           daily. Click <b>+Buy an Account</b> to open a ticket in{" "}
           <b>Nick G&apos;s Discord</b> and lock in one you like.
         </p>
-
-        <div className="taa-heads-up">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M12 9v4" /><path d="M12 17h.01" />
-            <path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
-          </svg>
-          <span><b>Heads up:</b> accounts sell fast. The list refreshes as
-          the ticket queue moves, so the account you inquire about may
-          already be reserved by the time you open a ticket. Grab one
-          quick or ask for the next equivalent.</span>
-        </div>
+        <p className="taa-hero-sub">
+          <b>Heads up:</b> accounts sell fast. The list refreshes as the
+          ticket queue moves, so the account you inquire about may already
+          be reserved by the time you open a ticket. Grab one quick or ask
+          for the next equivalent.
+        </p>
 
         <div className="taa-hero-stats">
           <div className="taa-stat">
@@ -186,9 +179,11 @@ export default function AccountsClient({
             <div className="taa-stat-label">Last refresh</div>
           </div>
           <div className="taa-stat-sep" />
-          <div className="taa-stat">
-            <div className="taa-stat-val taa-stat-val-red">100%</div>
-            <div className="taa-stat-label">Verified</div>
+          <div className="taa-verify-cta taa-verify-cta-pending" role="note" aria-label="Verification chat coming soon">
+            <div className="taa-verify-cta-label">Chat with us to verify</div>
+            <div className="taa-verify-cta-sub">
+              Coming soon &middot; AM Team + Nick G verification hub
+            </div>
           </div>
         </div>
       </section>
@@ -335,9 +330,13 @@ export default function AccountsClient({
 
       {/* Footer */}
       <footer className="taa-footer">
-        <div>
-          <span className="taa-footer-dot" /> Live sync from Discord ·
-          Powered by <b>Aragon Media</b> × <b>Accelerator</b>
+        <div className="taa-footer-info">
+          <span className="taa-footer-line">
+            <span className="taa-footer-dot" /> Live sync from Discord
+          </span>
+          <span className="taa-footer-powered">
+            Powered by <b>Aragon Media</b> × <b>Accelerator</b>
+          </span>
         </div>
         <a href={ticketUrl} target="_blank" rel="noopener noreferrer">
           Open a ticket →
