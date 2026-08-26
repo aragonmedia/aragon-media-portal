@@ -164,8 +164,7 @@ export default function AccountsClient({
         <p className="taa-hero-sub">
           <b>Heads up:</b> accounts sell fast. The list refreshes as the
           ticket queue moves, so the account you inquire about may already
-          be reserved by the time you open a ticket. Grab one quick or ask
-          for the next equivalent.
+          be reserved by the time you open a ticket.
         </p>
 
         <div className="taa-hero-stats">
@@ -179,12 +178,19 @@ export default function AccountsClient({
             <div className="taa-stat-label">Last refresh</div>
           </div>
           <div className="taa-stat-sep" />
-          <div className="taa-verify-cta taa-verify-cta-pending" role="note" aria-label="Verification chat coming soon">
+          <a
+            href={ticketUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="taa-verify-cta"
+            aria-label="Chat with us to verify — opens Discord ticket"
+          >
             <div className="taa-verify-cta-label">Chat with us to verify</div>
             <div className="taa-verify-cta-sub">
-              Coming soon &middot; AM Team + Nick G verification hub
+              Open a ticket &middot; AM Team + Nick G verify &amp; activate
+              <span aria-hidden> →</span>
             </div>
-          </div>
+          </a>
         </div>
       </section>
 
