@@ -10,6 +10,7 @@ const NAV = [
   { href: "/admin/withdrawals", label: "Withdrawals", icon: "◎" },
   { href: "/admin/chats", label: "Chats", icon: "✦" },
   { href: "/admin/agreements", label: "Agreements", icon: "◇" },
+  { href: "/admin/accelerator", label: "Accelerator", icon: "▲" },
 ];
 
 export default function AdminSidebar() {

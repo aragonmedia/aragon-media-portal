@@ -2,6 +2,16 @@
 
 import { useEffect, useMemo, useState } from "react";
 
+type FollowerBucket = "all" | "lt50" | "50-100" | "100-200" | "gt200";
+
+const FOLLOWER_BUCKETS: { key: FollowerBucket; label: string; test: (n: number | null) => boolean }[] = [
+  { key: "all",      label: "All",         test: () => true },
+  { key: "lt50",     label: "< 50K",       test: (n) => n !== null && n < 50_000 },
+  { key: "50-100",   label: "50K – 100K",  test: (n) => n !== null && n >= 50_000 && n < 100_000 },
+  { key: "100-200",  label: "100K – 200K", test: (n) => n !== null && n >= 100_000 && n < 200_000 },
+  { key: "gt200",    label: "200K +",      test: (n) => n !== null && n >= 200_000 },
+];
+
 type Account = {
   id: string;
   handle: string;
@@ -16,6 +26,7 @@ type Props = {
   initialAccounts: Account[];
   lastSyncedAt: string | null;
   ticketUrl: string;
+  liveListUrl: string;
 };
 
 function money(cents: number) {
@@ -47,11 +58,13 @@ export default function AccountsClient({
   initialAccounts,
   lastSyncedAt,
   ticketUrl,
+  liveListUrl,
 }: Props) {
   const [accounts, setAccounts] = useState<Account[]>(initialAccounts);
   const [syncedAt, setSyncedAt] = useState<string | null>(lastSyncedAt);
   const [refreshing, setRefreshing] = useState(false);
   const [query, setQuery] = useState("");
+  const [bucket, setBucket] = useState<FollowerBucket>("all");
   const [relLabel, setRelLabel] = useState(fmtRelative(lastSyncedAt));
 
   // Live-tick the "last synced" label without re-mounting.
@@ -79,13 +92,31 @@ export default function AccountsClient({
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
-    if (!q) return accounts;
-    return accounts.filter(
-      (a) =>
+    const bucketTest =
+      FOLLOWER_BUCKETS.find((b) => b.key === bucket)?.test ?? (() => true);
+    return accounts.filter((a) => {
+      if (!bucketTest(a.followers)) return false;
+      if (!q) return true;
+      return (
         a.handle.toLowerCase().includes(q) ||
         a.accountType.toLowerCase().includes(q)
-    );
-  }, [accounts, query]);
+      );
+    });
+  }, [accounts, query, bucket]);
+
+  // Per-bucket count for the pill badge
+  const bucketCounts = useMemo(() => {
+    const out: Record<FollowerBucket, number> = {
+      all: accounts.length, lt50: 0, "50-100": 0, "100-200": 0, gt200: 0,
+    };
+    for (const a of accounts) {
+      for (const b of FOLLOWER_BUCKETS) {
+        if (b.key === "all") continue;
+        if (b.test(a.followers)) out[b.key]++;
+      }
+    }
+    return out;
+  }, [accounts]);
 
   const totalListed = accounts.length;
 
@@ -128,10 +159,21 @@ export default function AccountsClient({
         <div className="taa-hero-eyebrow">LIVE INVENTORY</div>
         <h1>US TikTok Shop <span className="taa-hero-accent">Affiliate Accounts</span></h1>
         <p className="taa-hero-sub">
-          Verified US Shop affiliate accounts, ready to activate. Prices
-          update daily. Click <b>+ Buy an Account</b> to open a ticket
-          in Discord and lock in one you like.
+          US Shop affiliate accounts, ready to activate. Prices update
+          daily. Click <b>+Buy an Account</b> to open a ticket in{" "}
+          <b>Nick G&apos;s Discord</b> and lock in one you like.
         </p>
+
+        <div className="taa-heads-up">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M12 9v4" /><path d="M12 17h.01" />
+            <path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
+          </svg>
+          <span><b>Heads up:</b> accounts sell fast. The list refreshes as
+          the ticket queue moves, so the account you inquire about may
+          already be reserved by the time you open a ticket. Grab one
+          quick or ask for the next equivalent.</span>
+        </div>
 
         <div className="taa-hero-stats">
           <div className="taa-stat">
@@ -169,23 +211,56 @@ export default function AccountsClient({
           )}
         </div>
 
-        <button
-          type="button"
-          className="taa-refresh"
-          onClick={refresh}
-          disabled={refreshing}
-          aria-busy={refreshing}
-        >
-          <svg
-            className={refreshing ? "spin" : ""}
-            width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round"
+        <div className="taa-toolbar-actions">
+          <a
+            href={liveListUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="taa-view-live"
+            title="Open Nick G's live listings channel in Discord"
           >
-            <path d="M21 12a9 9 0 1 1-3-6.7" />
-            <path d="M21 4v5h-5" />
-          </svg>
-          <span>{refreshing ? "Refreshing…" : "Refresh accounts"}</span>
-        </button>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M7 17L17 7" /><path d="M8 7h9v9" />
+            </svg>
+            <span>View live list</span>
+          </a>
+          <button
+            type="button"
+            className="taa-refresh"
+            onClick={refresh}
+            disabled={refreshing}
+            aria-busy={refreshing}
+          >
+            <svg
+              className={refreshing ? "spin" : ""}
+              width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round"
+            >
+              <path d="M21 12a9 9 0 1 1-3-6.7" />
+              <path d="M21 4v5h-5" />
+            </svg>
+            <span>{refreshing ? "Refreshing…" : "Refresh accounts"}</span>
+          </button>
+        </div>
       </section>
+
+      {/* Follower filter pills */}
+      <div className="taa-filter-row">
+        <span className="taa-filter-label">Followers</span>
+        <div className="taa-filter-pills">
+          {FOLLOWER_BUCKETS.map((b) => (
+            <button
+              key={b.key}
+              type="button"
+              className={`taa-pill${bucket === b.key ? " active" : ""}`}
+              onClick={() => setBucket(b.key)}
+              aria-pressed={bucket === b.key}
+            >
+              <span>{b.label}</span>
+              <span className="taa-pill-count">{bucketCounts[b.key]}</span>
+            </button>
+          ))}
+        </div>
+      </div>
 
       {/* Accounts */}
       {filtered.length === 0 ? (

@@ -24,11 +24,14 @@ export const metadata = {
     "Live listings of TikTok Shop affiliate accounts available through the Accelerator program.",
 };
 
-// Ticket channel URL (Roni's Discord). Env override wins so we don't
-// have to redeploy if the channel moves.
+// Ticket channel URL (Nick G's Discord). Env override wins so we
+// don't have to redeploy if the channel moves.
 const TICKET_URL =
   process.env.ACCELERATOR_TICKET_URL ??
   "https://discord.com/channels/1244370367493963837/1382956924303183933";
+const LIVE_LIST_URL =
+  process.env.ACCELERATOR_LIVE_LIST_URL ??
+  "https://discord.com/channels/1244370367493963837/1244789011109642330";
 
 export default async function AccountsPage() {
   const [rows, lastSuccess] = await Promise.all([
@@ -57,6 +60,7 @@ export default async function AccountsPage() {
       }))}
       lastSyncedAt={lastSuccess[0]?.createdAt?.toISOString() ?? null}
       ticketUrl={TICKET_URL}
+      liveListUrl={LIVE_LIST_URL}
     />
   );
 }
