@@ -2,6 +2,7 @@
 --
 -- Cached rows parsed from the daily-edited Discord channel message.
 -- Idempotent so the migration runner can re-apply without error.
+
 CREATE TABLE IF NOT EXISTS "accelerator_accounts" (
     "id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
     "handle" varchar(200) NOT NULL,
@@ -14,13 +15,9 @@ CREATE TABLE IF NOT EXISTS "accelerator_accounts" (
     "position" integer NOT NULL DEFAULT 0,
     "last_seen_at" timestamp with time zone DEFAULT now() NOT NULL,
     "created_at" timestamp with time zone DEFAULT now() NOT NULL
-);
---> statement-breakpoint
-CREATE UNIQUE INDEX IF NOT EXISTS "accelerator_accounts_handle_uniq" ON "accelerator_accounts" ("handle");
---> statement-breakpoint
-CREATE INDEX IF NOT EXISTS "accelerator_accounts_position_idx" ON "accelerator_accounts" ("position");
-
--- Sync log so we can show "last refreshed" on the public page.
+);--> statement-breakpoint
+CREATE UNIQUE INDEX IF NOT EXISTS "accelerator_accounts_handle_uniq" ON "accelerator_accounts" ("handle");--> statement-breakpoint
+CREATE INDEX IF NOT EXISTS "accelerator_accounts_position_idx" ON "accelerator_accounts" ("position");--> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "accelerator_syncs" (
     "id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
     "source" varchar(50) NOT NULL DEFAULT 'manual',
