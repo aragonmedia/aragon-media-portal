@@ -179,11 +179,9 @@ export default function AccountsClient({
           </div>
           <div className="taa-stat-sep" />
           <a
-            href={ticketUrl}
-            target="_blank"
-            rel="noopener noreferrer"
+            href="/chatroom"
             className="taa-verify-cta"
-            aria-label="Chat with us to verify — opens Discord ticket"
+            aria-label="Chat with us to verify — opens verification chatroom"
           >
             <div className="taa-verify-cta-label">Chat with us to verify</div>
             <div className="taa-verify-cta-sub">
