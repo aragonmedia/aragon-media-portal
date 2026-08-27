@@ -24,6 +24,7 @@ import {
   index,
   uniqueIndex,
   date,
+  jsonb,
 } from "drizzle-orm/pg-core";
 
 // ===== Enums =====
@@ -272,4 +273,43 @@ export const acceleratorSyncs = pgTable("accelerator_syncs", {
   createdAt: timestamp("created_at", { withTimezone: true })
     .defaultNow()
     .notNull(),
+});
+
+// ===== chatroom_threads / messages / credentials (P2) =====
+export const chatroomThreads = pgTable(
+  "chatroom_threads",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    email: varchar("email", { length: 320 }).notNull(),
+    name: varchar("name", { length: 200 }).notNull(),
+    browserKey: varchar("browser_key", { length: 64 }).notNull(),
+    status: varchar("status", { length: 30 }).notNull().default("open"),
+    createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+    lastMessageAt: timestamp("last_message_at", { withTimezone: true }).defaultNow().notNull(),
+    lastUserMessageAt: timestamp("last_user_message_at", { withTimezone: true }),
+    lastAdminMessageAt: timestamp("last_admin_message_at", { withTimezone: true }),
+  }
+);
+
+export const chatroomMessages = pgTable("chatroom_messages", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  threadId: uuid("thread_id")
+    .references(() => chatroomThreads.id, { onDelete: "cascade" })
+    .notNull(),
+  sender: varchar("sender", { length: 10 }).notNull(), // "user" | "am"
+  body: text("body").notNull().default(""),
+  attachments: jsonb("attachments").$type<string[]>().notNull().default([]),
+  createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+});
+
+export const chatroomCredentials = pgTable("chatroom_credentials", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  threadId: uuid("thread_id")
+    .references(() => chatroomThreads.id, { onDelete: "cascade" })
+    .notNull(),
+  ciphertext: text("ciphertext").notNull(),
+  iv: varchar("iv", { length: 48 }).notNull(),
+  authTag: varchar("auth_tag", { length: 48 }).notNull(),
+  submittedAt: timestamp("submitted_at", { withTimezone: true }).defaultNow().notNull(),
+  viewedByAdminAt: timestamp("viewed_by_admin_at", { withTimezone: true }),
 });

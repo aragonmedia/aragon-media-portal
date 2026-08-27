@@ -11,6 +11,7 @@ const NAV = [
   { href: "/admin/chats", label: "Chats", icon: "✦" },
   { href: "/admin/agreements", label: "Agreements", icon: "◇" },
   { href: "/admin/accelerator", label: "Accelerator", icon: "▲" },
+  { href: "/admin/chatroom", label: "Chatroom", icon: "◐" },
 ];
 
 export default function AdminSidebar() {

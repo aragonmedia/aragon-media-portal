@@ -654,3 +654,85 @@ function escapeHtml(s: string): string {
     .replace(/>/g, "&gt;")
     .replace(/"/g, "&quot;");
 }
+
+// ============================================================
+// Chatroom (P2) — new user message notification for admins
+// Fires from POST /api/chatroom/messages when the sender is "user".
+// Emails both Kevin and Roni per env-var config. Never throws
+// upward — Resend hiccups are logged, not surfaced to the user.
+// ============================================================
+export async function sendChatroomUserMessageNotification(opts: {
+  to: string[];               // recipient email list (Kevin + Roni)
+  fromName: string;
+  fromEmail: string;
+  snippet: string;
+  attachments: number;
+  hasCredentials: boolean;
+  openUrl: string;
+}) {
+  try {
+    if (opts.to.length === 0) return;
+    const resend = getResend();
+    const eyebrow = opts.hasCredentials
+      ? "New chatroom message · CREDENTIALS ATTACHED"
+      : "New chatroom message";
+    const subject = opts.hasCredentials
+      ? `[VERIFY] ${opts.fromName} submitted TikTok login info`
+      : `${opts.fromName} sent a message — Accelerator chatroom`;
+    const attachNote =
+      opts.attachments > 0
+        ? `<p style="margin:12px 0 0;font-size:12px;color:#6B6B6B;">📎 ${opts.attachments} attachment${opts.attachments === 1 ? "" : "s"} included.</p>`
+        : "";
+    const credsNote = opts.hasCredentials
+      ? `<div style="margin-top:14px;padding:12px 14px;background:#FFF1EE;border:1px solid #E5B9B0;border-left:3px solid #B33A2B;border-radius:4px;font-size:13px;color:#B33A2B;">🔒 <b>Encrypted TikTok credentials attached.</b> Open the thread in /admin/chatroom to decrypt and view.</div>`
+      : "";
+
+    const html = `<!DOCTYPE html><html>${EMAIL_HEAD}
+    <body bgcolor="#F5F2EA" style="margin:0;padding:0;background:#F5F2EA;color:#1A1A1A;font-family:system-ui,-apple-system,'Inter Tight',sans-serif;">
+      <table role="presentation" width="100%" bgcolor="#F5F2EA" style="background:#F5F2EA;">
+        <tr><td align="center" style="padding:32px 18px;">
+          <table role="presentation" width="600" bgcolor="#FFFFFF" style="background:#FFFFFF;border:1px solid #E8E2D2;border-radius:12px;max-width:600px;width:100%;">
+            <tr><td bgcolor="#FFFFFF" style="padding:30px 32px 14px;background:#FFFFFF;">
+              <p style="margin:0 0 6px 0;font-size:11px;letter-spacing:0.2em;color:#A8862E;text-transform:uppercase;font-weight:700;">${eyebrow}</p>
+              <h1 style="margin:0;font-size:22px;line-height:1.25;color:#1A1A1A;letter-spacing:-0.01em;">${escapeHtml(opts.fromName)}</h1>
+              <p style="margin:6px 0 0;font-size:12px;color:#6B6B6B;">${escapeHtml(opts.fromEmail)}</p>
+            </td></tr>
+            <tr><td bgcolor="#FFFFFF" style="padding:14px 32px;background:#FFFFFF;">
+              <div style="background:#FFFBF0;border:1px solid #E8E2D2;border-left:3px solid #A8862E;padding:14px 16px;font-size:14px;color:#1A1A1A;line-height:1.65;white-space:pre-wrap;word-break:break-word;border-radius:4px;">${escapeHtml(opts.snippet)}</div>
+              ${attachNote}
+              ${credsNote}
+            </td></tr>
+            <tr><td bgcolor="#FFFFFF" style="padding:18px 32px 22px;background:#FFFFFF;">
+              <a href="${opts.openUrl}" style="display:inline-block;padding:12px 22px;background:#A8862E;color:#FFFFFF;text-decoration:none;font-size:13px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;border-radius:4px;">Open thread →</a>
+            </td></tr>
+            <tr><td bgcolor="#FFFFFF" style="padding:14px 32px 26px;background:#FFFFFF;border-top:1px solid #E8E2D2;color:#8B8278;font-size:11px;line-height:1.6;text-align:center;">
+              Accelerator × Aragon Media — Verification chatroom
+            </td></tr>
+          </table>
+        </td></tr>
+      </table>
+    </body></html>`;
+
+    const text = [
+      "NEW CHATROOM MESSAGE",
+      "",
+      `${opts.fromName} <${opts.fromEmail}>:`,
+      "",
+      opts.snippet,
+      opts.attachments ? `\n📎 ${opts.attachments} attachment${opts.attachments === 1 ? "" : "s"}` : "",
+      opts.hasCredentials ? "\n🔒 Encrypted TikTok credentials attached — decrypt in /admin/chatroom" : "",
+      "",
+      `Open thread: ${opts.openUrl}`,
+    ].filter(Boolean).join("\n");
+
+    await resend.emails.send({
+      from: FROM,
+      to: opts.to,
+      subject,
+      text,
+      html,
+    });
+  } catch (err) {
+    console.error("[email] sendChatroomUserMessageNotification failed:", err);
+  }
+}
