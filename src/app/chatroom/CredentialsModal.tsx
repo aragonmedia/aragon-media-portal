@@ -55,9 +55,9 @@ export default function CredentialsModal({ onClose, onSubmit }: Props) {
             <div className="cred-eyebrow">SECURE SUBMISSION</div>
             <h2>Submit your TikTok login</h2>
             <p>
-              Encrypted at rest with AES-256-GCM. Only Kevin + Roni can
-              decrypt it inside the admin console. Never emailed in plain
-              text, never logged.
+              Encrypted end-to-end with AES-256-GCM. Only authorized
+              admins can decrypt it inside the private console — never
+              emailed, never logged.
             </p>
           </div>
           <button type="button" className="cred-close" onClick={onClose} aria-label="Close">×</button>
@@ -130,10 +130,9 @@ export default function CredentialsModal({ onClose, onSubmit }: Props) {
           </label>
 
           <div className="cred-warning">
-            <strong>Heads up:</strong> TikTok will email a 6-digit
-            verification code to your TikTok email when we sign in.
-            Watch that inbox and just type the code back to us as a
-            reply in this chat.
+            <strong>Heads up:</strong> TikTok will email a 6-digit code
+            when we sign in. Watch your inbox and paste it back to us
+            in the chat.
           </div>
 
           {error && <div className="cred-error">{error}</div>}
@@ -141,7 +140,7 @@ export default function CredentialsModal({ onClose, onSubmit }: Props) {
           <div className="cred-actions">
             <button type="button" className="cred-cancel" onClick={onClose}>Cancel</button>
             <button type="submit" className="cred-submit" disabled={submitting}>
-              {submitting ? "Encrypting + Sending…" : "🔒 Submit login securely"}
+              {submitting ? "Encrypting + Sending…" : "🔒 Send securely"}
             </button>
           </div>
         </form>

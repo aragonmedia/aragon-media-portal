@@ -181,10 +181,9 @@ export default function ChatroomClient({ calendlyUrl }: { calendlyUrl: string })
             <span className="taa-hero-accent">Aragon Media × Accelerator</span>
           </h1>
           <p className="taa-hero-sub">
-            After you buy an account through Nick G&apos;s Discord, the Aragon
-            Media team + Accelerator handle activation, TikTok Shop Partner
-            Center onboarding, and payout setup with you. Start a
-            verification chat below.
+            Bought an account through <b>Nick G&apos;s Discord</b>? The team
+            handles activation, TikTok Shop onboarding, and payout setup
+            with you here. Drop your email to start.
           </p>
 
           <form className="cr-gate" onSubmit={(e) => { e.preventDefault(); openThread(); }}>
@@ -216,9 +215,9 @@ export default function ChatroomClient({ calendlyUrl }: { calendlyUrl: string })
             </button>
             {error && <p className="cr-error">{error}</p>}
             <p className="cr-privacy">
-              Your email + name are used to route the conversation. TikTok
-              login info you share via the modal is encrypted with AES-256-GCM.
-              Only Kevin + Roni can decrypt it.
+              Your email + name are used to route the conversation. Any
+              login info you share is encrypted at rest and only visible
+              to authorized admins in the private console.
             </p>
           </form>
         </section>
@@ -245,9 +244,8 @@ export default function ChatroomClient({ calendlyUrl }: { calendlyUrl: string })
               Hi <span className="taa-hero-accent">{thread.name.split(/\s+/)[0]}</span>
             </h1>
             <p className="cr-thread-sub">
-              We&apos;ll reply here as soon as we see your message. Watch your
-              inbox — TikTok emails a 6-digit code to your TikTok email
-              during verification. Just type it back to us as a message when
+              We reply as soon as we see it. During verification TikTok
+              emails a 6-digit code — just paste it back to us here when
               it arrives.
             </p>
           </div>
@@ -257,10 +255,10 @@ export default function ChatroomClient({ calendlyUrl }: { calendlyUrl: string })
           <div ref={feedRef} className="cr-feed">
             {messages.length === 0 ? (
               <div className="cr-feed-empty">
-                <p>No messages yet. Say hi and we&apos;ll take it from there.</p>
+                <p>Say hi and we&apos;ll take it from there.</p>
                 <p className="cr-feed-empty-sub">
-                  Or use <b>Submit TikTok login</b> below to send credentials
-                  securely — encrypted at rest, only Kevin + Roni can decrypt.
+                  Or use <b>Submit TikTok Login</b> below to send credentials
+                  securely — encrypted, admin-only visibility.
                 </p>
               </div>
             ) : (
@@ -307,8 +305,7 @@ export default function ChatroomClient({ calendlyUrl }: { calendlyUrl: string })
           </div>
 
           <div className="cr-heads-up">
-            <b>Heads up:</b> TikTok emails a 6-digit code when we sign in — just
-            paste the code back here as a message.
+            <b>Heads up:</b> TikTok emails a 6-digit code when we sign in — paste it back here as a message.
           </div>
 
           <form
