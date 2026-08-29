@@ -13,7 +13,6 @@ import { db } from "@/db";
 import { chatroomThreads, chatroomMessages } from "@/db/schema";
 import { isAdminSession } from "@/lib/auth/admin";
 import { sendChatroomAdminReplyNotification } from "@/lib/email/send";
-import { signToken } from "@/lib/chatroom/magic-link";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -56,13 +55,12 @@ export async function POST(req: Request) {
   // Notify the user that AM replied (fire-and-log, non-blocking)
   const thread = rows[0];
   const origin = new URL(req.url).origin;
-  const magicToken = signToken({ threadId: thread.id, email: thread.email });
   await sendChatroomAdminReplyNotification({
     to: thread.email,
     userName: thread.name,
     snippet: text.slice(0, 280) || (attachments.length ? "(attachments only — open the chat to view)" : ""),
     attachments: attachments.length,
-    openUrl: `${origin}/chatroom?t=${encodeURIComponent(magicToken)}`,
+    openUrl: `${origin}/chatroom`,
   });
 
   return NextResponse.json({
