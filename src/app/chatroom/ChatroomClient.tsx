@@ -23,7 +23,13 @@ type Thread = {
 const POLL_INTERVAL_MS = 15_000;
 const MAX_ATTACHMENTS = 4;
 
-export default function ChatroomClient({ calendlyUrl }: { calendlyUrl: string }) {
+export default function ChatroomClient({
+  calendlyUrl,
+  hasMagicToken = false,
+}: {
+  calendlyUrl: string;
+  hasMagicToken?: boolean;
+}) {
   const [gate, setGate] = useState({ email: "", name: "" });
   const [thread, setThread] = useState<Thread | null>(null);
   const [messages, setMessages] = useState<Msg[]>([]);
@@ -45,6 +51,35 @@ export default function ChatroomClient({ calendlyUrl }: { calendlyUrl: string })
       if (email) setGate({ email, name });
     } catch {}
   }, []);
+
+  // Magic-link auto-resume: if the server set the token cookie (e.g. the
+  // user just came from an email link), open the thread without asking
+  // for email/name.
+  useEffect(() => {
+    if (!hasMagicToken) return;
+    let cancelled = false;
+    (async () => {
+      try {
+        const res = await fetch("/api/chatroom/threads", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({}),
+        });
+        const j = await res.json();
+        if (!cancelled && j.ok) {
+          setThread(j.thread);
+          setMessages(j.messages);
+          // Backfill localStorage so the gate stays consistent if they
+          // sign out and come back on this same device.
+          try {
+            localStorage.setItem("am_chatroom_email", j.thread.email);
+            localStorage.setItem("am_chatroom_name", j.thread.name);
+          } catch {}
+        }
+      } catch {}
+    })();
+    return () => { cancelled = true; };
+  }, [hasMagicToken]);
 
   // Auto-scroll to bottom on new messages
   useEffect(() => {

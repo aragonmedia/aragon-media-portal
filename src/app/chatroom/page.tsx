@@ -6,7 +6,10 @@
  * TikTok credentials submission modal, drag-drop screenshots.
  */
 
+import { cookies } from "next/headers";
+import { redirect } from "next/navigation";
 import ChatroomClient from "./ChatroomClient";
+import { TOKEN_COOKIE, verifyToken } from "@/lib/chatroom/magic-link";
 
 export const dynamic = "force-dynamic";
 
@@ -33,6 +36,30 @@ const CALENDLY_URL =
   process.env.ACCELERATOR_CALENDLY_URL ??
   "https://calendly.com/itskevinaragon/30min";
 
-export default function ChatroomPage() {
-  return <ChatroomClient calendlyUrl={CALENDLY_URL} />;
+export default async function ChatroomPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ t?: string }>;
+}) {
+  const sp = await searchParams;
+  const token = typeof sp.t === "string" ? sp.t : "";
+  let hasToken = false;
+  if (token) {
+    const verified = verifyToken(token);
+    if (verified) {
+      // Persist the token on this browser then bounce to the clean URL
+      const jar = await cookies();
+      jar.set(TOKEN_COOKIE, token, {
+        path: "/",
+        maxAge: 90 * 24 * 60 * 60,
+        sameSite: "lax",
+        httpOnly: true,
+        secure: true,
+      });
+      redirect("/chatroom");
+    }
+  }
+  const jar = await cookies();
+  hasToken = !!jar.get(TOKEN_COOKIE)?.value && !!verifyToken(jar.get(TOKEN_COOKIE)!.value);
+  return <ChatroomClient calendlyUrl={CALENDLY_URL} hasMagicToken={hasToken} />;
 }

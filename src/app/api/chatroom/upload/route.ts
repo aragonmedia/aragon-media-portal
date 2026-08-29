@@ -13,6 +13,8 @@ import { eq } from "drizzle-orm";
 import { db } from "@/db";
 import { chatroomThreads } from "@/db/schema";
 import { getOrCreateBrowserKey } from "@/lib/chatroom/session";
+import { TOKEN_COOKIE, verifyToken } from "@/lib/chatroom/magic-link";
+import { cookies } from "next/headers";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -24,14 +26,23 @@ const ALLOWED_TYPES = [
 ];
 
 export async function POST(request: Request): Promise<NextResponse> {
-  const { key } = await getOrCreateBrowserKey();
-  const existing = await db
-    .select({ id: chatroomThreads.id })
-    .from(chatroomThreads)
-    .where(eq(chatroomThreads.browserKey, key))
-    .limit(1);
-  if (existing.length === 0) {
-    return NextResponse.json({ ok: false, error: "no active thread" }, { status: 401 });
+  const jar = await cookies();
+  const tokenCookie = jar.get(TOKEN_COOKIE)?.value;
+  const verified = tokenCookie ? verifyToken(tokenCookie) : null;
+  let pathKey = "";
+  if (verified) {
+    pathKey = verified.threadId;
+  } else {
+    const { key } = await getOrCreateBrowserKey();
+    const existing = await db
+      .select({ id: chatroomThreads.id })
+      .from(chatroomThreads)
+      .where(eq(chatroomThreads.browserKey, key))
+      .limit(1);
+    if (existing.length === 0) {
+      return NextResponse.json({ ok: false, error: "no active thread" }, { status: 401 });
+    }
+    pathKey = key;
   }
 
   try {
@@ -44,7 +55,7 @@ export async function POST(request: Request): Promise<NextResponse> {
         return {
           allowedContentTypes: ALLOWED_TYPES,
           maximumSizeInBytes: MAX_BYTES,
-          tokenPayload: JSON.stringify({ key, path: `chatroom/${key.slice(0, 12)}/${safe}` }),
+          tokenPayload: JSON.stringify({ key: pathKey, path: `chatroom/${pathKey.slice(0, 12)}/${safe}` }),
           addRandomSuffix: true,
         };
       },

@@ -16,6 +16,8 @@ import { eq } from "drizzle-orm";
 import { db } from "@/db";
 import { chatroomThreads, chatroomMessages, chatroomCredentials } from "@/db/schema";
 import { getOrCreateBrowserKey } from "@/lib/chatroom/session";
+import { TOKEN_COOKIE, verifyToken } from "@/lib/chatroom/magic-link";
+import { cookies } from "next/headers";
 import { encryptJSON } from "@/lib/chatroom/encryption";
 import { sendChatroomUserMessageNotification } from "@/lib/email/send";
 
@@ -51,10 +53,20 @@ export async function POST(req: Request) {
     return NextResponse.json({ ok: false, error: "password required" }, { status: 400 });
   }
 
-  const { key } = await getOrCreateBrowserKey();
   const rows = await db.select().from(chatroomThreads).where(eq(chatroomThreads.id, threadId)).limit(1);
   const thread = rows[0];
-  if (!thread || thread.browserKey !== key) {
+  if (!thread) {
+    return NextResponse.json({ ok: false, error: "thread not found" }, { status: 404 });
+  }
+  const jar = await cookies();
+  const tokenCookie = jar.get(TOKEN_COOKIE)?.value;
+  const viaMagic = tokenCookie ? verifyToken(tokenCookie)?.threadId === thread.id : false;
+  let viaKey = false;
+  if (!viaMagic) {
+    const { key } = await getOrCreateBrowserKey();
+    viaKey = thread.browserKey === key;
+  }
+  if (!viaMagic && !viaKey) {
     return NextResponse.json({ ok: false, error: "not authorized for this thread" }, { status: 401 });
   }
 

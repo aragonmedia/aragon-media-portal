@@ -777,7 +777,7 @@ export async function sendChatroomAdminReplyNotification(opts: {
             <tr><td bgcolor="#FFFFFF" style="padding:18px 32px 22px;background:#FFFFFF;">
               <a href="${opts.openUrl}" style="display:inline-block;padding:12px 22px;background:#DC1E2E;color:#FFFFFF;text-decoration:none;font-size:13px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;border-radius:4px;">Open chat →</a>
               <p style="margin:14px 0 0;font-size:12px;color:#8B8278;line-height:1.5;">
-                Reopen the conversation from the same browser you started it in and enter your email + name — your history is right where you left it.
+                One-tap access from this email — no login required. This link keeps you signed into your thread on any device for 90 days.
               </p>
             </td></tr>
             <tr><td bgcolor="#FFFFFF" style="padding:14px 32px 26px;background:#FFFFFF;border-top:1px solid #E8E2D2;color:#8B8278;font-size:11px;line-height:1.6;text-align:center;">
@@ -800,7 +800,7 @@ export async function sendChatroomAdminReplyNotification(opts: {
       "",
       `Open chat: ${opts.openUrl}`,
       "",
-      "Reopen from the same browser you started in and enter your email + name.",
+      "One-tap access. Link keeps you signed into your thread on any device for 90 days.",
     ].filter(Boolean).join("\n");
 
     await resend.emails.send({

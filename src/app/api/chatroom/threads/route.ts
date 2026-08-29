@@ -1,11 +1,14 @@
 /**
  * POST /api/chatroom/threads
  *
- * Start a new thread OR resume an existing one for this (email + browser)
- * pair. Body: { email, name }. Sets the browser cookie if it wasn't set.
- * Returns the thread + full message history (last 200 msgs).
+ * Two auth paths:
+ *   (a) Magic-link cookie present + valid → resume thread by tid,
+ *       bypass email/name entirely. Used when the user returns from
+ *       an email link (any device, any browser).
+ *   (b) Body { email, name } → existing browser-cookie flow. Creates
+ *       a new thread if none matches (email + browser_key).
  *
- * Public. No auth — this is the entry point into the /chatroom flow.
+ * Returns { thread, messages }. Sets browser cookie if it was missing.
  */
 
 import { NextResponse } from "next/server";
@@ -13,6 +16,8 @@ import { and, asc, eq } from "drizzle-orm";
 import { db } from "@/db";
 import { chatroomThreads, chatroomMessages } from "@/db/schema";
 import { browserCookieHeader, getOrCreateBrowserKey } from "@/lib/chatroom/session";
+import { TOKEN_COOKIE, verifyToken } from "@/lib/chatroom/magic-link";
+import { cookies } from "next/headers";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -20,6 +25,47 @@ export const dynamic = "force-dynamic";
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 export async function POST(req: Request) {
+  // (a) Try magic-link cookie first — no body required
+  const jar = await cookies();
+  const tokenCookie = jar.get(TOKEN_COOKIE)?.value;
+  if (tokenCookie) {
+    const verified = verifyToken(tokenCookie);
+    if (verified) {
+      const rows = await db
+        .select()
+        .from(chatroomThreads)
+        .where(eq(chatroomThreads.id, verified.threadId))
+        .limit(1);
+      if (rows[0]) {
+        const thread = rows[0];
+        const msgs = await db
+          .select()
+          .from(chatroomMessages)
+          .where(eq(chatroomMessages.threadId, thread.id))
+          .orderBy(asc(chatroomMessages.createdAt))
+          .limit(200);
+        return NextResponse.json({
+          ok: true,
+          via: "magic",
+          thread: {
+            id: thread.id,
+            email: thread.email,
+            name: thread.name,
+            createdAt: thread.createdAt.toISOString(),
+          },
+          messages: msgs.map((m) => ({
+            id: m.id,
+            sender: m.sender,
+            body: m.body,
+            attachments: m.attachments,
+            createdAt: m.createdAt.toISOString(),
+          })),
+        });
+      }
+    }
+  }
+
+  // (b) Body-based create/resume by email + browser_key
   let body: { email?: unknown; name?: unknown };
   try { body = await req.json(); }
   catch { return NextResponse.json({ ok: false, error: "invalid json" }, { status: 400 }); }
@@ -34,8 +80,6 @@ export async function POST(req: Request) {
   }
 
   const { key, setCookie } = await getOrCreateBrowserKey();
-
-  // Try to find an existing thread for (email, browser_key)
   const existing = await db
     .select()
     .from(chatroomThreads)
@@ -50,7 +94,6 @@ export async function POST(req: Request) {
       .returning();
     thread = inserted[0];
   } else if (thread.name !== name) {
-    // User updated their name — persist it
     const updated = await db
       .update(chatroomThreads)
       .set({ name })
@@ -71,6 +114,7 @@ export async function POST(req: Request) {
   return new Response(
     JSON.stringify({
       ok: true,
+      via: "email",
       thread: {
         id: thread.id,
         email: thread.email,

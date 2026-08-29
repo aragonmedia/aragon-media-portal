@@ -30,3 +30,17 @@ export function browserCookieHeader(value: string): string {
   // 180-day expiry, root path, lax so it survives OAuth-style redirects
   return `${BROWSER_COOKIE}=${value}; Path=/; Max-Age=15552000; SameSite=Lax`;
 }
+
+
+/**
+ * Read the magic-link token cookie set by /chatroom?t=... (server-side
+ * only — cookie is HttpOnly).
+ */
+import { TOKEN_COOKIE, verifyToken } from "./magic-link";
+export async function getMagicLinkThreadId(): Promise<string | null> {
+  const jar = await cookies();
+  const raw = jar.get(TOKEN_COOKIE)?.value;
+  if (!raw) return null;
+  const verified = verifyToken(raw);
+  return verified?.threadId ?? null;
+}
