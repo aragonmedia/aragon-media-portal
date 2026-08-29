@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
+import { upload } from "@vercel/blob/client";
 
 type Msg = { id: string; sender: string; body: string; attachments: string[]; createdAt: string; };
 type Thread = { id: string; email: string; name: string; createdAt: string; };
@@ -27,9 +28,41 @@ export default function ThreadClient({
   const [messages, setMessages] = useState<Msg[]>(initialMessages);
   const [reply, setReply] = useState("");
   const [sending, setSending] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const [pending, setPending] = useState<File[]>([]);
+  const [dragOver, setDragOver] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [decrypted, setDecrypted] = useState<Record<string, DecryptedCreds | "loading" | "error">>({});
   const feedRef = useRef<HTMLDivElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const MAX_ATTACH = 4;
+  function addFiles(files: FileList | File[]) {
+    const list = Array.from(files).filter((f) => f.type.startsWith("image/"));
+    setPending((cur) => [...cur, ...list].slice(0, MAX_ATTACH));
+  }
+  function removePending(i: number) {
+    setPending((cur) => cur.filter((_, idx) => idx !== i));
+  }
+  async function uploadPending(): Promise<string[]> {
+    if (pending.length === 0) return [];
+    setUploading(true);
+    const urls: string[] = [];
+    try {
+      for (const file of pending) {
+        const safeName = file.name.replace(/[^a-zA-Z0-9._-]+/g, "_");
+        const path = `chatroom-admin/${Date.now()}-${safeName}`;
+        const blob = await upload(path, file, {
+          access: "public",
+          handleUploadUrl: "/api/blob/client-upload",
+        });
+        urls.push(blob.url);
+      }
+    } finally {
+      setUploading(false);
+    }
+    return urls;
+  }
 
   useEffect(() => {
     feedRef.current?.scrollTo({ top: feedRef.current.scrollHeight, behavior: "smooth" });
@@ -37,18 +70,22 @@ export default function ThreadClient({
 
   async function send(e: React.FormEvent) {
     e.preventDefault();
-    if (sending || !reply.trim()) return;
+    if (sending) return;
+    const text = reply.trim();
+    if (!text && pending.length === 0) return;
     setSending(true); setError(null);
     try {
+      const attachments = await uploadPending();
       const res = await fetch("/api/admin/chatroom/reply", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ threadId: thread.id, body: reply.trim() }),
+        body: JSON.stringify({ threadId: thread.id, body: text, attachments }),
       });
       const j = await res.json();
       if (!j.ok) throw new Error(j.error || "Send failed.");
       setMessages((cur) => [...cur, j.message]);
       setReply("");
+      setPending([]);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Send failed.");
     } finally {
@@ -154,7 +191,32 @@ export default function ThreadClient({
           )}
         </div>
 
-        <form onSubmit={send} className="acrx-composer">
+        <form
+          onSubmit={send}
+          className={`acrx-composer${dragOver ? " drag" : ""}`}
+          onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
+          onDragLeave={() => setDragOver(false)}
+          onDrop={(e) => {
+            e.preventDefault();
+            setDragOver(false);
+            addFiles(e.dataTransfer.files);
+          }}
+        >
+          {pending.length > 0 && (
+            <div className="acrx-pending">
+              {pending.map((f, i) => (
+                <div key={i} className="acrx-pending-item">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={URL.createObjectURL(f)} alt="pending" />
+                  <button
+                    type="button"
+                    onClick={() => removePending(i)}
+                    aria-label="Remove"
+                  >×</button>
+                </div>
+              ))}
+            </div>
+          )}
           <textarea
             value={reply}
             onChange={(e) => setReply(e.target.value)}
@@ -163,13 +225,34 @@ export default function ThreadClient({
                 e.preventDefault(); send(e as unknown as React.FormEvent);
               }
             }}
-            placeholder="Reply to the creator…"
+            placeholder="Reply to the creator… (drag images anywhere to attach up to 4)"
             rows={3}
             disabled={sending}
           />
-          <button type="submit" disabled={sending || !reply.trim()}>
-            {sending ? "Sending…" : "Send reply"}
-          </button>
+          <div className="acrx-composer-actions">
+            <label className="acrx-attach">
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                multiple
+                hidden
+                onChange={(e) => { if (e.target.files) addFiles(e.target.files); }}
+              />
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
+                <path d="m21.44 11.05-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66L9.41 17.41a2 2 0 0 1-2.83-2.83l8.49-8.49" />
+              </svg>
+              <span>Attach ({pending.length}/{MAX_ATTACH})</span>
+            </label>
+            <div className="acrx-composer-spacer" />
+            <button
+              type="submit"
+              className="acrx-send"
+              disabled={sending || uploading || (!reply.trim() && pending.length === 0)}
+            >
+              {uploading ? "Uploading…" : sending ? "Sending…" : "Send reply"}
+            </button>
+          </div>
           {error && <p className="acrx-error">{error}</p>}
         </form>
       </div>
@@ -213,7 +296,32 @@ export default function ThreadClient({
         .acrx-msg-attach { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px; }
         .acrx-msg-attach img { max-width: 140px; max-height: 140px; border-radius: 8px; border: 1px solid #262626; }
 
-        .acrx-composer { padding: 14px 16px; border-top: 1px solid #1F1F1F; background: #0B0B0B; display: flex; flex-direction: column; gap: 10px; }
+        .acrx-composer { padding: 14px 16px; border-top: 1px solid #1F1F1F; background: #0B0B0B; display: flex; flex-direction: column; gap: 10px; transition: background 150ms ease; }
+        .acrx-composer.drag { background: rgba(201, 168, 76, 0.06); }
+        .acrx-pending { display: flex; gap: 8px; flex-wrap: wrap; }
+        .acrx-pending-item { position: relative; }
+        .acrx-pending-item img { width: 70px; height: 70px; border-radius: 8px; object-fit: cover; border: 1px solid #262626; }
+        .acrx-pending-item button {
+          position: absolute; top: -6px; right: -6px;
+          background: #DC1E2E; border: none;
+          width: 20px; height: 20px; border-radius: 50%;
+          color: #FFFFFF; font-size: 14px; line-height: 1;
+          cursor: pointer; padding: 0;
+          display: flex; align-items: center; justify-content: center;
+        }
+        .acrx-composer-actions { display: flex; align-items: center; gap: 8px; }
+        .acrx-attach {
+          display: inline-flex; align-items: center; gap: 6px;
+          padding: 8px 12px;
+          background: transparent;
+          border: 1px solid #262626;
+          color: #9A9590;
+          border-radius: 8px; cursor: pointer;
+          font-size: 11.5px; font-weight: 700; letter-spacing: 0.06em;
+          text-transform: uppercase;
+        }
+        .acrx-attach:hover { color: #C9A84C; border-color: #C9A84C; }
+        .acrx-composer-spacer { flex: 1; }
         .acrx-composer textarea {
           width: 100%;
           background: #141414;
@@ -228,15 +336,14 @@ export default function ThreadClient({
           box-sizing: border-box;
         }
         .acrx-composer textarea:focus { border-color: #C9A84C; }
-        .acrx-composer button {
-          align-self: flex-end;
+        .acrx-send {
           background: #C9A84C; border: 1px solid #C9A84C;
           color: #0B0B0B; font: inherit; font-size: 13px; font-weight: 700;
           padding: 10px 22px; border-radius: 8px; cursor: pointer;
           letter-spacing: 0.06em; text-transform: uppercase;
         }
-        .acrx-composer button:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 6px 14px -4px rgba(201,168,76,0.4); }
-        .acrx-composer button:disabled { opacity: 0.5; cursor: not-allowed; }
+        .acrx-send:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 6px 14px -4px rgba(201,168,76,0.4); }
+        .acrx-send:disabled { opacity: 0.5; cursor: not-allowed; }
         .acrx-error { margin: 4px 0 0; color: #DC4444; font-size: 12.5px; }
       `}</style>
     </div>
