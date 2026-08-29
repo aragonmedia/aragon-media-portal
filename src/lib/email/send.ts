@@ -736,3 +736,81 @@ export async function sendChatroomUserMessageNotification(opts: {
     console.error("[email] sendChatroomUserMessageNotification failed:", err);
   }
 }
+
+// ============================================================
+// Chatroom (P2) — admin reply notification to the user
+// Fires from POST /api/admin/chatroom/reply after the message is
+// inserted. Users don't have accounts — they only need to know
+// "you got a reply, come back to /chatroom".
+// ============================================================
+export async function sendChatroomAdminReplyNotification(opts: {
+  to: string;                 // user's email
+  userName: string;           // user's name (for greeting)
+  snippet: string;            // up to ~280 chars of the admin's message
+  attachments: number;
+  openUrl: string;            // link back to /chatroom
+}) {
+  try {
+    if (!opts.to || !opts.to.includes("@")) return;
+    const resend = getResend();
+    const firstName = opts.userName.split(/\s+/)[0] || "there";
+    const subject = "New reply from Aragon Media × Accelerator";
+    const attachNote =
+      opts.attachments > 0
+        ? `<p style="margin:12px 0 0;font-size:12px;color:#6B6B6B;">📎 ${opts.attachments} attachment${opts.attachments === 1 ? "" : "s"} included in the full message.</p>`
+        : "";
+
+    const html = `<!DOCTYPE html><html>${EMAIL_HEAD}
+    <body bgcolor="#F5F2EA" style="margin:0;padding:0;background:#F5F2EA;color:#1A1A1A;font-family:system-ui,-apple-system,'Inter Tight',sans-serif;">
+      <table role="presentation" width="100%" bgcolor="#F5F2EA" style="background:#F5F2EA;">
+        <tr><td align="center" style="padding:32px 18px;">
+          <table role="presentation" width="600" bgcolor="#FFFFFF" style="background:#FFFFFF;border:1px solid #E8E2D2;border-radius:12px;max-width:600px;width:100%;">
+            <tr><td bgcolor="#FFFFFF" style="padding:30px 32px 14px;background:#FFFFFF;">
+              <p style="margin:0 0 6px 0;font-size:11px;letter-spacing:0.2em;color:#DC1E2E;text-transform:uppercase;font-weight:700;">Verification chat · New reply</p>
+              <h1 style="margin:0;font-size:22px;line-height:1.25;color:#1A1A1A;letter-spacing:-0.01em;">Hi ${escapeHtml(firstName)}, we replied.</h1>
+              <p style="margin:6px 0 0;font-size:13px;color:#6B6B6B;">The Aragon Media × Accelerator team just responded in your verification chat.</p>
+            </td></tr>
+            <tr><td bgcolor="#FFFFFF" style="padding:14px 32px;background:#FFFFFF;">
+              <div style="background:#FFF6F7;border:1px solid #F5C7CB;border-left:3px solid #DC1E2E;padding:14px 16px;font-size:14px;color:#1A1A1A;line-height:1.65;white-space:pre-wrap;word-break:break-word;border-radius:4px;">${escapeHtml(opts.snippet)}</div>
+              ${attachNote}
+            </td></tr>
+            <tr><td bgcolor="#FFFFFF" style="padding:18px 32px 22px;background:#FFFFFF;">
+              <a href="${opts.openUrl}" style="display:inline-block;padding:12px 22px;background:#DC1E2E;color:#FFFFFF;text-decoration:none;font-size:13px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;border-radius:4px;">Open chat →</a>
+              <p style="margin:14px 0 0;font-size:12px;color:#8B8278;line-height:1.5;">
+                Reopen the conversation from the same browser you started it in and enter your email + name — your history is right where you left it.
+              </p>
+            </td></tr>
+            <tr><td bgcolor="#FFFFFF" style="padding:14px 32px 26px;background:#FFFFFF;border-top:1px solid #E8E2D2;color:#8B8278;font-size:11px;line-height:1.6;text-align:center;">
+              Accelerator × Aragon Media — Verification chatroom
+            </td></tr>
+          </table>
+        </td></tr>
+      </table>
+    </body></html>`;
+
+    const text = [
+      "NEW REPLY IN YOUR VERIFICATION CHAT",
+      "",
+      `Hi ${firstName},`,
+      "",
+      "The Aragon Media × Accelerator team just responded:",
+      "",
+      opts.snippet,
+      opts.attachments ? `\n📎 ${opts.attachments} attachment${opts.attachments === 1 ? "" : "s"}` : "",
+      "",
+      `Open chat: ${opts.openUrl}`,
+      "",
+      "Reopen from the same browser you started in and enter your email + name.",
+    ].filter(Boolean).join("\n");
+
+    await resend.emails.send({
+      from: FROM,
+      to: [opts.to],
+      subject,
+      text,
+      html,
+    });
+  } catch (err) {
+    console.error("[email] sendChatroomAdminReplyNotification failed:", err);
+  }
+}

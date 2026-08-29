@@ -12,6 +12,7 @@ import { eq } from "drizzle-orm";
 import { db } from "@/db";
 import { chatroomThreads, chatroomMessages } from "@/db/schema";
 import { isAdminSession } from "@/lib/auth/admin";
+import { sendChatroomAdminReplyNotification } from "@/lib/email/send";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -50,6 +51,17 @@ export async function POST(req: Request) {
     .update(chatroomThreads)
     .set({ lastMessageAt: now, lastAdminMessageAt: now })
     .where(eq(chatroomThreads.id, threadId));
+
+  // Notify the user that AM replied (fire-and-log, non-blocking)
+  const thread = rows[0];
+  const origin = new URL(req.url).origin;
+  await sendChatroomAdminReplyNotification({
+    to: thread.email,
+    userName: thread.name,
+    snippet: text.slice(0, 280) || (attachments.length ? "(attachments only — open the chat to view)" : ""),
+    attachments: attachments.length,
+    openUrl: `${origin}/chatroom`,
+  });
 
   return NextResponse.json({
     ok: true,
