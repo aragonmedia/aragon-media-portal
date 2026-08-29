@@ -181,9 +181,10 @@ export default function ChatroomClient({ calendlyUrl }: { calendlyUrl: string })
             <span className="taa-hero-accent">Aragon Media × Accelerator</span>
           </h1>
           <p className="taa-hero-sub">
-            Bought an account through <b>Nick G&apos;s Discord</b>? The team
-            handles activation, TikTok Shop onboarding, and payout setup
-            with you here. Drop your email to start.
+            Bought an account through <b>Nick G&apos;s Discord</b> or have an
+            account ready for verification? We handle activation, TikTok
+            Shop onboarding, and payout setup with you here. Drop your
+            email to start.
           </p>
 
           <form className="cr-gate" onSubmit={(e) => { e.preventDefault(); openThread(); }}>
