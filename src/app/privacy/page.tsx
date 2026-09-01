@@ -169,6 +169,53 @@ export default function PrivacyPage() {
           </p>
         </section>
 
+        <section className="legal-section">
+          <h2 className="legal-h2"><span className="legal-h2-num">12</span>Discord bot &amp; third-party integrations</h2>
+          <p>
+            We operate a read-only Discord application called{" "}
+            <strong>&ldquo;Kevin &times; Affiliate Accelerator&rdquo;</strong>{" "}
+            (application ID <code>1544430620946604184</code>) inside servers
+            operated by our TikTok Accelerator partners. Its sole function is
+            to read publicly-posted account-listing messages from a single
+            channel per server so that current inventory can be surfaced on{" "}
+            <a href="https://portal.kevin-aragon.com/accounts">portal.kevin-aragon.com/accounts</a>.
+          </p>
+          <h3 className="legal-h3">What the bot reads</h3>
+          <p>
+            Only the text content of messages posted in the authorized
+            listings channel(s). The bot cannot access, and we do not store,
+            log, or transmit: any other channel, any direct messages, any
+            member identity, any private ticket thread, or any content from
+            servers where the bot has not been explicitly installed with
+            channel-level permissions.
+          </p>
+          <h3 className="legal-h3">What we store from Discord</h3>
+          <p>
+            Only structured, non-personal listing data parsed out of those
+            public messages: TikTok handle, follower count, listed price. We
+            do not store Discord user IDs, message IDs, message authors,
+            timestamps, or the raw message text beyond the current active
+            snapshot.
+          </p>
+          <h3 className="legal-h3">Retention &amp; deletion</h3>
+          <p>
+            The listing cache is refreshed on a scheduled cadence — old
+            entries that no longer appear in the source channel are deleted
+            automatically. Server owners can revoke the bot&apos;s access at
+            any time from Discord Server Settings, which will freeze further
+            reads immediately; email us at{" "}
+            <a href="mailto:aragonkevin239@gmail.com">aragonkevin239@gmail.com</a>{" "}
+            and we will purge any cached listings within 24 hours on request.
+          </p>
+          <h3 className="legal-h3">Discord&apos;s own policies</h3>
+          <p>
+            Use of the bot is also subject to{" "}
+            <a href="https://discord.com/terms" target="_blank" rel="noopener noreferrer">Discord&apos;s Terms of Service</a>{" "}
+            and{" "}
+            <a href="https://discord.com/privacy" target="_blank" rel="noopener noreferrer">Discord&apos;s Privacy Policy</a>.
+          </p>
+        </section>
+
         <div className="legal-foot">
           <span><strong>Aragon Media</strong> · 1309 Coffeen Ave, Sheridan, WY 82801</span>
           <span>Questions? <a href="mailto:aragonkevin239@gmail.com">aragonkevin239@gmail.com</a></span>

@@ -208,6 +208,40 @@ export default function TermsPage() {
           </p>
         </section>
 
+        <section className="legal-section">
+          <h2 className="legal-h2"><span className="legal-h2-num">13</span>Third-party integrations &amp; Discord bot</h2>
+          <p>
+            Aragon Media operates a read-only Discord application called{" "}
+            <strong>&ldquo;Kevin &times; Affiliate Accelerator&rdquo;</strong>{" "}
+            (application ID <code>1544430620946604184</code>) in partnership
+            with the TikTok Affiliate Accelerator program. It is installed in
+            server owner-authorized Discord servers strictly to read publicly
+            posted account-listing messages from a single channel per server,
+            so that inventory can be surfaced on{" "}
+            <a href="https://portal.kevin-aragon.com/accounts">portal.kevin-aragon.com/accounts</a>.
+          </p>
+          <p>
+            The bot requests only these Discord permissions:{" "}
+            <code>View Channel</code> and <code>Read Message History</code>. It
+            cannot send messages, DM users, read private tickets, moderate,
+            manage roles, or access member lists. Server owners can revoke
+            access at any time from Discord Server Settings.
+          </p>
+          <p>
+            Parsed listing text (TikTok handle, follower count, listed price)
+            is stored in our production database, refreshed on a scheduled
+            cadence, and displayed to visitors. We do not store, log, or
+            forward any Discord user identifiers, private messages, direct
+            messages, or contents of any channel other than the authorized
+            listings channel. Data handling for this integration is covered
+            in the corresponding section of the <Link href="/privacy">Privacy Policy</Link>.
+          </p>
+          <p>
+            Questions or removal requests about the Discord integration:{" "}
+            <a href="mailto:aragonkevin239@gmail.com">aragonkevin239@gmail.com</a>.
+          </p>
+        </section>
+
         <div className="legal-foot">
           <span><strong>Aragon Media</strong> · 1309 Coffeen Ave, Sheridan, WY 82801</span>
           <span>Questions? <a href="mailto:aragonkevin239@gmail.com">aragonkevin239@gmail.com</a></span>
