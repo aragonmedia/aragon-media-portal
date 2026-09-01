@@ -62,6 +62,11 @@ export default function AccountsClient({
   const [syncedAt, setSyncedAt] = useState<string | null>(lastSyncedAt);
   const [refreshing, setRefreshing] = useState(false);
   const [query, setQuery] = useState("");
+  const [lastRefreshedAt, setLastRefreshedAt] = useState<number>(0);
+  const [nowTs, setNowTs] = useState<number>(() => Date.now());
+
+  const REFRESH_MIN_INTERVAL_MS = 60 * 60 * 1000; // 1 hour throttle
+  const REFRESH_STORAGE_KEY = "taa_last_refresh_ts";
   const [bucket, setBucket] = useState<FollowerBucket>("all");
   const [relLabel, setRelLabel] = useState(fmtRelative(lastSyncedAt));
 
@@ -72,8 +77,29 @@ export default function AccountsClient({
   }, [syncedAt]);
   useEffect(() => setRelLabel(fmtRelative(syncedAt)), [syncedAt]);
 
+  // Restore last-refresh timestamp (persist across reloads)
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem(REFRESH_STORAGE_KEY);
+      if (raw) {
+        const n = Number(raw);
+        if (Number.isFinite(n)) setLastRefreshedAt(n);
+      }
+    } catch {}
+  }, []);
+  // Tick nowTs every 15s so the countdown label updates in real time.
+  useEffect(() => {
+    const t = setInterval(() => setNowTs(Date.now()), 15_000);
+    return () => clearInterval(t);
+  }, []);
+
   async function refresh() {
     if (refreshing) return;
+    const now = Date.now();
+    if (lastRefreshedAt && now - lastRefreshedAt < REFRESH_MIN_INTERVAL_MS) {
+      // Throttled — no-op. UI already shows the countdown.
+      return;
+    }
     setRefreshing(true);
     try {
       const res = await fetch("/api/accelerator/accounts", { cache: "no-store" });
@@ -82,11 +108,22 @@ export default function AccountsClient({
         setAccounts(j.accounts);
         setSyncedAt(j.lastSyncedAt);
       }
+      setLastRefreshedAt(now);
+      try { localStorage.setItem(REFRESH_STORAGE_KEY, String(now)); } catch {}
     } finally {
-      // Minimum 600ms spin so the animation reads as "did something"
       setTimeout(() => setRefreshing(false), 600);
     }
   }
+
+  const cooldownMs = lastRefreshedAt
+    ? Math.max(0, REFRESH_MIN_INTERVAL_MS - (nowTs - lastRefreshedAt))
+    : 0;
+  const cooldownLabel = (() => {
+    if (cooldownMs <= 0) return "";
+    const mins = Math.ceil(cooldownMs / 60_000);
+    if (mins >= 60) return "1h";
+    return `${mins}m`;
+  })();
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -227,8 +264,9 @@ export default function AccountsClient({
             type="button"
             className="taa-refresh"
             onClick={refresh}
-            disabled={refreshing}
+            disabled={refreshing || cooldownMs > 0}
             aria-busy={refreshing}
+            title={cooldownMs > 0 ? `Refresh available in ${cooldownLabel}` : "Refresh accounts"}
           >
             <svg
               className={refreshing ? "spin" : ""}
@@ -237,7 +275,13 @@ export default function AccountsClient({
               <path d="M21 12a9 9 0 1 1-3-6.7" />
               <path d="M21 4v5h-5" />
             </svg>
-            <span>{refreshing ? "Refreshing…" : "Refresh accounts"}</span>
+            <span>
+              {refreshing
+                ? "Refreshing…"
+                : cooldownMs > 0
+                ? `Refresh in ${cooldownLabel}`
+                : "Refresh accounts"}
+            </span>
           </button>
         </div>
       </section>

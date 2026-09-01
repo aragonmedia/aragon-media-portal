@@ -1,0 +1,8 @@
+{
+  "crons": [
+    {
+      "path": "/api/accelerator/sync/discord",
+      "schedule": "0 */6 * * *"
+    }
+  ]
+}
