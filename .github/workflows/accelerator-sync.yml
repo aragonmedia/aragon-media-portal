@@ -1,0 +1,59 @@
+# ============================================================
+# Accelerator listings — Discord sync cron
+# ============================================================
+# Replaces the Vercel Cron (Pro-only) with a free GitHub Actions
+# schedule. Pings /api/accelerator/sync/discord every 6 hours, which
+# fetches the last 100 messages from Nick G's listings channel via
+# the Discord bot and upserts /accounts.
+#
+# Also exposes a manual "Run workflow" button so we can trigger a
+# sync on demand from the Actions tab.
+#
+# Repo secret required (Settings → Secrets and variables → Actions):
+#   ACCELERATOR_SYNC_SECRET  =  <Vercel's MIGRATION_SECRET value>
+#
+# Cadence:
+#   00:00 UTC + 06:00 UTC + 12:00 UTC + 18:00 UTC daily
+name: Accelerator Discord sync
+
+on:
+  schedule:
+    - cron: "0 */6 * * *"
+  workflow_dispatch:
+
+concurrency:
+  group: accelerator-sync
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    name: POST /api/accelerator/sync/discord
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Ping sync endpoint
+        env:
+          SECRET: ${{ secrets.ACCELERATOR_SYNC_SECRET }}
+        run: |
+          set -euo pipefail
+          if [ -z "${SECRET:-}" ]; then
+            echo "::error::ACCELERATOR_SYNC_SECRET repo secret is not set"
+            exit 1
+          fi
+          echo "Firing accelerator Discord sync…"
+          RESPONSE=$(curl -sS --max-time 60 -X POST \
+            -H "Authorization: Bearer $SECRET" \
+            -w "\nHTTP_STATUS:%{http_code}" \
+            https://portal.kevin-aragon.com/api/accelerator/sync/discord)
+          STATUS=$(echo "$RESPONSE" | grep -oE 'HTTP_STATUS:[0-9]+' | cut -d: -f2)
+          BODY=$(echo "$RESPONSE" | sed 's/HTTP_STATUS:[0-9]*//')
+          echo "HTTP $STATUS"
+          echo "$BODY"
+          # Fail the job if non-2xx
+          if [ "$STATUS" -lt 200 ] || [ "$STATUS" -ge 300 ]; then
+            echo "::error::sync endpoint returned $STATUS"
+            exit 1
+          fi
+          # Extract parsed count as a summary line
+          PARSED=$(echo "$BODY" | grep -oE '"parsed":[0-9]+' | head -1 | cut -d: -f2 || echo "?")
+          echo "::notice::Parsed $PARSED accounts from Discord"
