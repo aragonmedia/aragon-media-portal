@@ -611,7 +611,7 @@ function Wins() {
         <div className="ac-wins-empty">
           <div className="ac-wins-empty-glow" aria-hidden="true" />
           <p className="ac-wins-empty-title">More wins landing shortly.</p>
-          <p className="ac-wins-empty-sub">Check back weekly — the team is flooding this space with fresh screenshots as creators activate and start earning.</p>
+          <p className="ac-wins-empty-sub">Check back weekly. The team is flooding this space with fresh screenshots as creators activate and start earning.</p>
         </div>
       ) : (
         <div className="ac-wins-grid">
