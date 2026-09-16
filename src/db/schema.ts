@@ -313,3 +313,19 @@ export const chatroomCredentials = pgTable("chatroom_credentials", {
   submittedAt: timestamp("submitted_at", { withTimezone: true }).defaultNow().notNull(),
   viewedByAdminAt: timestamp("viewed_by_admin_at", { withTimezone: true }),
 });
+
+// ===== accelerator_intents (P3 landing capture) =====
+export const acceleratorIntents = pgTable("accelerator_intents", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  email: varchar("email", { length: 320 }).notNull(),
+  name: varchar("name", { length: 200 }).notNull(),
+  browserKey: varchar("browser_key", { length: 64 }),
+  viewedTiersAt: timestamp("viewed_tiers_at", { withTimezone: true }),
+  clickedTier: varchar("clicked_tier", { length: 40 }),
+  clickedTierPriceCents: integer("clicked_tier_price_cents"),
+  clickedAt: timestamp("clicked_at", { withTimezone: true }),
+  referrer: varchar("referrer", { length: 500 }),
+  userAgent: varchar("user_agent", { length: 500 }),
+  createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
+});

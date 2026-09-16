@@ -814,3 +814,134 @@ export async function sendChatroomAdminReplyNotification(opts: {
     console.error("[email] sendChatroomAdminReplyNotification failed:", err);
   }
 }
+
+// ============================================================
+// Accelerator P3 — landing page intent notifications
+// ============================================================
+
+// Admin ping when a fresh visitor submits the gate to reveal pricing
+export async function sendAcceleratorRevealNotifyAdmin(opts: {
+  to: string[];
+  name: string;
+  email: string;
+  referrer: string;
+  adminUrl: string;
+}) {
+  try {
+    if (opts.to.length === 0) return;
+    const resend = getResend();
+    const subject = `Accelerator lead: ${opts.name}`;
+    const html = `<!DOCTYPE html><html>${EMAIL_HEAD}
+    <body bgcolor="#F5F2EA" style="margin:0;padding:0;background:#F5F2EA;font-family:system-ui,-apple-system,'Inter Tight',sans-serif;">
+      <table role="presentation" width="100%" bgcolor="#F5F2EA" style="background:#F5F2EA;">
+        <tr><td align="center" style="padding:32px 18px;">
+          <table role="presentation" width="600" bgcolor="#FFFFFF" style="background:#FFFFFF;border:1px solid #E8E2D2;border-radius:12px;max-width:600px;width:100%;">
+            <tr><td style="padding:30px 32px 14px;">
+              <p style="margin:0 0 6px 0;font-size:11px;letter-spacing:0.2em;color:#DC1E2E;text-transform:uppercase;font-weight:700;">Accelerator landing · New lead</p>
+              <h1 style="margin:0;font-size:22px;color:#1A1A1A;letter-spacing:-0.01em;">${escapeHtml(opts.name)}</h1>
+              <p style="margin:6px 0 0;font-size:13px;color:#6B6B6B;">${escapeHtml(opts.email)}</p>
+              <p style="margin:14px 0 0;font-size:12.5px;color:#6B6B6B;">This visitor unlocked pricing on /accelerator. They haven't clicked a tier yet.</p>
+              ${opts.referrer ? `<p style="margin:8px 0 0;font-size:11px;color:#8B8278;">Referrer: ${escapeHtml(opts.referrer)}</p>` : ""}
+            </td></tr>
+            <tr><td style="padding:14px 32px 26px;">
+              <a href="${opts.adminUrl}" style="display:inline-block;padding:12px 22px;background:#DC1E2E;color:#FFFFFF;text-decoration:none;font-size:13px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;border-radius:4px;">Open admin →</a>
+            </td></tr>
+          </table>
+        </td></tr>
+      </table>
+    </body></html>`;
+    await resend.emails.send({
+      from: FROM, to: opts.to, subject,
+      text: `NEW ACCELERATOR LEAD\n\n${opts.name} <${opts.email}> unlocked pricing.\n${opts.referrer ? "Referrer: " + opts.referrer + "\n" : ""}\nOpen admin: ${opts.adminUrl}`,
+      html,
+    });
+  } catch (err) { console.error("[email] sendAcceleratorRevealNotifyAdmin failed:", err); }
+}
+
+// Buyer pre-checkout email (backup for the Square-Skool redirect)
+export async function sendAcceleratorIntentToBuyer(opts: {
+  to: string;
+  name: string;
+  tierLabel: string;
+  priceCents: number;
+  skoolUrl: string;
+}) {
+  try {
+    if (!opts.to.includes("@")) return;
+    const resend = getResend();
+    const firstName = opts.name.split(/\s+/)[0] || "there";
+    const price = `$${(opts.priceCents / 100).toLocaleString()}`;
+    const subject = `You're one step away — Accelerator Program`;
+    const html = `<!DOCTYPE html><html>${EMAIL_HEAD}
+    <body bgcolor="#050505" style="margin:0;padding:0;background:#050505;font-family:system-ui,-apple-system,'Inter Tight',sans-serif;color:#F5F5F7;">
+      <table role="presentation" width="100%" bgcolor="#050505" style="background:#050505;">
+        <tr><td align="center" style="padding:32px 18px;">
+          <table role="presentation" width="600" bgcolor="#101012" style="background:#101012;border:1px solid #262626;border-radius:12px;max-width:600px;width:100%;">
+            <tr><td style="padding:30px 32px 14px;">
+              <p style="margin:0 0 6px 0;font-size:11px;letter-spacing:0.2em;color:#DC1E2E;text-transform:uppercase;font-weight:700;">TikTok Affiliate Accelerator</p>
+              <h1 style="margin:0;font-size:26px;color:#FFFFFF;letter-spacing:-0.02em;font-weight:800;">Hi ${escapeHtml(firstName)}, checkout is up next.</h1>
+              <p style="margin:12px 0 0;font-size:14px;color:#9A9AA2;line-height:1.6;">You picked <strong style="color:#FFFFFF;">${escapeHtml(opts.tierLabel)}</strong> at <strong style="color:#DC1E2E;">${price}</strong>. We're routing you to Square to complete payment.</p>
+              <p style="margin:12px 0 0;font-size:14px;color:#9A9AA2;line-height:1.6;">After payment lands, you'll be sent to the Skool community — that's where the program lives. If Square doesn't auto-redirect for any reason, tap the button below to jump straight to Skool and request access with this email.</p>
+            </td></tr>
+            <tr><td style="padding:14px 32px;">
+              <a href="${opts.skoolUrl}" style="display:inline-block;padding:14px 26px;background:#DC1E2E;color:#FFFFFF;text-decoration:none;font-size:13px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;border-radius:6px;">Join Skool community →</a>
+            </td></tr>
+            <tr><td style="padding:18px 32px 24px;font-size:12px;color:#7A7A82;line-height:1.6;">
+              Questions? Reply to this email or hit the chat widget on the landing page. The Aragon Media × Accelerator team will get back to you fast.
+            </td></tr>
+            <tr><td style="padding:14px 32px 22px;border-top:1px solid #262626;color:#7A7A82;font-size:11px;text-align:center;">
+              Aragon Media × Accelerator · Verification, activation, and payouts handled with you.
+            </td></tr>
+          </table>
+        </td></tr>
+      </table>
+    </body></html>`;
+    await resend.emails.send({
+      from: FROM, to: [opts.to], subject,
+      text: [
+        `Hi ${firstName},`, "",
+        `You picked ${opts.tierLabel} at ${price}. We're routing you to Square to complete payment.`, "",
+        `After payment lands, you'll be sent to the Skool community: ${opts.skoolUrl}`,
+        `If Square doesn't auto-redirect, click that link and request access with this email.`, "",
+        `Questions? Reply to this email or use the chat on the landing page.`,
+      ].join("\n"),
+      html,
+    });
+  } catch (err) { console.error("[email] sendAcceleratorIntentToBuyer failed:", err); }
+}
+
+// Admin hot-lead alert on tier click
+export async function sendAcceleratorIntentToAdmin(opts: {
+  to: string[];
+  name: string;
+  email: string;
+  tierLabel: string;
+  priceCents: number;
+}) {
+  try {
+    if (opts.to.length === 0) return;
+    const resend = getResend();
+    const price = `$${(opts.priceCents / 100).toLocaleString()}`;
+    const subject = `🔥 Hot Accelerator lead: ${opts.name} clicked ${opts.tierLabel}`;
+    const html = `<!DOCTYPE html><html>${EMAIL_HEAD}
+    <body bgcolor="#F5F2EA" style="margin:0;padding:0;background:#F5F2EA;font-family:system-ui,-apple-system,'Inter Tight',sans-serif;">
+      <table role="presentation" width="100%" bgcolor="#F5F2EA">
+        <tr><td align="center" style="padding:32px 18px;">
+          <table role="presentation" width="600" bgcolor="#FFFFFF" style="background:#FFFFFF;border:1px solid #E5B9B0;border-left:4px solid #DC1E2E;border-radius:12px;max-width:600px;width:100%;">
+            <tr><td style="padding:30px 32px 14px;">
+              <p style="margin:0 0 6px 0;font-size:11px;letter-spacing:0.2em;color:#DC1E2E;text-transform:uppercase;font-weight:700;">🔥 Accelerator · Hot lead</p>
+              <h1 style="margin:0;font-size:22px;color:#1A1A1A;">${escapeHtml(opts.name)} clicked to buy.</h1>
+              <p style="margin:8px 0 0;font-size:13px;color:#6B6B6B;">${escapeHtml(opts.email)} → ${escapeHtml(opts.tierLabel)} (${price})</p>
+              <p style="margin:14px 0 0;font-size:12.5px;color:#6B6B6B;">They've been routed to Square. If payment completes, Square redirects them to Skool. Watch for a new access request in the Skool admin — approve it with the email above.</p>
+            </td></tr>
+          </table>
+        </td></tr>
+      </table>
+    </body></html>`;
+    await resend.emails.send({
+      from: FROM, to: opts.to, subject,
+      text: `HOT ACCELERATOR LEAD\n\n${opts.name} <${opts.email}> clicked ${opts.tierLabel} (${price}).\n\nThey've been routed to Square. Watch for a Skool access request and approve with the email above.`,
+      html,
+    });
+  } catch (err) { console.error("[email] sendAcceleratorIntentToAdmin failed:", err); }
+}
