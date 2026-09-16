@@ -65,6 +65,8 @@ const WINS: { src: string; caption?: string; video?: boolean }[] = [
   { src: "/accelerator/wins/IMG_1568.PNG" },
   { src: "/accelerator/wins/IMG_1545.jpg" },
   { src: "/accelerator/wins/IMG_0706.jpg" },
+  { src: "/accelerator/wins/IMG_5906.png" },
+  { src: "/accelerator/wins/IMG_5993 3.png" },
   { src: "/accelerator/wins/after 08.JPG" },
 ];
 
