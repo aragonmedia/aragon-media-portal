@@ -26,7 +26,47 @@ const PARTNERS = [
 
 // Wins gallery — Kevin drops screenshots to /public/accelerator/wins/
 // and we add entries here. Empty for now.
-const WINS: { src: string; caption?: string }[] = [];
+const WINS: { src: string; caption?: string; video?: boolean }[] = [
+  // Big numbers — heavy hitters first
+  { src: "/accelerator/wins/proof-486k-nov.png", caption: "$486K in November" },
+  { src: "/accelerator/wins/proof-125k-week.png", caption: "$125K in one week" },
+  { src: "/accelerator/wins/proof-94k-viral.png", caption: "$94K viral drop" },
+  { src: "/accelerator/wins/proof-89k-dec.png", caption: "$89K in December" },
+  { src: "/accelerator/wins/38k.png", caption: "$38K day" },
+  { src: "/accelerator/wins/proof-33k-pulled.png", caption: "$33K pulled" },
+  { src: "/accelerator/wins/IMG_9230 - $31K.jpeg", caption: "$31K" },
+  { src: "/accelerator/wins/proof-27k-goli.png", caption: "$27K on Goli" },
+  { src: "/accelerator/wins/27k.png", caption: "$27K" },
+  { src: "/accelerator/wins/24k.png", caption: "$24K" },
+  { src: "/accelerator/wins/23k.png", caption: "$23K" },
+  { src: "/accelerator/wins/$18k.png", caption: "$18K" },
+  { src: "/accelerator/wins/12k.jpeg", caption: "$12K" },
+  { src: "/accelerator/wins/10k.png", caption: "$10K" },
+  { src: "/accelerator/wins/2k orders.png", caption: "2K+ orders" },
+  { src: "/accelerator/wins/proof-kyvo-card.png", caption: "Kyvo creator card" },
+  { src: "/accelerator/wins/proof-views.png", caption: "Views performance" },
+  // Video
+  { src: "/accelerator/wins/IMG_9468.MOV", video: true, caption: "Inside the program" },
+  // Pictures of Kevin / the team
+  { src: "/accelerator/wins/IMG_8755.jpg" },
+  { src: "/accelerator/wins/IMG_8732.jpg" },
+  { src: "/accelerator/wins/IMG_8313.jpg" },
+  { src: "/accelerator/wins/IMG_9744.jpg" },
+  { src: "/accelerator/wins/IMG_7583.PNG" },
+  { src: "/accelerator/wins/IMG_7361.jpg" },
+  { src: "/accelerator/wins/IMG_7347.jpg" },
+  { src: "/accelerator/wins/IMG_7313.jpg" },
+  { src: "/accelerator/wins/IMG_7312.jpg" },
+  { src: "/accelerator/wins/IMG_7311.PNG" },
+  { src: "/accelerator/wins/IMG_7244.PNG" },
+  { src: "/accelerator/wins/IMG_7243.PNG" },
+  { src: "/accelerator/wins/IMG_7235.jpg" },
+  { src: "/accelerator/wins/IMG_1569.PNG" },
+  { src: "/accelerator/wins/IMG_1568.PNG" },
+  { src: "/accelerator/wins/IMG_1545.jpg" },
+  { src: "/accelerator/wins/IMG_0706.jpg" },
+  { src: "/accelerator/wins/after 08.JPG" },
+];
 
 const TESTIMONIALS = [
   { src: "/media/testimonials/alkis.mp4", name: "Alkis", city: "Athens, Greece" },
@@ -81,10 +121,8 @@ function Header() {
           <b>ACCELERATOR</b>
         </span>
         <span className="ac-brand-x">×</span>
-        <span className="ac-brand-tag">
-          <small>ARAGON</small>
-          <b>MEDIA</b>
-        </span>
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src={encodeURI("/AM_LOGO-removebg-preview copy.png")} alt="Aragon Media" className="ac-am-logo" />
       </div>
       <nav className="ac-header-nav">
         <a href="#how" className="ac-nav-link">How it works</a>
@@ -617,8 +655,20 @@ function Wins() {
         <div className="ac-wins-grid">
           {WINS.map((w, i) => (
             <figure key={i} className="ac-win-card">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={w.src} alt={w.caption || "Creator win"} loading="lazy" />
+              {w.video ? (
+                <video
+                  src={encodeURI(w.src)}
+                  autoPlay
+                  muted
+                  loop
+                  playsInline
+                  controls
+                  preload="metadata"
+                />
+              ) : (
+                /* eslint-disable-next-line @next/next/no-img-element */
+                <img src={encodeURI(w.src)} alt={w.caption || "Creator win"} loading="lazy" />
+              )}
               {w.caption && <figcaption>{w.caption}</figcaption>}
             </figure>
           ))}
@@ -754,8 +804,11 @@ function Styles() {
       .ac-wins { padding: 80px 40px; max-width: 1180px; margin: 0 auto; }
       .ac-wins-head { text-align: center; max-width: 760px; margin: 0 auto 40px; }
       .ac-wins-head .ac-section-sub { margin-left: auto; margin-right: auto; }
-      .ac-wins-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
-      .ac-win-card { margin: 0; background: var(--taa-bg-card); border: 1px solid var(--taa-border); border-radius: 14px; overflow: hidden; padding: 0; }
+      .ac-wins-grid { column-count: 3; column-gap: 16px; }
+      .ac-win-card { break-inside: avoid; -webkit-column-break-inside: avoid; page-break-inside: avoid; display: block; width: 100%; margin: 0 0 16px; }
+      .ac-am-logo { height: 34px; width: auto; display: block; filter: drop-shadow(0 0 8px rgba(220,30,46,0.35)); }
+      .ac-win-card video { width: 100%; height: auto; display: block; background: #000; }
+      .ac-win-card { background: var(--taa-bg-card); border: 1px solid var(--taa-border); border-radius: 14px; overflow: hidden; }
       .ac-win-card img { width: 100%; height: auto; display: block; }
       .ac-win-card figcaption { padding: 12px 16px; font-size: 12.5px; color: var(--taa-muted); border-top: 1px solid var(--taa-border); }
       .ac-wins-empty { position: relative; padding: 60px 40px; background: var(--taa-bg-card); border: 1px dashed var(--taa-border-strong); border-radius: 14px; text-align: center; overflow: hidden; }
@@ -828,7 +881,10 @@ function Styles() {
         .ac-partner-logo-wrap { height: 56px; min-width: 90px; padding: 10px 14px; }
         .ac-partner-logo { height: 32px; max-width: 100px; }
         .ac-tests, .ac-how, .ac-pricing, .ac-faq, .ac-wins { padding-left: 20px; padding-right: 20px; padding-top: 50px; padding-bottom: 30px; }
-        .ac-tests-grid, .ac-wins-grid { grid-template-columns: 1fr; gap: 14px; }
+        .ac-tests-grid { grid-template-columns: 1fr; gap: 14px; }
+        .ac-wins-grid { column-count: 2; column-gap: 10px; }
+        .ac-win-card { margin: 0 0 10px; }
+        .ac-am-logo { height: 26px; }
         .ac-steps { grid-template-columns: 1fr; gap: 12px; }
         .ac-step { padding: 20px 18px; }
         .ac-step-num { font-size: 36px; }
