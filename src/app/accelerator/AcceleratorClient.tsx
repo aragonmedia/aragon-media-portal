@@ -55,8 +55,8 @@ export default function AcceleratorClient() {
       <Header />
       <Hero />
       <Partners />
-      <HowItWorks />
       <PricingBlock />
+      <HowItWorks />
       <Testimonials />
       <Wins />
       <FAQ />
@@ -819,7 +819,9 @@ function Styles() {
         .ac-hero-sub { font-size: 15px; margin-bottom: 26px; }
         .ac-hero-cta-row { margin-bottom: 40px; width: 100%; }
         .ac-hero-cta-row .ac-cta-primary, .ac-hero-cta-row .ac-cta-ghost { flex: 1; justify-content: center; padding: 12px 18px; font-size: 12px; }
-        .ac-hero-stats { padding: 14px 18px; gap: 14px 20px; width: 100%; box-sizing: border-box; }
+        .ac-hero-stats { display: grid; grid-template-columns: 1fr 1fr; padding: 14px 18px; gap: 14px 18px; width: 100%; box-sizing: border-box; }
+        .ac-hero-stats .ac-stat-sep { display: none; }
+        .ac-hero-stats .ac-stat { min-width: 0; text-align: left; }
         .ac-stat-n { font-size: 20px; }
         .ac-stat-l { font-size: 9.5px; }
         .ac-partners { padding: 30px 20px 40px; }
