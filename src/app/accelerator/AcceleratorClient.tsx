@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 
 /* ============================================================
    TYPES + CONSTANTS
@@ -23,21 +24,25 @@ const PARTNERS = [
   { src: "/partners/cc.png", alt: "CC" },
 ];
 
+// Wins gallery — Kevin drops screenshots to /public/accelerator/wins/
+// and we add entries here. Empty for now.
+const WINS: { src: string; caption?: string }[] = [];
+
 const TESTIMONIALS = [
-  { src: "/media/testimonials/alkis.mp4", name: "Alkis", city: "Toronto, CA" },
-  { src: "/media/testimonials/menes.mp4", name: "Menes", city: "London, UK" },
-  { src: "/media/testimonials/teep.mp4", name: "Teep", city: "Melbourne, AU" },
+  { src: "/media/testimonials/alkis.mp4", name: "Alkis", city: "Athens, Greece" },
+  { src: "/media/testimonials/menes.mp4", name: "Menes", city: "Toronto, Canada" },
+  { src: "/media/testimonials/teep.mp4", name: "Teep", city: "Canada" },
 ];
 
 const FAQ_ITEMS = [
-  { q: "Do I need to be in the US?", a: "No — that's the whole point. The program is built for creators outside the US. We walk you through the VPN, US SIM, and phone setup on Day 2 of the fast track." },
+  { q: "Do I need to be in the US?", a: "No, that's the whole point. The program is built for creators outside the US. We walk you through the VPN, US SIM, and phone setup on Day 2 of the fast track." },
   { q: "Do I need a VPN or a specific phone?", a: "Yes to both. You'll need a reputable VPN and ideally a refurbished phone (we recommend specific models). We show you exactly what to buy and how to configure it in Module 2." },
   { q: "Do I need to buy a TikTok Shop account separately?", a: "Depends on your tier. Education + Verified Account includes one activated account handed to you on day 1. Education Only means you'll source an account yourself (from Nick G's marketplace on /accounts, or elsewhere)." },
   { q: "How fast is activation?", a: "Verified Account tier: 24 hours from submission. Education Only tier: next business day after you source your own account and submit it via the private chat." },
-  { q: "How do payouts work?", a: "TikTok Shop pays commissions into a Wise USD account we help you set up. From Wise you can withdraw to your bank in any currency, at the mid-market rate — no US bank required." },
-  { q: "What if my account gets a violation?", a: "We cover full compliance walkthroughs in Module 3 — the exact things to avoid, how to appeal, and how to restart clean if something goes wrong. Most violations are preventable." },
+  { q: "How do payouts work?", a: "TikTok Shop pays commissions into a Wise USD account we help you set up. From Wise you can withdraw to your bank in any currency, at the mid-market rate. No US bank required." },
+  { q: "What if my account gets a violation?", a: "We cover full compliance walkthroughs in Module 3. The exact things to avoid, how to appeal, and how to restart clean if something goes wrong. Most violations are preventable." },
   { q: "Can I upgrade tiers later?", a: "Yes. Enroll in Education Only, then pay the delta later to add an activated account. We honor the upgrade at any point in your program." },
-  { q: "What's the guarantee?", a: "If you follow every step and complete the 7-day fast track, you will be live on TikTok Shop — that's our commitment. This is a completion-based guarantee, not a money-back refund policy. The program works when you work it." },
+  { q: "What's the guarantee?", a: "If you follow every step and complete the 7-day fast track, you will be live on TikTok Shop. That's our commitment. This is a completion-based guarantee, not a money-back refund policy. The program works when you work it." },
 ];
 
 /* ============================================================
@@ -50,9 +55,10 @@ export default function AcceleratorClient() {
       <Header />
       <Hero />
       <Partners />
-      <Testimonials />
       <HowItWorks />
       <PricingBlock />
+      <Testimonials />
+      <Wins />
       <FAQ />
       <Footer />
       <ChatWidget />
@@ -117,7 +123,7 @@ function Hero() {
       <p className="ac-hero-sub">
         The operating system for creators <strong>outside the US</strong> to earn
         <strong> USD commissions</strong> on TikTok Shop. Skool community, live
-        workshops, and a verified account handed to you — activation in
+        workshops, and a verified account handed to you. Activation in
         <strong> 24 hours</strong>.
       </p>
       <div className="ac-hero-cta-row">
@@ -152,8 +158,10 @@ function Partners() {
       <div className="ac-marquee">
         <div className="ac-marquee-track">
           {[...PARTNERS, ...PARTNERS].map((p, i) => (
-            /* eslint-disable-next-line @next/next/no-img-element */
-            <img key={i} src={p.src} alt={p.alt} className="ac-partner-logo" />
+            <div key={i} className="ac-partner-logo-wrap">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={p.src} alt={p.alt} className="ac-partner-logo" />
+            </div>
           ))}
         </div>
       </div>
@@ -288,7 +296,7 @@ function PricingBlock() {
         <div className="ac-guarantee">
           <span className="ac-guarantee-icon">🛡</span>
           <div>
-            <b>7-Day Activation Guarantee.</b> Follow every step and complete the fast track — you will be live on TikTok Shop. That&apos;s our commitment.
+            <b>7-Day Activation Guarantee.</b> Follow every step and complete the fast track. You will be live on TikTok Shop. That&apos;s our commitment.
           </div>
         </div>
       </div>
@@ -297,7 +305,7 @@ function PricingBlock() {
         <div className="ac-gate-card">
           <div className="ac-gate-eyebrow">UNLOCK PRICING</div>
           <h3 className="ac-gate-title">Enter your name and email to see the tiers.</h3>
-          <p className="ac-gate-sub">Takes 3 seconds. No spam — just so we can send you Skool access details after you enroll.</p>
+          <p className="ac-gate-sub">Takes 3 seconds. No spam. Just so we can send you Skool access details after you enroll.</p>
           <form onSubmit={submitGate} className="ac-gate-form">
             <div className="ac-gate-row">
               <input
@@ -515,7 +523,11 @@ function ChatWidget() {
     } finally { setStatus("open"); }
   }
 
-  return (
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => { setMounted(true); }, []);
+  if (!mounted) return null;
+
+  const widget = (
     <div className="ac-chat-widget" data-open={open}>
       {!open && (
         <button className="ac-chat-toggle" onClick={() => setOpen(true)} aria-label="Open chat">
@@ -580,6 +592,40 @@ function ChatWidget() {
       )}
     </div>
   );
+
+  return createPortal(widget, document.body);
+}
+
+/* ============================================================
+   WINS gallery (Kevin uploads screenshots here)
+   ============================================================ */
+function Wins() {
+  return (
+    <section className="ac-wins" id="wins">
+      <div className="ac-wins-head">
+        <p className="ac-section-eyebrow">MORE WINS</p>
+        <h2 className="ac-section-title">The <span className="ac-accent">receipts.</span></h2>
+        <p className="ac-section-sub">Fresh screenshots straight from the creators inside the program. Updated weekly.</p>
+      </div>
+      {WINS.length === 0 ? (
+        <div className="ac-wins-empty">
+          <div className="ac-wins-empty-glow" aria-hidden="true" />
+          <p className="ac-wins-empty-title">More wins landing shortly.</p>
+          <p className="ac-wins-empty-sub">Check back weekly — the team is flooding this space with fresh screenshots as creators activate and start earning.</p>
+        </div>
+      ) : (
+        <div className="ac-wins-grid">
+          {WINS.map((w, i) => (
+            <figure key={i} className="ac-win-card">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={w.src} alt={w.caption || "Creator win"} loading="lazy" />
+              {w.caption && <figcaption>{w.caption}</figcaption>}
+            </figure>
+          ))}
+        </div>
+      )}
+    </section>
+  );
 }
 
 /* ============================================================
@@ -617,7 +663,7 @@ function Styles() {
       .ac-hero-sub-line { color: var(--taa-white); }
       .ac-hero-sub { margin: 0 0 30px; max-width: 640px; color: var(--taa-muted); font-size: 16px; line-height: 1.65; }
       .ac-hero-sub strong { color: var(--taa-white); font-weight: 700; }
-      .ac-hero-cta-row { display: inline-flex; gap: 10px; margin-bottom: 40px; flex-wrap: wrap; }
+      .ac-hero-cta-row { display: flex; gap: 12px; margin-bottom: 56px; flex-wrap: wrap; }
       .ac-cta-primary { background: var(--taa-red); color: var(--taa-white); border: 1px solid var(--taa-red); font: inherit; font-size: 13px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; padding: 13px 24px; border-radius: 6px; cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; gap: 8px; transition: transform 120ms ease, box-shadow 120ms ease, background 120ms ease; }
       .ac-cta-primary:hover:not(:disabled) { background: var(--taa-red-bright); transform: translateY(-1px); box-shadow: 0 12px 30px -10px var(--taa-red-glow); }
       .ac-cta-primary:disabled { opacity: 0.6; cursor: progress; }
@@ -632,9 +678,9 @@ function Styles() {
       .ac-partners { padding: 40px 40px 60px; max-width: 1180px; margin: 0 auto; text-align: center; }
       .ac-partners-eyebrow { font-size: 10.5px; letter-spacing: 0.24em; color: var(--taa-muted); font-weight: 700; text-transform: uppercase; margin: 0 0 20px; }
       .ac-marquee { overflow: hidden; mask-image: linear-gradient(to right, transparent 0%, black 12%, black 88%, transparent 100%); -webkit-mask-image: linear-gradient(to right, transparent 0%, black 12%, black 88%, transparent 100%); }
-      .ac-marquee-track { display: flex; gap: 60px; align-items: center; width: max-content; animation: ac-slide 40s linear infinite; }
-      .ac-partner-logo { height: 42px; width: auto; opacity: 0.55; filter: brightness(0) invert(1); transition: opacity 150ms ease; }
-      .ac-partner-logo:hover { opacity: 1; }
+      .ac-marquee-track { display: flex; gap: 24px; align-items: center; width: max-content; animation: ac-slide 40s linear infinite; }
+      .ac-partner-logo-wrap { background: #FFFFFF; border-radius: 10px; padding: 12px 18px; height: 68px; min-width: 110px; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; box-shadow: 0 4px 20px rgba(0,0,0,0.25); }
+      .ac-partner-logo { height: 42px; width: auto; max-width: 140px; object-fit: contain; display: block; }
       @keyframes ac-slide { from { transform: translateX(0); } to { transform: translateX(-50%); } }
 
       /* ---- testimonials ---- */
@@ -704,6 +750,19 @@ function Styles() {
       .ac-faq-sign { color: var(--taa-red); font-size: 20px; font-weight: 300; }
       .ac-faq-a { margin-top: 12px; font-size: 13.5px; color: var(--taa-muted); line-height: 1.65; }
 
+      /* ---- wins ---- */
+      .ac-wins { padding: 80px 40px; max-width: 1180px; margin: 0 auto; }
+      .ac-wins-head { text-align: center; max-width: 760px; margin: 0 auto 40px; }
+      .ac-wins-head .ac-section-sub { margin-left: auto; margin-right: auto; }
+      .ac-wins-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+      .ac-win-card { margin: 0; background: var(--taa-bg-card); border: 1px solid var(--taa-border); border-radius: 14px; overflow: hidden; padding: 0; }
+      .ac-win-card img { width: 100%; height: auto; display: block; }
+      .ac-win-card figcaption { padding: 12px 16px; font-size: 12.5px; color: var(--taa-muted); border-top: 1px solid var(--taa-border); }
+      .ac-wins-empty { position: relative; padding: 60px 40px; background: var(--taa-bg-card); border: 1px dashed var(--taa-border-strong); border-radius: 14px; text-align: center; overflow: hidden; }
+      .ac-wins-empty-glow { position: absolute; inset: 0; background: radial-gradient(ellipse at center, rgba(220,30,46,0.06) 0%, transparent 70%); pointer-events: none; }
+      .ac-wins-empty-title { position: relative; margin: 0 0 8px; font-size: 18px; font-weight: 800; color: var(--taa-white); letter-spacing: -0.01em; }
+      .ac-wins-empty-sub { position: relative; margin: 0; max-width: 480px; margin-left: auto; margin-right: auto; font-size: 13.5px; color: var(--taa-muted); line-height: 1.6; }
+
       /* ---- footer ---- */
       .ac-footer { max-width: 1180px; margin: 0 auto; padding: 40px 40px 60px; border-top: 1px solid var(--taa-border); display: flex; justify-content: space-between; align-items: center; color: var(--taa-muted); font-size: 12.5px; flex-wrap: wrap; gap: 14px; }
       .ac-footer b { color: var(--taa-white); }
@@ -713,10 +772,10 @@ function Styles() {
       .ac-footer-links a:hover { color: var(--taa-red); }
 
       /* ---- chat widget ---- */
-      .ac-chat-widget { position: fixed; bottom: 24px; right: 24px; z-index: 40; }
+      .ac-chat-widget { position: fixed; bottom: 24px; right: 24px; z-index: 9999; }
       .ac-chat-toggle { display: inline-flex; align-items: center; gap: 10px; background: var(--taa-red); color: var(--taa-white); border: none; font: inherit; font-size: 13px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; padding: 14px 22px; border-radius: 999px; cursor: pointer; box-shadow: 0 8px 30px rgba(220, 30, 46, 0.4); transition: transform 120ms ease; }
       .ac-chat-toggle:hover { transform: translateY(-2px); }
-      .ac-chat-panel { width: 360px; max-height: 560px; background: var(--taa-bg-card); border: 1px solid var(--taa-border-strong); border-radius: 14px; box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5); overflow: hidden; display: flex; flex-direction: column; }
+      .ac-chat-panel { width: 380px; max-width: calc(100vw - 32px); max-height: min(600px, calc(100vh - 100px)); background: var(--taa-bg-card); border: 1px solid var(--taa-border-strong); border-radius: 14px; box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6); overflow: hidden; display: flex; flex-direction: column; }
       .ac-chat-head { display: flex; justify-content: space-between; align-items: flex-start; padding: 16px 18px; border-bottom: 1px solid var(--taa-border); background: var(--taa-bg-elev); }
       .ac-chat-head-title { font-size: 14px; font-weight: 800; color: var(--taa-white); }
       .ac-chat-head-sub { font-size: 11px; color: var(--taa-muted); margin-top: 2px; }
@@ -747,19 +806,52 @@ function Styles() {
 
       /* ---- responsive ---- */
       @media (max-width: 900px) {
-        .ac-header { padding: 14px 20px; }
+        .ac-header { padding: 12px 16px; gap: 10px; }
+        .ac-header-brand { gap: 8px; }
+        .ac-header-brand img { width: 32px; height: 32px; }
+        .ac-brand-tag b { font-size: 13px; }
+        .ac-brand-tag small { font-size: 8px; }
+        .ac-brand-x { font-size: 16px; }
         .ac-header-nav { display: none; }
-        .ac-hero { padding: 50px 22px 40px; }
-        .ac-hero-stats { padding: 16px 20px; gap: 18px 24px; }
-        .ac-tests, .ac-how, .ac-pricing, .ac-faq { padding-left: 22px; padding-right: 22px; padding-top: 60px; padding-bottom: 40px; }
-        .ac-tests-grid { grid-template-columns: 1fr; }
-        .ac-steps { grid-template-columns: 1fr; }
-        .ac-tiers { grid-template-columns: 1fr; }
+        .ac-hero { padding: 40px 20px 30px; }
+        .ac-hero-eyebrow { font-size: 9.5px; padding: 5px 12px; }
+        .ac-hero-title { font-size: clamp(38px, 10vw, 56px); }
+        .ac-hero-sub { font-size: 15px; margin-bottom: 26px; }
+        .ac-hero-cta-row { margin-bottom: 40px; width: 100%; }
+        .ac-hero-cta-row .ac-cta-primary, .ac-hero-cta-row .ac-cta-ghost { flex: 1; justify-content: center; padding: 12px 18px; font-size: 12px; }
+        .ac-hero-stats { padding: 14px 18px; gap: 14px 20px; width: 100%; box-sizing: border-box; }
+        .ac-stat-n { font-size: 20px; }
+        .ac-stat-l { font-size: 9.5px; }
+        .ac-partners { padding: 30px 20px 40px; }
+        .ac-partner-logo-wrap { height: 56px; min-width: 90px; padding: 10px 14px; }
+        .ac-partner-logo { height: 32px; max-width: 100px; }
+        .ac-tests, .ac-how, .ac-pricing, .ac-faq, .ac-wins { padding-left: 20px; padding-right: 20px; padding-top: 50px; padding-bottom: 30px; }
+        .ac-tests-grid, .ac-wins-grid { grid-template-columns: 1fr; gap: 14px; }
+        .ac-steps { grid-template-columns: 1fr; gap: 12px; }
+        .ac-step { padding: 20px 18px; }
+        .ac-step-num { font-size: 36px; }
+        .ac-tiers { grid-template-columns: 1fr; gap: 14px; margin-top: 30px; }
+        .ac-tier { padding: 28px 22px; }
+        .ac-tier-price { font-size: 34px; }
+        .ac-gate-card { padding: 24px 20px; margin: 32px auto 0; }
         .ac-gate-row { grid-template-columns: 1fr; }
-        .ac-partners { padding-left: 22px; padding-right: 22px; }
-        .ac-footer { flex-direction: column; align-items: flex-start; padding: 30px 22px; }
-        .ac-chat-widget { bottom: 16px; right: 16px; }
-        .ac-chat-panel { width: calc(100vw - 32px); max-width: 400px; }
+        .ac-guarantee { flex-direction: column; text-align: center; align-items: center; padding: 14px 16px; }
+        .ac-faq { padding-top: 50px; padding-bottom: 30px; }
+        .ac-faq-q { font-size: 13.5px; }
+        .ac-faq-a { font-size: 13px; }
+        .ac-footer { flex-direction: column; align-items: flex-start; padding: 24px 20px 40px; gap: 12px; }
+        .ac-footer-links { flex-wrap: wrap; gap: 14px; }
+        .ac-chat-widget { bottom: 14px; right: 14px; }
+        .ac-chat-toggle { padding: 12px 18px; font-size: 12px; }
+        .ac-chat-toggle svg { width: 18px; height: 18px; }
+        .ac-chat-panel { width: calc(100vw - 24px); max-height: calc(100vh - 88px); }
+      }
+      @media (max-width: 480px) {
+        .ac-hero-title { font-size: clamp(32px, 11vw, 44px); }
+        .ac-hero-stats { gap: 10px 16px; padding: 12px 14px; }
+        .ac-stat { min-width: 68px; }
+        .ac-stat-n { font-size: 18px; }
+        .ac-section-title { font-size: clamp(24px, 7vw, 32px); }
       }
     `}</style>
   );
