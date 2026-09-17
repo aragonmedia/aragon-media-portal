@@ -115,6 +115,7 @@ export default function AcceleratorClient() {
 function Header() {
   return (
     <header className="ac-header">
+      <div className="ac-header-inner">
       <div className="ac-header-brand">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src="/accelerator/wolf-transparent.png" alt="" width={40} height={40} />
@@ -132,6 +133,7 @@ function Header() {
         <a href="#faq" className="ac-nav-link">FAQ</a>
         <Link href="/accounts" className="ac-nav-cta">Browse accounts →</Link>
       </nav>
+      </div>
     </header>
   );
 }
@@ -695,7 +697,8 @@ function Styles() {
       .ac-section-sub { margin: 12px 0 0; max-width: 640px; color: var(--taa-muted); font-size: 14.5px; line-height: 1.6; }
 
       /* ---- header ---- */
-      .ac-header { position: sticky; top: 0; z-index: 20; display: flex; justify-content: space-between; align-items: center; padding: 18px 40px; background: rgba(5, 5, 5, 0.75); backdrop-filter: blur(10px); border-bottom: 1px solid var(--taa-border); }
+      .ac-header { position: sticky; top: 0; z-index: 20; padding: 18px 40px; background: rgba(5, 5, 5, 0.75); backdrop-filter: blur(10px); border-bottom: 1px solid var(--taa-border); }
+      .ac-header-inner { max-width: 1180px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; gap: 24px; }
       .ac-header-brand { display: inline-flex; align-items: center; gap: 14px; }
       .ac-header-brand img { filter: drop-shadow(0 0 12px rgba(220, 30, 46, 0.4)); }
       .ac-brand-tag { display: inline-flex; flex-direction: column; gap: 2px; line-height: 1; }
@@ -861,7 +864,8 @@ function Styles() {
 
       /* ---- responsive ---- */
       @media (max-width: 900px) {
-        .ac-header { padding: 12px 16px; gap: 10px; }
+        .ac-header { padding: 12px 16px; }
+        .ac-header-inner { gap: 10px; }
         .ac-header-brand { gap: 8px; }
         .ac-header-brand img { width: 32px; height: 32px; }
         .ac-brand-tag b { font-size: 13px; }
