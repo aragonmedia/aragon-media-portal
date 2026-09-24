@@ -98,6 +98,7 @@ export default function AcceleratorClient() {
       <Hero />
       <Partners />
       <PricingBlock />
+      <InlineChat />
       <HowItWorks />
       <Testimonials />
       <Wins />
@@ -639,6 +640,152 @@ function ChatWidget() {
 }
 
 /* ============================================================
+   INLINE CHAT (below pricing, always visible — not the floating widget)
+   ============================================================ */
+function InlineChat() {
+  const [status, setStatus] = useState<ChatStatus>("gate");
+  const [form, setForm] = useState({ name: "", email: "" });
+  const [thread, setThread] = useState<{ id: string; email: string; name: string } | null>(null);
+  const [msgs, setMsgs] = useState<Array<{ id: string; sender: string; body: string; createdAt: string }>>([]);
+  const [composer, setComposer] = useState("");
+  const [error, setError] = useState<string | null>(null);
+  const feedRef = useRef<HTMLDivElement>(null);
+  const CAL = "https://calendly.com/itskevinaragon/30min";
+
+  useEffect(() => {
+    try {
+      const em = localStorage.getItem("am_chatroom_email") ?? "";
+      const nm = localStorage.getItem("am_chatroom_name") ?? "";
+      if (em) setForm({ name: nm, email: em });
+    } catch {}
+  }, []);
+
+  useEffect(() => {
+    feedRef.current?.scrollTo({ top: feedRef.current.scrollHeight, behavior: "smooth" });
+  }, [msgs.length]);
+
+  const openThread = useCallback(async () => {
+    setError(null);
+    try {
+      const res = await fetch("/api/chatroom/threads", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: form.email.trim(), name: form.name.trim() }),
+      });
+      const j = await res.json();
+      if (!j.ok) throw new Error(j.error || "Couldn't open the chat.");
+      setThread(j.thread); setMsgs(j.messages); setStatus("open");
+      try { localStorage.setItem("am_chatroom_email", form.email.trim()); localStorage.setItem("am_chatroom_name", form.name.trim()); } catch {}
+    } catch (e) { setError(e instanceof Error ? e.message : "Something went wrong."); }
+  }, [form.email, form.name]);
+
+  async function send() {
+    if (!thread || !composer.trim() || status === "sending") return;
+    const text = composer.trim();
+    setStatus("sending"); setError(null);
+    try {
+      const res = await fetch("/api/chatroom/messages", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ threadId: thread.id, body: text }),
+      });
+      const j = await res.json();
+      if (!j.ok) throw new Error(j.error || "Send failed.");
+      setMsgs((cur) => [...cur, j.message]);
+      setComposer("");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Send failed.");
+    } finally { setStatus("open"); }
+  }
+
+  return (
+    <section className="ac-inline-chat" id="talk">
+      <div className="ac-inline-chat-head">
+        <p className="ac-section-eyebrow">TALK TO US LIVE</p>
+        <h2 className="ac-section-title">Questions? <span className="ac-accent">Send it.</span></h2>
+        <p className="ac-section-sub">The AM team is here. Drop your name and email, then chat with us directly. Or book a 30-min call and we&apos;ll walk you through the program on Zoom.</p>
+      </div>
+
+      <div className="ac-inline-chat-card">
+        <div className="ac-inline-chat-side">
+          <div className="ac-inline-chat-bullets">
+            <div className="ac-inline-chat-bullet">
+              <span className="ac-inline-chat-dot" />
+              <div>
+                <b>Fast replies.</b>
+                <span>The team is on it every day. Expect a response the same day.</span>
+              </div>
+            </div>
+            <div className="ac-inline-chat-bullet">
+              <span className="ac-inline-chat-dot" />
+              <div>
+                <b>No pitch.</b>
+                <span>Ask anything about the tiers, timing, or what happens after you join.</span>
+              </div>
+            </div>
+            <div className="ac-inline-chat-bullet">
+              <span className="ac-inline-chat-dot" />
+              <div>
+                <b>Prefer a call?</b>
+                <span>Book a 30-min Zoom with Kevin below. Same day openings on most weeks.</span>
+              </div>
+            </div>
+          </div>
+          <a href={CAL} target="_blank" rel="noopener noreferrer" className="ac-cta-ghost ac-inline-chat-book">Book a 30-min call →</a>
+        </div>
+
+        <div className="ac-inline-chat-panel">
+          <div className="ac-inline-chat-head-strip">
+            <span className="ac-inline-chat-live-dot" />
+            <div>
+              <div className="ac-inline-chat-title">Chat with the AM team</div>
+              <div className="ac-inline-chat-sub">Private thread. We&apos;ll email you when we reply.</div>
+            </div>
+          </div>
+
+          {status === "gate" ? (
+            <form className="ac-inline-chat-gate" onSubmit={(e) => { e.preventDefault(); openThread(); }}>
+              <input
+                type="text" required placeholder="Your name" autoComplete="name"
+                value={form.name} onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
+              />
+              <input
+                type="email" required placeholder="you@example.com" autoComplete="email"
+                value={form.email} onChange={(e) => setForm((f) => ({ ...f, email: e.target.value }))}
+              />
+              <button type="submit" className="ac-cta-primary">Start chat →</button>
+              {error && <p className="ac-chat-err">{error}</p>}
+            </form>
+          ) : (
+            <>
+              <div ref={feedRef} className="ac-inline-chat-feed">
+                {msgs.length === 0 ? (
+                  <div className="ac-chat-empty">Say hi — the AM team will jump in.</div>
+                ) : msgs.map((m) => (
+                  <div key={m.id} className={`ac-chat-msg ${m.sender === "user" ? "me" : "them"}`}>
+                    <p>{m.body}</p>
+                    <span>{m.sender === "user" ? "You" : "AM Team"} · {new Date(m.createdAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}</span>
+                  </div>
+                ))}
+              </div>
+              <form className="ac-inline-chat-composer" onSubmit={(e) => { e.preventDefault(); send(); }}>
+                <input
+                  type="text" placeholder="Type a message…"
+                  value={composer} onChange={(e) => setComposer(e.target.value)}
+                  disabled={status === "sending"}
+                />
+                <button type="submit" disabled={!composer.trim() || status === "sending"}>Send</button>
+                {error && <p className="ac-chat-err">{error}</p>}
+              </form>
+            </>
+          )}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ============================================================
    WINS gallery (Kevin uploads screenshots here)
    ============================================================ */
 function Wins() {
@@ -821,6 +968,37 @@ function Styles() {
       .ac-wins-empty-title { position: relative; margin: 0 0 8px; font-size: 18px; font-weight: 800; color: var(--taa-white); letter-spacing: -0.01em; }
       .ac-wins-empty-sub { position: relative; margin: 0; max-width: 480px; margin-left: auto; margin-right: auto; font-size: 13.5px; color: var(--taa-muted); line-height: 1.6; }
 
+      /* ---- inline chat (below pricing) ---- */
+      .ac-inline-chat { max-width: 1180px; margin: 0 auto; padding: 30px 40px 60px; }
+      .ac-inline-chat-head { text-align: center; max-width: 720px; margin: 0 auto 32px; }
+      .ac-inline-chat-head .ac-section-sub { margin-left: auto; margin-right: auto; }
+      .ac-inline-chat-card { display: grid; grid-template-columns: 1fr 1.15fr; gap: 24px; background: var(--taa-bg-card); border: 1px solid var(--taa-border-strong); border-radius: 18px; padding: 28px; box-shadow: 0 20px 60px rgba(0,0,0,0.35); position: relative; overflow: hidden; }
+      .ac-inline-chat-card::before { content: ""; position: absolute; inset: 0; background: radial-gradient(ellipse at top left, rgba(220,30,46,0.07), transparent 55%); pointer-events: none; }
+      .ac-inline-chat-side { position: relative; display: flex; flex-direction: column; justify-content: space-between; gap: 24px; padding: 6px 4px 6px 6px; }
+      .ac-inline-chat-bullets { display: flex; flex-direction: column; gap: 18px; }
+      .ac-inline-chat-bullet { display: flex; gap: 12px; align-items: flex-start; }
+      .ac-inline-chat-bullet div { display: flex; flex-direction: column; gap: 3px; }
+      .ac-inline-chat-bullet b { color: var(--taa-white); font-size: 14px; font-weight: 800; letter-spacing: -0.005em; }
+      .ac-inline-chat-bullet span { color: var(--taa-muted); font-size: 13px; line-height: 1.55; }
+      .ac-inline-chat-dot { flex-shrink: 0; width: 8px; height: 8px; border-radius: 50%; background: var(--taa-red); margin-top: 6px; box-shadow: 0 0 0 3px rgba(220,30,46,0.18); }
+      .ac-inline-chat-book { align-self: flex-start; }
+      .ac-inline-chat-panel { position: relative; background: rgba(0,0,0,0.35); border: 1px solid var(--taa-border); border-radius: 14px; display: flex; flex-direction: column; min-height: 340px; overflow: hidden; }
+      .ac-inline-chat-head-strip { display: flex; align-items: center; gap: 12px; padding: 14px 18px; border-bottom: 1px solid var(--taa-border); background: rgba(255,255,255,0.02); }
+      .ac-inline-chat-live-dot { width: 8px; height: 8px; border-radius: 50%; background: #22c55e; box-shadow: 0 0 0 3px rgba(34,197,94,0.2); animation: acPulse 1.6s ease-in-out infinite; flex-shrink: 0; }
+      @keyframes acPulse { 0%,100% { opacity: 1; } 50% { opacity: 0.55; } }
+      .ac-inline-chat-title { font-size: 14px; font-weight: 800; color: var(--taa-white); }
+      .ac-inline-chat-sub { font-size: 12px; color: var(--taa-muted); margin-top: 2px; }
+      .ac-inline-chat-gate { display: flex; flex-direction: column; gap: 10px; padding: 18px; flex: 1; }
+      .ac-inline-chat-gate input { width: 100%; padding: 12px 14px; background: rgba(255,255,255,0.03); border: 1px solid var(--taa-border); border-radius: 8px; color: var(--taa-white); font-size: 14px; box-sizing: border-box; }
+      .ac-inline-chat-gate input:focus { outline: none; border-color: var(--taa-red); }
+      .ac-inline-chat-gate .ac-cta-primary { margin-top: 4px; justify-content: center; }
+      .ac-inline-chat-feed { flex: 1; overflow-y: auto; padding: 16px 18px; display: flex; flex-direction: column; gap: 10px; max-height: 300px; }
+      .ac-inline-chat-composer { display: flex; gap: 8px; padding: 12px; border-top: 1px solid var(--taa-border); background: rgba(0,0,0,0.4); }
+      .ac-inline-chat-composer input { flex: 1; padding: 10px 12px; background: rgba(255,255,255,0.03); border: 1px solid var(--taa-border); border-radius: 8px; color: var(--taa-white); font-size: 14px; }
+      .ac-inline-chat-composer input:focus { outline: none; border-color: var(--taa-red); }
+      .ac-inline-chat-composer button { padding: 10px 16px; background: var(--taa-red); color: var(--taa-white); border: none; border-radius: 8px; font-size: 13px; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; cursor: pointer; }
+      .ac-inline-chat-composer button:disabled { opacity: 0.5; cursor: not-allowed; }
+
       /* ---- footer ---- */
       .ac-footer { max-width: 1180px; margin: 0 auto; padding: 40px 40px 60px; border-top: 1px solid var(--taa-border); display: flex; justify-content: space-between; align-items: center; color: var(--taa-muted); font-size: 12.5px; flex-wrap: wrap; gap: 14px; }
       .ac-footer b { color: var(--taa-white); }
@@ -887,6 +1065,11 @@ function Styles() {
         .ac-partner-logo-wrap { height: 56px; min-width: 90px; padding: 10px 14px; }
         .ac-partner-logo { height: 32px; max-width: 100px; }
         .ac-tests, .ac-how, .ac-pricing, .ac-faq, .ac-wins { padding-left: 20px; padding-right: 20px; padding-top: 50px; padding-bottom: 30px; }
+        .ac-inline-chat { padding: 20px 20px 40px; }
+        .ac-inline-chat-card { grid-template-columns: 1fr; padding: 20px; gap: 20px; }
+        .ac-inline-chat-side { text-align: left; }
+        .ac-inline-chat-book { align-self: stretch; text-align: center; justify-content: center; }
+        .ac-inline-chat-panel { min-height: 300px; }
         .ac-tests-grid { grid-template-columns: 1fr; gap: 14px; }
         .ac-wins-grid { column-count: 2; column-gap: 10px; }
         .ac-win-card { margin: 0 0 10px; }
