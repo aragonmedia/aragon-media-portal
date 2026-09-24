@@ -430,3 +430,23 @@
 .admin-section-head + .admin-edit-panel{border-top:none;border-radius:0 0 6px 6px;}
 .acct-add-form{padding:14px 18px;background:#0F0F0F;border:1px solid #2A2A2A;}
 .acct-add-form + .acct-list{margin-top:10px;}
+
+/* ---- /admin/accelerator-leads ---- */
+.admin-page{padding:36px 40px;}
+.admin-page-head{display:flex;justify-content:space-between;align-items:flex-start;gap:20px;margin-bottom:28px;flex-wrap:wrap;}
+.admin-page-head h1{margin:0;font-size:24px;letter-spacing:-0.02em;color:#FAF7EE;font-weight:700;}
+.admin-stat-row{display:flex;gap:12px;}
+.admin-stat-row .admin-stat{padding:14px 20px;min-width:120px;}
+.admin-stat-num{font-size:24px;font-weight:800;color:#F5F1E6;letter-spacing:-0.02em;}
+.admin-td-when{white-space:nowrap;font-size:12px;color:#F5F1E6;}
+.admin-td-sub{font-size:11px;color:#7A756D;margin-top:2px;}
+.admin-td-referrer{max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:11px;color:#7A756D;}
+.admin-pill{display:inline-block;padding:4px 10px;border-radius:999px;font-size:11px;font-weight:700;letter-spacing:0.04em;}
+.admin-pill-hot{background:rgba(220,30,46,0.16);color:#F87171;border:1px solid rgba(220,30,46,0.35);}
+.admin-pill-warm{background:rgba(202,138,4,0.14);color:#EAB308;border:1px solid rgba(202,138,4,0.32);}
+@media (max-width: 700px){
+  .admin-page{padding:20px 16px;}
+  .admin-page-head{flex-direction:column;}
+  .admin-stat-row{flex-wrap:wrap;}
+  .admin-stat-row .admin-stat{flex:1;min-width:100px;}
+}

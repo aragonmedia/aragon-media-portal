@@ -703,7 +703,7 @@ function InlineChat() {
       <div className="ac-inline-chat-head">
         <p className="ac-section-eyebrow">TALK TO US LIVE</p>
         <h2 className="ac-section-title">Questions? <span className="ac-accent">Send it.</span></h2>
-        <p className="ac-section-sub">The AM team is here. Drop your name and email, then chat with us directly. Or book a 30-min call and we&apos;ll walk you through the program on Zoom.</p>
+        <p className="ac-section-sub">The AM team is here. Drop your name and email, then chat with us directly.</p>
       </div>
 
       <div className="ac-inline-chat-card">
@@ -727,7 +727,7 @@ function InlineChat() {
               <span className="ac-inline-chat-dot" />
               <div>
                 <b>Prefer a call?</b>
-                <span>Book a 30-min Zoom with Kevin below. Same day openings on most weeks.</span>
+                <span>Book a 30-min meeting below. Same day openings on most weeks.</span>
               </div>
             </div>
           </div>
@@ -1071,6 +1071,7 @@ function Styles() {
         .ac-inline-chat-book { align-self: stretch; text-align: center; justify-content: center; }
         .ac-inline-chat-panel { min-height: 300px; }
         .ac-tests-grid { grid-template-columns: 1fr; gap: 14px; }
+        .ac-test-meta { text-align: center; padding: 14px 18px 16px; }
         .ac-wins-grid { column-count: 2; column-gap: 10px; }
         .ac-win-card { margin: 0 0 10px; }
         .ac-am-logo { height: 26px; }
