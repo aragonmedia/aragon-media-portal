@@ -11,7 +11,7 @@ const NAV = [
   { href: "/admin/chats", label: "Chats", icon: "✦" },
   { href: "/admin/agreements", label: "Agreements", icon: "◇" },
   { href: "/admin/accelerator", label: "Accelerator", icon: "▲" },
-  { href: "/admin/accelerator-leads", label: "Leads (P3)", icon: "◆" },
+  { href: "/admin/accelerator-leads", label: "Accelerator Leads", icon: "◆" },
   { href: "/admin/chatroom", label: "Chatroom", icon: "◐" },
 ];
 

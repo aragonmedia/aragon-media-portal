@@ -20,6 +20,7 @@ import { db } from "@/db";
 import { acceleratorIntents } from "@/db/schema";
 import { cookies } from "next/headers";
 import crypto from "node:crypto";
+import { upsertLead } from "@/lib/airtable/leads";
 import {
   sendAcceleratorIntentToBuyer,
   sendAcceleratorIntentToAdmin,
@@ -114,6 +115,15 @@ export async function POST(req: Request) {
       });
     }
 
+    // Best-effort Airtable sync (no-op if env vars unset).
+    upsertLead({
+      portalId: intent.id,
+      name,
+      email,
+      referrer,
+      userAgent,
+    }).catch(() => {});
+
     const headers = new Headers({ "Content-Type": "application/json" });
     if (setCookie) headers.append("Set-Cookie", cookieHeader(key));
     return new Response(JSON.stringify({ ok: true, id: intent.id }), { headers });
@@ -160,6 +170,14 @@ export async function POST(req: Request) {
       priceCents: meta.priceCents!,
     });
   }
+
+  // Best-effort Airtable sync — PATCHes the existing row's Tier Interest.
+  upsertLead({
+    portalId: intent.id,
+    name: intent.name,
+    email: intent.email,
+    clickedTier: tier,
+  }).catch(() => {});
 
   return NextResponse.json({ ok: true, checkoutUrl: meta.url });
 }
