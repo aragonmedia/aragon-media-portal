@@ -95,16 +95,21 @@ export async function POST(req: NextRequest) {
     .set({ consumedAt: new Date() })
     .where(eq(verificationCodes.id, codeRows[0].id));
 
-  // Claim any pending invite for this verified email.
-  await db
-    .update(adminInvites)
-    .set({ status: "claimed", claimedAt: new Date() })
-    .where(
-      and(
-        eq(adminInvites.email, email),
-        eq(adminInvites.status, "pending")
-      )
-    );
+  // Claim any pending invite for this verified email (safe if table
+  // doesn't exist yet — pre-migration).
+  try {
+    await db
+      .update(adminInvites)
+      .set({ status: "claimed", claimedAt: new Date() })
+      .where(
+        and(
+          eq(adminInvites.email, email),
+          eq(adminInvites.status, "pending")
+        )
+      );
+  } catch (err) {
+    console.warn("[admin login] invite claim skipped:", err instanceof Error ? err.message : err);
+  }
 
   await setAdminCookie(adminUser.id);
 

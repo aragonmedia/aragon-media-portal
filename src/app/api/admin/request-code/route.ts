@@ -51,8 +51,10 @@ export async function POST(req: NextRequest) {
     let adminRow = matches[0]?.isAdmin ? matches[0] : null;
 
     // If not an admin yet, check for a pending invite. Invite proves intent;
-    // the code (below) will prove email ownership.
+    // the code (below) will prove email ownership. Wrapped in try/catch so
+    // we don't 500 when the invite table doesn't exist yet (pre-migration).
     if (!adminRow) {
+      try {
       const inv = await db
         .select({ id: adminInvites.id, role: adminInvites.role })
         .from(adminInvites)
@@ -82,6 +84,9 @@ export async function POST(req: NextRequest) {
           }).returning({ id: users.id, name: users.name });
           adminRow = { id: created.id, name: created.name, isAdmin: true };
         }
+      }
+      } catch (err) {
+        console.warn("[admin request-code] invite lookup skipped:", err instanceof Error ? err.message : err);
       }
     }
 
