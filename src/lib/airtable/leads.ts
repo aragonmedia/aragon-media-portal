@@ -89,15 +89,16 @@ export async function upsertLead(input: {
   const env = airtableEnv();
   if (!env) return null; // no-op if not configured
   try {
-    const tierLabel = input.clickedTier ? TIER_INTEREST[input.clickedTier] : "Unknown";
     const existing = await findByPortalId(env, input.portalId);
     const fields: Record<string, unknown> = {
       "Name": input.name || "(no name)",
       "Email": input.email,
       "Portal ID": input.portalId,
       "Lead Source": SOURCE_LANDING,
-      "Tier Interest": tierLabel,
     };
+    // Only set Tier Interest when we actually have a tier click — otherwise
+    // a slow reveal PATCH could overwrite a fast click's tier value.
+    if (input.clickedTier) fields["Tier Interest"] = TIER_INTEREST[input.clickedTier];
     if (!existing) fields["Stage"] = STAGE_NEW;
     if (existing) return (await patchLead(env, existing, fields)) ? existing : null;
     return await createLead(env, fields);
