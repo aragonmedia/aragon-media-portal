@@ -2,6 +2,7 @@ import Link from "next/link";
 import { db } from "@/db";
 import { chats, messages, users } from "@/db/schema";
 import { desc, eq, sql } from "drizzle-orm";
+import { requireAdminRole } from "@/lib/auth/admin-role";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -18,6 +19,7 @@ function fmt(d: Date | string | null | undefined): string {
 }
 
 export default async function AdminChatsListPage() {
+  await requireAdminRole(["owner"]);
   const list = await db
     .select({
       id: chats.id,

@@ -6,9 +6,8 @@
  * leaving the portal. Read-only for now; add-status + notes come next.
  */
 
-import { redirect } from "next/navigation";
 import { desc } from "drizzle-orm";
-import { isAdminSession } from "@/lib/auth/admin";
+import { requireAdminRole } from "@/lib/auth/admin-role";
 import { db } from "@/db";
 import { acceleratorIntents } from "@/db/schema";
 
@@ -26,9 +25,7 @@ function fmt(d: Date) {
 }
 
 export default async function AdminAcceleratorLeadsPage() {
-  if (!(await isAdminSession())) {
-    redirect("/admin");
-  }
+  await requireAdminRole(["owner", "accelerator_admin", "am_lead"]);
 
   const rows = await db
     .select()

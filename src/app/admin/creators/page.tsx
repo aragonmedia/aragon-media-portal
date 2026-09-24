@@ -3,11 +3,13 @@ import { db } from "@/db";
 import { users, accounts, agreements, withdrawals } from "@/db/schema";
 import { sql, desc } from "drizzle-orm";
 import CreatorRowActions from "./CreatorRowActions";
+import { requireAdminRole } from "@/lib/auth/admin-role";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
 export default async function AdminCreatorsPage() {
+  await requireAdminRole(["owner"]);
   // One query per stat we need to surface inline. Joining/aggregating in
   // Postgres beats N+1 loops here even though the population is tiny.
   const list = await db

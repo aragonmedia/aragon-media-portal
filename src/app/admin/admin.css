@@ -460,3 +460,22 @@
   .admin-page-actions{align-items:stretch;}
   .admin-export-btn{justify-content:center;}
 }
+
+/* ---- team invite page ---- */
+.team-invite-card{background:#141414;border:1px solid #2A2A2A;border-radius:12px;padding:22px 24px;margin-bottom:28px;}
+.team-invite-title{font-size:13px;font-weight:800;color:#FAF7EE;letter-spacing:0.02em;margin-bottom:14px;}
+.team-invite-form{display:grid;grid-template-columns:1.6fr 1fr auto;gap:10px;}
+.team-input,.team-select{background:#0F0F0F;border:1px solid #2A2A2A;border-radius:8px;padding:10px 14px;color:#FAF7EE;font-size:14px;font-family:inherit;}
+.team-input:focus,.team-select:focus{outline:none;border-color:#DC1E2E;}
+.team-send{padding:10px 20px;background:#DC1E2E;color:#FAF7EE;border:none;border-radius:8px;font-size:12px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;cursor:pointer;white-space:nowrap;}
+.team-send:disabled{opacity:0.5;cursor:not-allowed;}
+.team-role-desc{font-size:12px;color:#9A9590;margin:10px 0 0;line-height:1.6;}
+.team-msg{margin:12px 0 0;padding:10px 14px;border-radius:8px;font-size:12.5px;}
+.team-msg-ok{background:rgba(34,197,94,0.12);border:1px solid rgba(34,197,94,0.32);color:#4ADE80;}
+.team-msg-err{background:rgba(220,30,46,0.14);border:1px solid rgba(220,30,46,0.35);color:#F87171;}
+.team-section-title{font-size:12px;color:#9A9590;letter-spacing:0.14em;text-transform:uppercase;font-weight:700;margin:32px 0 12px;}
+.team-revoke{background:transparent;border:1px solid #2A2A2A;color:#F87171;padding:6px 12px;border-radius:6px;font-size:11px;font-weight:700;letter-spacing:0.04em;text-transform:uppercase;cursor:pointer;}
+.team-revoke:hover{background:rgba(220,30,46,0.08);border-color:#DC1E2E;}
+@media (max-width: 700px){
+  .team-invite-form{grid-template-columns:1fr;}
+}

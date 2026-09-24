@@ -11,7 +11,7 @@
 import { NextRequest } from "next/server";
 import { and, desc, eq, isNull, gt } from "drizzle-orm";
 import { db } from "@/db";
-import { users, verificationCodes } from "@/db/schema";
+import { users, verificationCodes, adminInvites } from "@/db/schema";
 import { hashCode } from "@/lib/auth/codes";
 import { setAdminCookie } from "@/lib/auth/admin";
 
@@ -94,7 +94,19 @@ export async function POST(req: NextRequest) {
     .update(verificationCodes)
     .set({ consumedAt: new Date() })
     .where(eq(verificationCodes.id, codeRows[0].id));
-  await setAdminCookie();
+
+  // Claim any pending invite for this verified email.
+  await db
+    .update(adminInvites)
+    .set({ status: "claimed", claimedAt: new Date() })
+    .where(
+      and(
+        eq(adminInvites.email, email),
+        eq(adminInvites.status, "pending")
+      )
+    );
+
+  await setAdminCookie(adminUser.id);
 
   return Response.json({ ok: true });
 }

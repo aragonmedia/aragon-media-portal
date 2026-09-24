@@ -9,6 +9,7 @@ import { desc, eq, sql } from "drizzle-orm";
 import { isAdminSession } from "@/lib/auth/admin";
 import { db } from "@/db";
 import { chatroomThreads, chatroomMessages, chatroomCredentials } from "@/db/schema";
+import { requireAdminRole } from "@/lib/auth/admin-role";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -19,6 +20,7 @@ function fmt(d: Date | null | undefined) {
 }
 
 export default async function AdminChatroomList() {
+  await requireAdminRole(["owner", "accelerator_admin", "chat_only"]);
   if (!(await isAdminSession())) redirect("/admin");
 
   const threads = await db

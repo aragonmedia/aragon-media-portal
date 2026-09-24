@@ -11,9 +11,9 @@
  */
 
 import { NextRequest } from "next/server";
-import { eq } from "drizzle-orm";
 import { db } from "@/db";
-import { users, verificationCodes } from "@/db/schema";
+import { and, eq, gt } from "drizzle-orm";
+import { users, verificationCodes, adminInvites } from "@/db/schema";
 import { generateCode, hashCode, codeExpiry } from "@/lib/auth/codes";
 import { sendVerificationEmail } from "@/lib/email/send";
 
@@ -48,7 +48,42 @@ export async function POST(req: NextRequest) {
       .where(eq(users.email, email))
       .limit(1);
 
-    const adminRow = matches[0]?.isAdmin ? matches[0] : null;
+    let adminRow = matches[0]?.isAdmin ? matches[0] : null;
+
+    // If not an admin yet, check for a pending invite. Invite proves intent;
+    // the code (below) will prove email ownership.
+    if (!adminRow) {
+      const inv = await db
+        .select({ id: adminInvites.id, role: adminInvites.role })
+        .from(adminInvites)
+        .where(
+          and(
+            eq(adminInvites.email, email),
+            eq(adminInvites.status, "pending"),
+            gt(adminInvites.expiresAt, new Date())
+          )
+        )
+        .limit(1);
+      if (inv[0]) {
+        if (matches[0]) {
+          await db
+            .update(users)
+            .set({ isAdmin: true, adminRole: inv[0].role })
+            .where(eq(users.id, matches[0].id));
+          adminRow = { id: matches[0].id, name: matches[0].name, isAdmin: true };
+        } else {
+          // Minimal user row so the code flow has something to attach to.
+          const [created] = await db.insert(users).values({
+            email,
+            name: email.split("@")[0],
+            role: "creator",
+            isAdmin: true,
+            adminRole: inv[0].role,
+          }).returning({ id: users.id, name: users.name });
+          adminRow = { id: created.id, name: created.name, isAdmin: true };
+        }
+      }
+    }
 
     if (adminRow) {
       const code = generateCode();

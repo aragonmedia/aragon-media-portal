@@ -2,6 +2,7 @@ import { db } from "@/db";
 import { agreements, users } from "@/db/schema";
 import { desc, eq } from "drizzle-orm";
 import Link from "next/link";
+import { requireAdminRole } from "@/lib/auth/admin-role";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -16,6 +17,7 @@ function fmt(d: Date | string | null | undefined): string {
 }
 
 export default async function AdminAgreementsPage() {
+  await requireAdminRole(["owner"]);
   const list = await db
     .select({
       id: agreements.id,

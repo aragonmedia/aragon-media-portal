@@ -82,6 +82,7 @@ export const users = pgTable(
     handle: varchar("handle", { length: 200 }),
     otherDetails: text("other_details"),
     isAdmin: boolean("is_admin").default(false).notNull(),
+    adminRole: varchar("admin_role", { length: 40 }),
     contractSignedAt: timestamp("contract_signed_at", { withTimezone: true }),
     contractVersion: varchar("contract_version", { length: 20 }),
     contractUnlocked: boolean("contract_unlocked").default(false).notNull(),
@@ -328,4 +329,17 @@ export const acceleratorIntents = pgTable("accelerator_intents", {
   userAgent: varchar("user_agent", { length: 500 }),
   createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
   updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
+});
+
+// ===== admin_invites (team invite flow) =====
+export const adminInvites = pgTable("admin_invites", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  email: varchar("email", { length: 320 }).notNull(),
+  role: varchar("role", { length: 40 }).notNull(),
+  token: varchar("token", { length: 64 }).notNull().unique(),
+  invitedBy: uuid("invited_by"),
+  status: varchar("status", { length: 20 }).default("pending").notNull(),
+  expiresAt: timestamp("expires_at", { withTimezone: true }).notNull(),
+  createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+  claimedAt: timestamp("claimed_at", { withTimezone: true }),
 });

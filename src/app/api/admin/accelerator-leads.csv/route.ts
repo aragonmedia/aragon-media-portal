@@ -8,7 +8,7 @@
 
 import { NextResponse } from "next/server";
 import { desc } from "drizzle-orm";
-import { isAdminSession } from "@/lib/auth/admin";
+import { getAdminRole } from "@/lib/auth/admin-role";
 import { db } from "@/db";
 import { acceleratorIntents } from "@/db/schema";
 
@@ -31,7 +31,8 @@ function csv(v: unknown): string {
 }
 
 export async function GET() {
-  if (!(await isAdminSession())) {
+  const role = await getAdminRole();
+  if (!role || !["owner", "accelerator_admin", "am_lead"].includes(role.role)) {
     return NextResponse.json({ ok: false, error: "unauthorized" }, { status: 401 });
   }
 

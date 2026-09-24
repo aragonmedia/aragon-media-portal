@@ -945,3 +945,49 @@ export async function sendAcceleratorIntentToAdmin(opts: {
     });
   } catch (err) { console.error("[email] sendAcceleratorIntentToAdmin failed:", err); }
 }
+
+// Team invite — sent to a new teammate when the owner invites them.
+export async function sendTeamInviteEmail(opts: {
+  to: string;
+  role: string;
+  inviteUrl: string;
+  inviterName: string;
+}) {
+  try {
+    const resend = getResend();
+    const ROLE_HUMAN: Record<string, string> = {
+      accelerator_admin: "Accelerator Admin (Leads + Chatroom access)",
+      am_lead: "AM Lead (Leads access)",
+      chat_only: "Chatroom (Accelerator chat access)",
+    };
+    const roleHuman = ROLE_HUMAN[opts.role] ?? opts.role;
+    const subject = `${opts.inviterName} invited you to the Aragon Media admin`;
+    const html = `<!DOCTYPE html><html>${EMAIL_HEAD}
+    <body bgcolor="#F5F2EA" style="margin:0;padding:0;background:#F5F2EA;font-family:system-ui,-apple-system,'Inter Tight',sans-serif;">
+      <table role="presentation" width="100%" bgcolor="#F5F2EA" style="background:#F5F2EA;">
+        <tr><td align="center" style="padding:40px 18px;">
+          <table role="presentation" width="580" bgcolor="#FFFFFF" style="background:#FFFFFF;border:1px solid #E8E2D2;border-radius:14px;max-width:580px;width:100%;">
+            <tr><td style="padding:32px 36px 10px;">
+              <p style="margin:0 0 8px 0;font-size:11px;letter-spacing:0.2em;color:#DC1E2E;text-transform:uppercase;font-weight:700;">Aragon Media · Team invite</p>
+              <h1 style="margin:0;font-size:24px;color:#1A1A1A;letter-spacing:-0.01em;line-height:1.25;">You're invited to the admin.</h1>
+              <p style="margin:14px 0 0;font-size:14px;color:#4B4B4B;line-height:1.6;">${escapeHtml(opts.inviterName)} added you to the Aragon Media admin console with this role:</p>
+              <p style="margin:14px 0 0;font-size:13.5px;color:#1A1A1A;font-weight:700;background:#F5F2EA;border-radius:8px;padding:14px 16px;">${escapeHtml(roleHuman)}</p>
+              <p style="margin:16px 0 0;font-size:13px;color:#6B6B6B;line-height:1.6;">Click the button below to sign in. We'll email you a 6-digit code to verify it's really you. No account needed — just your email.</p>
+            </td></tr>
+            <tr><td style="padding:18px 36px 30px;">
+              <a href="${opts.inviteUrl}" style="display:inline-block;padding:14px 26px;background:#DC1E2E;color:#FFFFFF;text-decoration:none;font-size:13.5px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;border-radius:6px;">Accept invite →</a>
+            </td></tr>
+            <tr><td style="padding:0 36px 30px;">
+              <p style="margin:0;font-size:11px;color:#8B8278;line-height:1.6;">This invite expires in 7 days. If you weren't expecting it, ignore this email — nothing changes on your account.</p>
+            </td></tr>
+          </table>
+        </td></tr>
+      </table>
+    </body></html>`;
+    await resend.emails.send({
+      from: FROM, to: opts.to, subject,
+      text: `${opts.inviterName} invited you to the Aragon Media admin.\n\nRole: ${roleHuman}\n\nAccept: ${opts.inviteUrl}\n\nExpires in 7 days.`,
+      html,
+    });
+  } catch (err) { console.error("[email] sendTeamInviteEmail failed:", err); }
+}

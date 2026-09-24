@@ -19,6 +19,7 @@ import {
   agreements,
 } from "@/db/schema";
 import { sql, desc, gte, isNull, and, gt, eq } from "drizzle-orm";
+import { requireAdminRole } from "@/lib/auth/admin-role";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -51,6 +52,7 @@ const STATUS_LABEL: Record<string, string> = {
 };
 
 export default async function AdminOverviewPage() {
+  await requireAdminRole(["owner"]);
   const oneWeekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
 
   // Top-line stats — single trips per metric

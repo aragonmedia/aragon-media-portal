@@ -3,6 +3,7 @@ import { withdrawals, users, accounts } from "@/db/schema";
 import { desc, eq } from "drizzle-orm";
 import Link from "next/link";
 import WithdrawalStatusFlip from "./WithdrawalStatusFlip";
+import { requireAdminRole } from "@/lib/auth/admin-role";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -39,6 +40,7 @@ export default async function AdminWithdrawalsPage({
 }: {
   searchParams?: Promise<{ creator?: string }>;
 }) {
+  await requireAdminRole(["owner"]);
   const sp = (await searchParams) ?? {};
   const creatorId = sp.creator && sp.creator.length > 0 ? sp.creator : null;
 

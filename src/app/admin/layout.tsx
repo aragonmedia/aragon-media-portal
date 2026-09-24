@@ -1,4 +1,4 @@
-import { isAdminSession } from "@/lib/auth/admin";
+import { getAdminRole } from "@/lib/auth/admin-role";
 import AdminLogin from "./AdminLogin";
 import AdminSidebar from "./AdminSidebar";
 import "./admin.css";
@@ -11,9 +11,8 @@ export default async function AdminLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const authed = await isAdminSession();
-  if (!authed) {
-    // Render the gate by itself — no sidebar, no chrome.
+  const session = await getAdminRole();
+  if (!session) {
     return (
       <main className="admin-shell">
         <AdminLogin />
@@ -22,7 +21,7 @@ export default async function AdminLayout({
   }
   return (
     <div className="admin-frame">
-      <AdminSidebar />
+      <AdminSidebar role={session.role} />
       <div className="admin-main">{children}</div>
     </div>
   );

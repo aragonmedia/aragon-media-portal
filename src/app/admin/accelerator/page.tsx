@@ -8,21 +8,17 @@
  * behind the admin cookie — no leakage.
  */
 
-import { redirect } from "next/navigation";
 import { desc } from "drizzle-orm";
-import { isAdminSession } from "@/lib/auth/admin";
 import { db } from "@/db";
 import { acceleratorAccounts, acceleratorSyncs } from "@/db/schema";
 import PasteClient from "./PasteClient";
+import { requireAdminRole } from "@/lib/auth/admin-role";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 
 export default async function AdminAcceleratorPage() {
-  if (!(await isAdminSession())) {
-    redirect("/admin");
-  }
-
+  await requireAdminRole(["owner"]);
   const [rows, recentSyncs] = await Promise.all([
     db.select().from(acceleratorAccounts).orderBy(desc(acceleratorAccounts.lastSeenAt)),
     db.select().from(acceleratorSyncs).orderBy(desc(acceleratorSyncs.createdAt)).limit(10),

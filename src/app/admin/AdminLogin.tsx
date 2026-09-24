@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 type Step = "email" | "code";
 
@@ -12,6 +12,17 @@ export default function AdminLogin() {
   const [info, setInfo] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [resendCooldown, setResendCooldown] = useState(0);
+  const [invited, setInvited] = useState(false);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("invite")) {
+      setInvited(true);
+      setInfo("Welcome. Enter the email your invite was sent to, and we'll send you a 6-digit code to sign in.");
+    }
+  }, []);
+
 
   function startCooldown() {
     setResendCooldown(60);

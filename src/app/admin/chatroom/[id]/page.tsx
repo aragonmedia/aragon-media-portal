@@ -4,6 +4,7 @@ import { isAdminSession } from "@/lib/auth/admin";
 import { db } from "@/db";
 import { chatroomThreads, chatroomMessages, chatroomCredentials } from "@/db/schema";
 import ThreadClient from "./ThreadClient";
+import { requireAdminRole } from "@/lib/auth/admin-role";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -13,6 +14,7 @@ export default async function AdminChatroomThread({
 }: {
   params: Promise<{ id: string }>;
 }) {
+  await requireAdminRole(["owner", "accelerator_admin", "chat_only"]);
   if (!(await isAdminSession())) redirect("/admin");
   const { id } = await params;
 
