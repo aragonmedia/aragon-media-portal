@@ -450,3 +450,13 @@
   .admin-stat-row{flex-wrap:wrap;}
   .admin-stat-row .admin-stat{flex:1;min-width:100px;}
 }
+
+/* ---- CSV export button ---- */
+.admin-page-actions{display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;margin-bottom:12px;}
+.admin-export-btn{display:inline-flex;align-items:center;gap:8px;padding:10px 18px;background:#DC1E2E;color:#FAF7EE;border-radius:8px;font-size:12px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;text-decoration:none;transition:filter 150ms ease;white-space:nowrap;}
+.admin-export-btn:hover{filter:brightness(1.1);}
+.admin-export-btn span{font-size:14px;line-height:1;}
+@media (max-width: 700px){
+  .admin-page-actions{align-items:stretch;}
+  .admin-export-btn{justify-content:center;}
+}

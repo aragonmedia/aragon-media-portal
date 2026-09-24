@@ -47,10 +47,20 @@ export default async function AdminAcceleratorLeadsPage() {
           <h1>Accelerator leads</h1>
           <p className="admin-page-sub">Every lead captured from the /accelerator landing page. Live from Neon.</p>
         </div>
-        <div className="admin-stat-row">
-          <div className="admin-stat"><div className="admin-stat-num">{revealed}</div><div className="admin-stat-label">Revealed</div></div>
-          <div className="admin-stat"><div className="admin-stat-num">{clicked}</div><div className="admin-stat-label">Clicked a tier</div></div>
-          <div className="admin-stat"><div className="admin-stat-num">{hot}</div><div className="admin-stat-label">$1,997 tier</div></div>
+        <div className="admin-page-actions">
+          <div className="admin-stat-row">
+            <div className="admin-stat"><div className="admin-stat-num">{revealed}</div><div className="admin-stat-label">Revealed</div></div>
+            <div className="admin-stat"><div className="admin-stat-num">{clicked}</div><div className="admin-stat-label">Clicked a tier</div></div>
+            <div className="admin-stat"><div className="admin-stat-num">{hot}</div><div className="admin-stat-label">$1,997 tier</div></div>
+          </div>
+          <a
+            href="/api/admin/accelerator-leads.csv"
+            download
+            className="admin-export-btn"
+            aria-label="Export leads as CSV"
+          >
+            <span aria-hidden="true">⇩</span> Export CSV
+          </a>
         </div>
       </div>
 
