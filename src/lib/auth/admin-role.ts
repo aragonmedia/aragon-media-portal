@@ -7,9 +7,9 @@
  *   am_lead            — future AM hire. Accelerator Leads only.
  *   chat_only          — future community mgr. Chatroom only.
  *
- * Every admin server component should call requireAdminRole([...])
- * near the top. The sidebar renders per-role. Both are needed —
- * hidden menus are decoration; middleware is truth.
+ * Fail-open on missing admin_role column: pre-migration, any is_admin=true
+ * user is treated as 'owner'. This keeps the app up while /api/admin/migrate
+ * gets run once.
  */
 
 import { redirect } from "next/navigation";
@@ -27,30 +27,47 @@ export const ROLE_LABEL: Record<AdminRole, string> = {
   chat_only: "Chatroom",
 };
 
-/** Look up the signed-in admin's role. Returns null if no session or no role. */
 export async function getAdminRole(): Promise<{ userId: string; role: AdminRole } | null> {
   const session = await getAdminSession();
   if (!session) return null;
-  const rows = await db
-    .select({ id: users.id, adminRole: users.adminRole, isAdmin: users.isAdmin })
-    .from(users)
-    .where(eq(users.id, session.userId))
-    .limit(1);
-  const row = rows[0];
-  if (!row || !row.isAdmin) return null;
-  const role = (row.adminRole as AdminRole | null) ?? "owner"; // legacy admins default to owner
-  return { userId: row.id, role };
+
+  // Try the schema with admin_role first; if the column doesn't exist yet
+  // (pre-migration), fall back to a legacy is_admin-only lookup and treat
+  // any admin as owner.
+  try {
+    const rows = await db
+      .select({ id: users.id, adminRole: users.adminRole, isAdmin: users.isAdmin })
+      .from(users)
+      .where(eq(users.id, session.userId))
+      .limit(1);
+    const row = rows[0];
+    if (!row || !row.isAdmin) return null;
+    const role = (row.adminRole as AdminRole | null) ?? "owner";
+    return { userId: row.id, role };
+  } catch (err) {
+    console.warn("[getAdminRole] falling back to legacy is_admin (migration likely not run):", err instanceof Error ? err.message : err);
+    try {
+      const rows = await db
+        .select({ id: users.id, isAdmin: users.isAdmin })
+        .from(users)
+        .where(eq(users.id, session.userId))
+        .limit(1);
+      const row = rows[0];
+      if (!row || !row.isAdmin) return null;
+      return { userId: row.id, role: "owner" };
+    } catch {
+      return null;
+    }
+  }
 }
 
-/** Redirect to /admin (login) if not signed in, or /admin (root) if wrong role. */
 export async function requireAdminRole(allowed: AdminRole[]): Promise<{ userId: string; role: AdminRole }> {
   const cur = await getAdminRole();
   if (!cur) redirect("/admin");
-  if (!allowed.includes(cur.role)) redirect("/admin/chatroom"); // safe default landing
+  if (!allowed.includes(cur.role)) redirect("/admin/chatroom");
   return cur;
 }
 
-/** Where each role should land after signing in — first surface they can see. */
 export function defaultRouteFor(role: AdminRole): string {
   switch (role) {
     case "owner": return "/admin";

@@ -10,18 +10,33 @@ export const runtime = "nodejs";
 export default async function TeamPage() {
   await requireAdminRole(["owner"]);
 
-  const [members, pending] = await Promise.all([
-    db
+  // Members: fall back to no-adminRole query if column missing (pre-migration).
+  let members: Array<{ id: string; email: string; name: string; adminRole: string | null; createdAt: Date; lastSigninAt: Date | null }> = [];
+  try {
+    members = await db
       .select({ id: users.id, email: users.email, name: users.name, adminRole: users.adminRole, createdAt: users.createdAt, lastSigninAt: users.lastSigninAt })
       .from(users)
       .where(eq(users.isAdmin, true))
-      .orderBy(desc(users.createdAt)),
-    db
+      .orderBy(desc(users.createdAt));
+  } catch {
+    const legacy = await db
+      .select({ id: users.id, email: users.email, name: users.name, createdAt: users.createdAt, lastSigninAt: users.lastSigninAt })
+      .from(users)
+      .where(eq(users.isAdmin, true))
+      .orderBy(desc(users.createdAt));
+    members = legacy.map((r) => ({ ...r, adminRole: null }));
+  }
+
+  let pending: Array<{ id: string; email: string; role: string; createdAt: Date; expiresAt: Date }> = [];
+  try {
+    pending = await db
       .select({ id: adminInvites.id, email: adminInvites.email, role: adminInvites.role, createdAt: adminInvites.createdAt, expiresAt: adminInvites.expiresAt })
       .from(adminInvites)
       .where(eq(adminInvites.status, "pending"))
-      .orderBy(desc(adminInvites.createdAt)),
-  ]);
+      .orderBy(desc(adminInvites.createdAt));
+  } catch (err) {
+    console.warn("[team page] pending invites unavailable (migration not run yet):", err instanceof Error ? err.message : err);
+  }
 
   return (
     <TeamClient
