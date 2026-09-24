@@ -115,14 +115,19 @@ export async function POST(req: Request) {
       });
     }
 
-    // Best-effort Airtable sync (no-op if env vars unset).
-    upsertLead({
-      portalId: intent.id,
-      name,
-      email,
-      referrer,
-      userAgent,
-    }).catch(() => {});
+    // Airtable sync — awaited so the serverless function doesn't shut down
+    // before the fetch completes. No-op if env vars unset.
+    try {
+      await upsertLead({
+        portalId: intent.id,
+        name,
+        email,
+        referrer,
+        userAgent,
+      });
+    } catch (err) {
+      console.error("[intent reveal] airtable sync failed:", err);
+    }
 
     const headers = new Headers({ "Content-Type": "application/json" });
     if (setCookie) headers.append("Set-Cookie", cookieHeader(key));
@@ -171,13 +176,17 @@ export async function POST(req: Request) {
     });
   }
 
-  // Best-effort Airtable sync — PATCHes the existing row's Tier Interest.
-  upsertLead({
-    portalId: intent.id,
-    name: intent.name,
-    email: intent.email,
-    clickedTier: tier,
-  }).catch(() => {});
+  // Airtable sync — awaited so the tier update lands before the response.
+  try {
+    await upsertLead({
+      portalId: intent.id,
+      name: intent.name,
+      email: intent.email,
+      clickedTier: tier,
+    });
+  } catch (err) {
+    console.error("[intent click] airtable sync failed:", err);
+  }
 
   return NextResponse.json({ ok: true, checkoutUrl: meta.url });
 }
