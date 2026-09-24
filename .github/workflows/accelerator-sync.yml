@@ -2,7 +2,7 @@
 # Accelerator listings — Discord sync cron
 # ============================================================
 # Replaces the Vercel Cron (Pro-only) with a free GitHub Actions
-# schedule. Pings /api/accelerator/sync/discord every 6 hours, which
+# schedule. Pings /api/accelerator/sync/discord every 12 hours (2x/day), which
 # fetches the last 100 messages from Nick G's listings channel via
 # the Discord bot and upserts /accounts.
 #
@@ -13,12 +13,12 @@
 #   ACCELERATOR_SYNC_SECRET  =  <Vercel's MIGRATION_SECRET value>
 #
 # Cadence:
-#   00:00 UTC + 06:00 UTC + 12:00 UTC + 18:00 UTC daily
+#   06:00 UTC + 18:00 UTC daily
 name: Accelerator Discord sync
 
 on:
   schedule:
-    - cron: "0 */6 * * *"
+    - cron: "0 6,18 * * *"
   workflow_dispatch:
 
 concurrency:
