@@ -81,7 +81,7 @@ const FAQ_ITEMS = [
   { q: "Do I need a VPN or a specific phone?", a: "Yes to both. You'll need a reputable VPN and ideally a refurbished phone (we recommend specific models). We show you exactly what to buy and how to configure it in Module 2." },
   { q: "Do I need to buy a TikTok Shop account separately?", a: "Depends on your tier. Education + Verified Account includes one activated account handed to you on day 1. Education Only means you'll source an account yourself (from Nick G's marketplace on /accounts, or elsewhere)." },
   { q: "How fast is activation?", a: "Verified Account tier: 24 hours from submission. Education Only tier: next business day after you source your own account and submit it via the private chat." },
-  { q: "How do payouts work?", a: "TikTok Shop pays commissions into a Wise USD account we help you set up. From Wise you can withdraw to your bank in any currency, at the mid-market rate. No US bank required." },
+  { q: "How do payouts work?", a: "The Aragon Media team sends you a withdrawal form each time you request a payout. Fill it out with your preferred payout method. Bank transfer, PayPal, or USD account all work. We handle the disbursement from there. No US bank required." },
   { q: "What if my account gets a violation?", a: "We cover full compliance walkthroughs in Module 3. The exact things to avoid, how to appeal, and how to restart clean if something goes wrong. Most violations are preventable." },
   { q: "Can I upgrade tiers later?", a: "Yes. Enroll in Education Only, then pay the delta later to add an activated account. We honor the upgrade at any point in your program." },
   { q: "What's the guarantee?", a: "If you follow every step and complete the 7-day fast track, you will be live on TikTok Shop. That's our commitment. This is a completion-based guarantee, not a money-back refund policy. The program works when you work it." },
@@ -246,9 +246,9 @@ function Testimonials() {
 function HowItWorks() {
   const steps = [
     { d: "DAY 1", t: "Enroll & unlock", b: "Join the Skool community, meet the operators, get your onboarding roadmap. Everything's laid out before you start." },
-    { d: "DAY 2", t: "Get set up", b: "VPN, US SIM, refurbished phone, Wise USD account. We walk you through every setup step live so nothing gets missed." },
+    { d: "DAY 2", t: "Get set up", b: "VPN, US SIM, refurbished phone, payout method of your choice. We walk you through every setup step live so nothing gets missed." },
     { d: "DAY 3", t: "Get activated", b: "Submit your account details in the private chat. The AM team verifies and activates within 24 hours." },
-    { d: "DAY 4–7", t: "Start earning", b: "Post your first UGC, showcase products in your videos, watch USD land in your Wise account." },
+    { d: "DAY 4–7", t: "Start earning", b: "Post your first UGC, showcase products in your videos, watch USD commissions land in the account you choose." },
   ];
   return (
     <section className="ac-how" id="how">
