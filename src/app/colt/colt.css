@@ -1,4 +1,9 @@
-/* TTSUnlocked — neon-blue palette override on top of shared accelerator.css */
+/* ============================================================
+   TTSUnlocked — neon-blue palette override.
+   Scopes under .colt-shell AND body[data-tenant="colt"] so
+   portal-rendered widgets (floating chat, DiscordGate) also
+   pick up the blue scheme.
+   ============================================================ */
 
 .colt-shell {
   --taa-bg: #050810;
@@ -20,7 +25,7 @@
   min-height: 100vh;
 }
 
-/* --- Hard-coded reds that bleed from accelerator.css: swap to blue inside .colt-shell --- */
+/* Backdrop grid + radar — hardcoded reds in accelerator.css */
 .colt-shell .taa-grid {
   background-image:
     linear-gradient(rgba(0, 229, 255, 0.05) 1px, transparent 1px),
@@ -29,50 +34,71 @@
 .colt-shell .taa-radar {
   background: radial-gradient(
     circle,
-    transparent 0 40%,
-    rgba(0, 229, 255, 0.08) 40% 41%,
-    transparent 42% 60%,
-    rgba(0, 229, 255, 0.06) 60% 61%,
-    transparent 62% 80%,
-    rgba(0, 229, 255, 0.04) 80% 81%,
-    transparent 82%
+    transparent 0 40%, rgba(0, 229, 255, 0.08) 40% 41%,
+    transparent 42% 60%, rgba(0, 229, 255, 0.06) 60% 61%,
+    transparent 62% 80%, rgba(0, 229, 255, 0.04) 80% 81%, transparent 82%
   );
 }
+
+/* Overrides for inline-styled reds in Roni's Styles() component.
+   Specificity note: these have to beat .ac-* selectors inside the
+   <style> block in the client component. */
+.colt-shell .ac-accent { text-shadow: 0 0 40px rgba(0, 229, 255, 0.5); }
 .colt-shell .ac-header-brand img,
-.colt-shell .colt-logo-img {
-  filter: drop-shadow(0 0 12px rgba(0, 229, 255, 0.5));
+.colt-shell .colt-logo-img { filter: drop-shadow(0 0 12px rgba(0, 229, 255, 0.5)); }
+.colt-shell .ac-nav-cta:hover { background: rgba(0, 229, 255, 0.1); }
+.colt-shell .ac-hero-eyebrow {
+  background: rgba(0, 229, 255, 0.06);
+  border: 1px solid rgba(0, 229, 255, 0.32);
+}
+.colt-shell .ac-step-num { color: rgba(0, 229, 255, 0.35); }
+.colt-shell .ac-guarantee {
+  background: rgba(0, 229, 255, 0.06);
+  border: 1px solid rgba(0, 229, 255, 0.3);
+  border-left: 3px solid var(--taa-red);
+}
+.colt-shell .ac-tier-highlight {
+  border-color: var(--taa-red);
+  background: linear-gradient(180deg, rgba(0, 229, 255, 0.06) 0%, var(--taa-bg-card) 100%);
+  box-shadow: 0 0 40px rgba(0, 229, 255, 0.15);
+}
+.colt-shell .ac-faq-item:hover { border-color: rgba(0, 229, 255, 0.4); }
+.colt-shell .ac-wins-empty-glow {
+  background: radial-gradient(ellipse at center, rgba(0, 229, 255, 0.06) 0%, transparent 70%);
+}
+.colt-shell .ac-inline-chat-card::before {
+  background: radial-gradient(ellipse at top left, rgba(0, 229, 255, 0.07), transparent 55%);
+}
+.colt-shell .ac-inline-chat-dot {
+  box-shadow: 0 0 0 3px rgba(0, 229, 255, 0.18);
+}
+.colt-shell .ac-footer-dot {
+  box-shadow: 0 0 0 3px rgba(0, 229, 255, 0.2);
 }
 
-/* --- Chat widget portal escapes .colt-shell — scope by pathname via body[data-tenant] --- */
-body[data-tenant="colt"] .ac-chat-toggle,
-body[data-tenant="colt"] .ac-chat-panel,
-body[data-tenant="colt"] .ac-chat-close,
-body[data-tenant="colt"] .ac-chat-book,
-body[data-tenant="colt"] .ac-chat-quicks a,
-body[data-tenant="colt"] .ac-chat-msg.me p {
-  --taa-red: #00E5FF;
-  --taa-red-bright: #2DD4C7;
-  --taa-red-glow: rgba(0, 229, 255, 0.35);
-  --taa-white: #FFFFFF;
-}
+/* Floating chat widget portals out of .colt-shell — scope by body[data-tenant] */
 body[data-tenant="colt"] .ac-chat-toggle {
   background: #00E5FF;
   color: #050810;
-  box-shadow: 0 10px 40px rgba(0, 229, 255, 0.4);
+  box-shadow: 0 8px 30px rgba(0, 229, 255, 0.4);
 }
 body[data-tenant="colt"] .ac-chat-panel {
+  --taa-red: #00E5FF;
+  --taa-red-glow: rgba(0, 229, 255, 0.35);
   border: 1px solid rgba(0, 229, 255, 0.3);
 }
 body[data-tenant="colt"] .ac-chat-head {
   border-bottom: 1px solid rgba(0, 229, 255, 0.18);
 }
-body[data-tenant="colt"] .ac-chat-msg.me p {
-  background: rgba(0, 229, 255, 0.1);
-  border: 1px solid rgba(0, 229, 255, 0.3);
-  color: #F5F8FF;
+body[data-tenant="colt"] .ac-chat-msg.me {
+  background: rgba(0, 229, 255, 0.12);
+  border: 1px solid rgba(0, 229, 255, 0.32);
 }
-body[data-tenant="colt"] .ac-chat-gate .ac-cta-primary,
+body[data-tenant="colt"] .ac-chat-gate button[type="submit"],
 body[data-tenant="colt"] .ac-chat-composer button {
   background: #00E5FF;
   color: #050810;
 }
+
+/* Hero banner image + logo mark sizing */
+.colt-logo-img { display: block; width: 44px; height: 44px; border-radius: 10px; }

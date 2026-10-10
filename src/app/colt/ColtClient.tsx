@@ -1,54 +1,103 @@
 "use client";
 
-/**
- * TTSUnlocked — Powered by COLT
- * ------------------------------------------------------------
- * Reuses the taa-* design tokens from /accounts/accelerator.css,
- * overridden to a neon blue palette in colt.css. Shares the
- * chatroom + intent capture backend via accelerator="colt" slug.
- *
- * TODO: refactor shared Styles() into one file so Roni + COLT
- * dedupe. For now it's a scoped copy.
- */
-
 import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 
-type ChatStatus = "gate" | "sending" | "open";
+/* ============================================================
+   TYPES + CONSTANTS
+   ============================================================ */
 type Tier = "edu_only" | "edu_plus_account" | "browse";
+type GateStatus = "idle" | "submitting" | "revealed";
+type ChatStatus = "gate" | "sending" | "open";
 
-const SLUG = "colt";
-const CAL = "https://calendly.com/itskevinaragon/30min";
-
-const TIERS: Array<{ id: Tier; label: string; priceLabel: string; features: string[]; popular?: boolean }> = [
-  { id: "edu_only", label: "Education Only", priceLabel: "$1,597", features: ["Step by step training", "TTS best practices", "Creator resources & guides"] },
-  { id: "edu_plus_account", label: "Education + Verified Account", priceLabel: "$1,997", popular: true, features: ["Full training program", "TikTok Shop account setup", "Verification support", "Ongoing guidance"] },
-  { id: "browse", label: "Accounts Only", priceLabel: "$650–$1K+", features: ["Verified TikTok Shop accounts", "Ready to go (US market)", "Instant access"] },
+const PARTNERS = [
+  { src: "/partners/tiktok-shop.png", alt: "TikTok Shop" },
+  { src: "/partners/nick-g.png", alt: "Nick G" },
+  { src: "/partners/kyvo.png", alt: "Kyvo" },
+  { src: "/partners/4orte.png", alt: "4orte" },
+  { src: "/partners/goli.png", alt: "Goli Nutrition" },
+  { src: "/partners/accounts-shop.png", alt: "Accounts Shop" },
+  { src: "/partners/creators-corner.png", alt: "Creators Corner" },
+  { src: "/partners/commission-club.png", alt: "Commission Club" },
+  { src: "/partners/apex-club.png", alt: "Apex Club" },
+  { src: "/partners/cc.png", alt: "CC" },
 ];
 
+// Wins gallery — Kevin drops screenshots to /public/accelerator/wins/
+// and we add entries here. Empty for now.
+const WINS: { src: string; caption?: string; video?: boolean }[] = [];
+
+const TESTIMONIALS: Array<{ src: string; name: string; city: string }> = [];
+
+const FAQ_ITEMS = [
+  { q: "Do I need to be in the US?", a: "No, that's the whole point. The program is built for creators outside the US. We walk you through the VPN, US SIM, and phone setup on Day 2 of the fast track." },
+  { q: "Do I need a VPN or a specific phone?", a: "Yes to both. You'll need a reputable VPN and ideally a refurbished phone (we recommend specific models). We show you exactly what to buy and how to configure it in Module 2." },
+  { q: "Do I need to buy a TikTok Shop account separately?", a: "Depends on your tier. Education + Verified Account includes one activated account handed to you on day 1. Education Only means you'll source an account yourself (from Nick G's marketplace on /accounts, or elsewhere)." },
+  { q: "How fast is activation?", a: "Verified Account tier: 24 hours from submission. Education Only tier: next business day after you source your own account and submit it via the private chat." },
+  { q: "How do payouts work?", a: "The Aragon Media team sends you a withdrawal form each time you request a payout. Fill it out with your preferred payout method. Bank transfer, PayPal, or USD account all work. We handle the disbursement from there. No US bank required." },
+  { q: "What if my account gets a violation?", a: "We cover full compliance walkthroughs in Module 3. The exact things to avoid, how to appeal, and how to restart clean if something goes wrong. Most violations are preventable." },
+  { q: "Can I upgrade tiers later?", a: "Yes. Enroll in Education Only, then pay the delta later to add an activated account. We honor the upgrade at any point in your program." },
+  { q: "What's the guarantee?", a: "If you follow every step and complete the 7-day fast track, you will be live on TikTok Shop. That's our commitment. This is a completion-based guarantee, not a money-back refund policy. The program works when you work it." },
+];
+
+/* ============================================================
+   ROOT
+   ============================================================ */
 export default function ColtClient() {
   return (
-    <div className="colt-shell ac-shell">
+    <div className="ac-shell colt-shell">
       <Backdrop />
       <Header />
       <Hero />
       <Partners />
-      <Stats />
-      <Pricing />
+      <PricingBlock />
       <InlineChat />
-      <SevenDay />
+      <HowItWorks />
       <Testimonials />
       <Wins />
       <FAQ />
       <Footer />
       <ChatWidget />
       <Styles />
-      <ColtOverrides />
     </div>
   );
 }
 
+/* ============================================================
+   HEADER (side-by-side co-brand)
+   ============================================================ */
+function Header() {
+  return (
+    <header className="ac-header">
+      <div className="ac-header-inner">
+      <div className="ac-header-brand">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src="/colt/logo-tu.png" alt="" width={40} height={40} />
+        <span className="ac-brand-tag">
+          <small>TTS</small>
+          <b>UNLOCKED</b>
+        </span>
+        <span className="ac-brand-x">×</span>
+        <span className="ac-brand-tag">
+          <small>POWERED BY</small>
+          <b>COLT</b>
+        </span>
+      </div>
+      <nav className="ac-header-nav">
+        <a href="#how" className="ac-nav-link">How it works</a>
+        <a href="#pricing" className="ac-nav-link">Pricing</a>
+        <a href="#faq" className="ac-nav-link">FAQ</a>
+        <Link href="/colt/accounts" className="ac-nav-cta">Browse accounts →</Link>
+      </nav>
+      </div>
+    </header>
+  );
+}
+
+/* ============================================================
+   BACKDROP grid + radar (reuses accelerator.css classes)
+   ============================================================ */
 function Backdrop() {
   return (
     <div className="taa-bg" aria-hidden>
@@ -58,103 +107,88 @@ function Backdrop() {
   );
 }
 
-function Header() {
-  return (
-    <header className="ac-header">
-      <div className="ac-header-inner">
-        <div className="ac-header-brand">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/colt/logo-tu.png" alt="TTSUnlocked" width={44} height={44} className="colt-logo-img" />
-          <span className="ac-brand-tag">
-            <small>TTS</small>
-            <b>UNLOCKED</b>
-          </span>
-          <span className="ac-brand-x">×</span>
-          <span className="ac-brand-tag">
-            <small>POWERED BY</small>
-            <b>COLT</b>
-          </span>
-        </div>
-        <nav className="ac-header-nav">
-          <a href="#pricing" className="ac-nav-link">Pricing</a>
-          <a href="#how" className="ac-nav-link">How it works</a>
-          <a href="#talk" className="ac-nav-link">Talk to us</a>
-          <Link href="/accounts?from=colt" className="ac-nav-cta">Browse accounts →</Link>
-        </nav>
-      </div>
-    </header>
-  );
-}
-
+/* ============================================================
+   HERO
+   ============================================================ */
 function Hero() {
   return (
     <section className="ac-hero">
       <div className="ac-hero-eyebrow">TTSUNLOCKED × POWERED BY COLT</div>
       <h1 className="ac-hero-title">
-        Unlock US TikTok Shop. <span className="ac-accent">From anywhere.</span>
+        US TikTok Shop <span className="ac-accent">from anywhere.</span>
         <br />
         <span className="ac-hero-sub-line">In 7 days.</span>
       </h1>
       <p className="ac-hero-sub">
-        The operating system for creators <strong>outside the US</strong> to earn <strong>USD commissions</strong> on TikTok Shop. Verified account, done-with-you setup, and a global creator community. Activation in <strong>24 hours</strong>.
+        The operating system for creators <strong>outside the US</strong> to earn
+        <strong> USD commissions</strong> on TikTok Shop. Skool community, live
+        workshops, and a verified account handed to you. Activation in
+        <strong> 24 hours</strong>.
       </p>
       <div className="ac-hero-cta-row">
-        <a href="#pricing" className="ac-cta-primary">Apply now →</a>
+        <a href="#pricing" className="ac-cta-primary">View Tiers</a>
         <a href="#how" className="ac-cta-ghost">How it works</a>
       </div>
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img src="/colt/hero-banner.png" alt="TTSUnlocked" className="colt-hero-banner" />
+      <div className="ac-hero-stats">
+        <Stat n="500+" label="CREATORS ACTIVATED" />
+        <Stat n="100%" label="ACTIVATION RATE" />
+        <Stat n="24 HR" label="SETUP" />
+        <Stat n="USD" label="PAID DIRECT" />
+      </div>
     </section>
   );
 }
-
-function Stats() {
+function Stat({ n, label }: { n: string; label: string }) {
   return (
-    <section className="colt-stats-wrap">
-      <div className="colt-stats">
-        <div className="colt-stat"><div className="colt-stat-num">500+</div><div className="colt-stat-label">Creators activated</div></div>
-        <div className="colt-stat"><div className="colt-stat-num">100%</div><div className="colt-stat-label">Activation rate</div></div>
-        <div className="colt-stat"><div className="colt-stat-num">24 HR</div><div className="colt-stat-label">Setup</div></div>
-        <div className="colt-stat"><div className="colt-stat-num">USD</div><div className="colt-stat-label">Paid direct</div></div>
+    <div className="ac-stat">
+      <div className="ac-stat-n">{n}</div>
+      <div className="ac-stat-l">{label}</div>
+    </div>
+  );
+}
+
+/* ============================================================
+   PARTNERS (auto-scrolling marquee)
+   ============================================================ */
+function Partners() {
+  return (
+    <section className="ac-partners">
+      <p className="ac-partners-eyebrow">BUILT WITH PARTNERS WHO WIN</p>
+      <div className="ac-marquee">
+        <div className="ac-marquee-track">
+          {[...PARTNERS, ...PARTNERS].map((p, i) => (
+            <div key={i} className="ac-partner-logo-wrap">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={p.src} alt={p.alt} className="ac-partner-logo" />
+            </div>
+          ))}
+        </div>
       </div>
     </section>
   );
 }
 
-function Pricing() {
-  const [busy, setBusy] = useState<Tier | null>(null);
-  async function pick(tier: Tier) {
-    setBusy(tier);
-    try {
-      const res = await fetch("/api/accelerator/intent", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ action: "click", tier, accelerator: SLUG }),
-      });
-      const j = await res.json();
-      if (j.ok && j.checkoutUrl) window.location.assign(j.checkoutUrl);
-      else alert(j.error || "Please drop your email in the chat below first so we can prep your account.");
-    } finally { setBusy(null); }
-  }
+/* ============================================================
+   TESTIMONIALS
+   ============================================================ */
+function Testimonials() {
   return (
-    <section className="ac-pricing" id="pricing">
-      <div className="ac-pricing-head">
-        <p className="ac-section-eyebrow">PRICING</p>
-        <h2 className="ac-section-title">Choose <span className="ac-accent">your path.</span></h2>
-        <p className="ac-section-sub">Flexible options to fit your goals. All plans give you access to TikTok Shop&apos;s global marketplace and earning potential.</p>
+    <section className="ac-tests" id="testimonials">
+      <div className="ac-tests-head">
+        <p className="ac-section-eyebrow">RESULTS</p>
+        <h2 className="ac-section-title">Real creators. <span className="ac-accent">Real USD commissions.</span></h2>
+        <p className="ac-section-sub">These are creators outside the US who ran the program and now get paid in USD every month.</p>
       </div>
-      <div className="ac-pricing-grid">
-        {TIERS.map((t) => (
-          <div key={t.id} className={`ac-tier${t.popular ? " ac-tier-popular" : ""}`}>
-            {t.popular && <div className="ac-tier-tag">MOST POPULAR</div>}
-            <h3 className="ac-tier-label">{t.label}</h3>
-            <div className="ac-tier-price">{t.priceLabel}</div>
-            <ul className="ac-tier-features">
-              {t.features.map((f) => (<li key={f}>{f}</li>))}
-            </ul>
-            <button className={`ac-tier-cta${t.popular ? " ac-cta-primary" : " ac-cta-ghost"}`} onClick={() => pick(t.id)} disabled={busy !== null}>
-              {busy === t.id ? "Opening…" : "Apply now →"}
-            </button>
+      <div className="ac-tests-grid">
+        {TESTIMONIALS.map((t) => (
+          <div key={t.src} className="ac-test-card">
+            <video className="ac-test-video" controls preload="metadata" playsInline>
+              <source src={t.src} type="video/mp4" />
+            </video>
+            <div className="ac-test-meta">
+              <div className="ac-test-name">{t.name}</div>
+              <div className="ac-test-city">{t.city}</div>
+            </div>
           </div>
         ))}
       </div>
@@ -162,34 +196,277 @@ function Pricing() {
   );
 }
 
-function SevenDay() {
+/* ============================================================
+   HOW IT WORKS
+   ============================================================ */
+function HowItWorks() {
   const steps = [
-    { d: "DAY 1", t: "Enroll & unlock", b: "Submit your application and get approved." },
-    { d: "DAY 2", t: "Set up", b: "Create your account and complete verification." },
-    { d: "DAY 3", t: "Activate", b: "Your TikTok Shop account goes live." },
-    { d: "DAY 4–7", t: "Start earning", b: "Post UGC, showcase products, and start earning USD." },
+    { d: "DAY 1", t: "Enroll & unlock", b: "Join the Skool community, meet the operators, get your onboarding roadmap. Everything's laid out before you start." },
+    { d: "DAY 2", t: "Get set up", b: "VPN, US SIM, refurbished phone, payout method of your choice. We walk you through every setup step live so nothing gets missed." },
+    { d: "DAY 3", t: "Get activated", b: "Submit your account details in the private chat. The TTSUnlocked team verifies and activates within 24 hours." },
+    { d: "DAY 4–7", t: "Start earning", b: "Post your first UGC, showcase products in your videos, watch USD commissions land in the account you choose." },
   ];
   return (
     <section className="ac-how" id="how">
       <div className="ac-how-head">
-        <p className="ac-section-eyebrow">THE 7-DAY PATH</p>
-        <h2 className="ac-section-title">From sign-up to <span className="ac-accent">earnings.</span></h2>
+        <p className="ac-section-eyebrow">THE 7-DAY FAST TRACK</p>
+        <h2 className="ac-section-title">Zero to <span className="ac-accent">earning USD</span> in one week.</h2>
+        <p className="ac-section-sub">A structured day-by-day walkthrough. Follow the steps, complete each module, activate.</p>
       </div>
-      <div className="ac-how-steps">
+      <ol className="ac-steps">
         {steps.map((s, i) => (
-          <div key={i} className="ac-how-step">
-            <div className="ac-how-step-num">{i + 1}</div>
-            <div className="ac-how-step-day">{s.d}</div>
-            <div className="ac-how-step-title">{s.t}</div>
-            <div className="ac-how-step-body">{s.b}</div>
-          </div>
+          <li key={s.d} className="ac-step">
+            <div className="ac-step-num">{String(i + 1).padStart(2, "0")}</div>
+            <div className="ac-step-body">
+              <div className="ac-step-day">{s.d}</div>
+              <h3 className="ac-step-title">{s.t}</h3>
+              <p className="ac-step-desc">{s.b}</p>
+            </div>
+          </li>
         ))}
+      </ol>
+    </section>
+  );
+}
+
+/* ============================================================
+   PRICING (gated)
+   ============================================================ */
+function PricingBlock() {
+  const [gate, setGate] = useState<GateStatus>("idle");
+  const [form, setForm] = useState({ name: "", email: "" });
+  const [error, setError] = useState<string | null>(null);
+  const [clicking, setClicking] = useState<Tier | null>(null);
+
+  // Resume if this browser has already unlocked
+  useEffect(() => {
+    try {
+      if (localStorage.getItem("ac_gate_ok") === "1") setGate("revealed");
+    } catch {}
+  }, []);
+
+  async function submitGate(e: React.FormEvent) {
+    e.preventDefault();
+    if (gate === "submitting") return;
+    setError(null);
+    setGate("submitting");
+    try {
+      const res = await fetch("/api/accelerator/intent", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "reveal", email: form.email.trim(), name: form.name.trim(), accelerator: "colt" }),
+      });
+      const j = await res.json();
+      if (!j.ok) throw new Error(j.error || "Something went wrong.");
+      try { localStorage.setItem("ac_gate_ok", "1"); localStorage.setItem("ac_gate_email", form.email.trim()); localStorage.setItem("ac_gate_name", form.name.trim()); } catch {}
+      setGate("revealed");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Something went wrong.");
+      setGate("idle");
+    }
+  }
+
+  async function clickTier(tier: Tier) {
+    if (clicking) return;
+    setClicking(tier);
+    try {
+      const res = await fetch("/api/accelerator/intent", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "click", tier, accelerator: "colt" }),
+      });
+      const j = await res.json();
+      if (j.ok && j.checkoutUrl) {
+        window.location.href = j.checkoutUrl;
+      } else {
+        setClicking(null);
+      }
+    } catch {
+      setClicking(null);
+    }
+  }
+
+  return (
+    <section className="ac-pricing" id="pricing">
+      <div className="ac-pricing-head">
+        <p className="ac-section-eyebrow">PICK YOUR PATH</p>
+        <h2 className="ac-section-title">One program. <span className="ac-accent">Three tiers.</span></h2>
+        <p className="ac-section-sub">Education-only, education + a verified account handed to you, or just browse Nick G&apos;s live inventory.</p>
+        <div className="ac-guarantee">
+          <span className="ac-guarantee-icon">🛡</span>
+          <div>
+            <b>7-Day Activation Guarantee.</b> Follow every step and complete the fast track. You will be live on TikTok Shop. That&apos;s our commitment.
+          </div>
+        </div>
+      </div>
+
+      {gate !== "revealed" ? (
+        <div className="ac-gate-card">
+          <div className="ac-gate-eyebrow">UNLOCK PRICING</div>
+          <h3 className="ac-gate-title">Enter your name and email to see the tiers.</h3>
+          <p className="ac-gate-sub">Takes 3 seconds. No spam. Just so we can send you Skool access details after you enroll.</p>
+          <form onSubmit={submitGate} className="ac-gate-form">
+            <div className="ac-gate-row">
+              <input
+                type="text" required placeholder="Your name" autoComplete="name"
+                value={form.name}
+                onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
+              />
+              <input
+                type="email" required placeholder="you@example.com" autoComplete="email"
+                value={form.email}
+                onChange={(e) => setForm((f) => ({ ...f, email: e.target.value }))}
+              />
+            </div>
+            <button type="submit" className="ac-cta-primary" disabled={gate === "submitting"}>
+              {gate === "submitting" ? "Unlocking…" : "Unlock the tiers →"}
+            </button>
+            {error && <p className="ac-gate-err">{error}</p>}
+          </form>
+        </div>
+      ) : (
+        <div className="ac-tiers">
+          <TierCard
+            eyebrow="EDUCATION ONLY"
+            price="$1,597"
+            label="one-time"
+            features={[
+              "Full Skool community access",
+              "All 7-day fast track modules",
+              "Weekly live workshops with COLT + TTSUnlocked",
+              "Resource vault + templates",
+              "Private chat with the TTSUnlocked team",
+              "Account NOT included (source your own)",
+            ]}
+            cta="Enroll — $1,597"
+            onClick={() => clickTier("edu_only")}
+            loading={clicking === "edu_only"}
+          />
+          <TierCard
+            highlight
+            eyebrow="EDUCATION + VERIFIED ACCOUNT"
+            price="$1,997"
+            label="one-time · most popular"
+            features={[
+              "Everything in Education Only",
+              "One verified US TikTok Shop account, day 1",
+              "Priority same-day activation",
+              "1-on-1 kickoff call with the TTSUnlocked team",
+              "Compliance walkthrough for your niche",
+              "Fast track your first commission",
+            ]}
+            cta="Enroll — $1,997"
+            onClick={() => clickTier("edu_plus_account")}
+            loading={clicking === "edu_plus_account"}
+          />
+          <TierCard
+            variant="browse"
+            eyebrow="ACCOUNTS ONLY"
+            price="Browse"
+            label="marketplace access"
+            features={[
+              "Nick G's live account inventory",
+              "Handles, follower counts, prices",
+              "Filter by follower tier",
+              "One-click Discord ticket to buy",
+              "No program included — accounts only",
+              "For creators who already know the game",
+            ]}
+            cta="Browse accounts →"
+            onClick={() => clickTier("browse")}
+            loading={clicking === "browse"}
+          />
+        </div>
+      )}
+    </section>
+  );
+}
+
+function TierCard(props: {
+  eyebrow: string; price: string; label: string; features: string[];
+  cta: string; onClick: () => void; loading?: boolean;
+  highlight?: boolean; variant?: "browse";
+}) {
+  return (
+    <div className={`ac-tier${props.highlight ? " ac-tier-highlight" : ""}${props.variant === "browse" ? " ac-tier-browse" : ""}`}>
+      {props.highlight && <div className="ac-tier-ribbon">MOST POPULAR</div>}
+      <div className="ac-tier-eyebrow">{props.eyebrow}</div>
+      <div className="ac-tier-price">{props.price}</div>
+      <div className="ac-tier-label">{props.label}</div>
+      <ul className="ac-tier-features">
+        {props.features.map((f, i) => (
+          <li key={i}>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12" /></svg>
+            <span>{f}</span>
+          </li>
+        ))}
+      </ul>
+      <button type="button" className="ac-cta-primary" onClick={props.onClick} disabled={props.loading}>
+        {props.loading ? "Routing…" : props.cta}
+      </button>
+    </div>
+  );
+}
+
+/* ============================================================
+   FAQ (accordion)
+   ============================================================ */
+function FAQ() {
+  const [open, setOpen] = useState<number | null>(0);
+  return (
+    <section className="ac-faq" id="faq">
+      <div className="ac-faq-head">
+        <p className="ac-section-eyebrow">FAQ</p>
+        <h2 className="ac-section-title">Questions we get <span className="ac-accent">every week.</span></h2>
+      </div>
+      <div className="ac-faq-list">
+        {FAQ_ITEMS.map((f, i) => {
+          const isOpen = open === i;
+          return (
+            <button
+              key={i}
+              type="button"
+              className={`ac-faq-item${isOpen ? " open" : ""}`}
+              onClick={() => setOpen(isOpen ? null : i)}
+              aria-expanded={isOpen}
+            >
+              <div className="ac-faq-q">
+                <span>{f.q}</span>
+                <span className="ac-faq-sign">{isOpen ? "–" : "+"}</span>
+              </div>
+              {isOpen && <div className="ac-faq-a">{f.a}</div>}
+            </button>
+          );
+        })}
       </div>
     </section>
   );
 }
 
-function InlineChat() {
+/* ============================================================
+   FOOTER
+   ============================================================ */
+function Footer() {
+  return (
+    <footer className="ac-footer">
+      <div className="ac-footer-brand">
+        <span className="ac-footer-dot" /> Powered by <b>COLT</b> × <b>TTSUnlocked</b>
+      </div>
+      <div className="ac-footer-links">
+        <Link href="/terms">Terms</Link>
+        <Link href="/privacy">Privacy</Link>
+        <Link href="/accounts">Accounts</Link>
+        <a href="mailto:aragonkevin239@gmail.com">Contact</a>
+      </div>
+    </footer>
+  );
+}
+
+/* ============================================================
+   CHAT WIDGET — reuses /api/chatroom infrastructure
+   ============================================================ */
+function ChatWidget() {
+  const [open, setOpen] = useState(false);
   const [status, setStatus] = useState<ChatStatus>("gate");
   const [form, setForm] = useState({ name: "", email: "" });
   const [thread, setThread] = useState<{ id: string; email: string; name: string } | null>(null);
@@ -197,19 +474,26 @@ function InlineChat() {
   const [composer, setComposer] = useState("");
   const [error, setError] = useState<string | null>(null);
   const feedRef = useRef<HTMLDivElement>(null);
+  const CAL = "https://calendly.com/itskevinaragon/30min";
 
-  useEffect(() => { try { const em = localStorage.getItem("am_chatroom_email") ?? ""; const nm = localStorage.getItem("am_chatroom_name") ?? ""; if (em) setForm({ name: nm, email: em }); } catch {} }, []);
-  useEffect(() => { feedRef.current?.scrollTo({ top: feedRef.current.scrollHeight, behavior: "smooth" }); }, [msgs.length]);
+  useEffect(() => {
+    try {
+      const em = localStorage.getItem("am_chatroom_email") ?? "";
+      const nm = localStorage.getItem("am_chatroom_name") ?? "";
+      if (em) setForm({ name: nm, email: em });
+    } catch {}
+  }, []);
+
+  useEffect(() => {
+    feedRef.current?.scrollTo({ top: feedRef.current.scrollHeight, behavior: "smooth" });
+  }, [msgs.length]);
 
   const openThread = useCallback(async () => {
     setError(null);
     try {
-      fetch("/api/accelerator/intent", {
-        method: "POST", headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ action: "reveal", name: form.name.trim(), email: form.email.trim(), accelerator: SLUG }),
-      }).catch(() => {});
       const res = await fetch("/api/chatroom/threads", {
-        method: "POST", headers: { "Content-Type": "application/json" },
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email: form.email.trim(), name: form.name.trim() }),
       });
       const j = await res.json();
@@ -225,14 +509,149 @@ function InlineChat() {
     setStatus("sending"); setError(null);
     try {
       const res = await fetch("/api/chatroom/messages", {
-        method: "POST", headers: { "Content-Type": "application/json" },
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ threadId: thread.id, body: text }),
       });
       const j = await res.json();
       if (!j.ok) throw new Error(j.error || "Send failed.");
       setMsgs((cur) => [...cur, j.message]);
       setComposer("");
-    } catch (err) { setError(err instanceof Error ? err.message : "Send failed."); } finally { setStatus("open"); }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Send failed.");
+    } finally { setStatus("open"); }
+  }
+
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => { setMounted(true); }, []);
+  if (!mounted) return null;
+
+  const widget = (
+    <div className="ac-chat-widget" data-open={open}>
+      {!open && (
+        <button className="ac-chat-toggle" onClick={() => setOpen(true)} aria-label="Open chat">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+          <span>Chat with us</span>
+        </button>
+      )}
+      {open && (
+        <div className="ac-chat-panel">
+          <div className="ac-chat-head">
+            <div>
+              <div className="ac-chat-head-title">Chat with the TTSUnlocked team</div>
+              <div className="ac-chat-head-sub">We reply as fast as we can.</div>
+            </div>
+            <button className="ac-chat-close" onClick={() => setOpen(false)} aria-label="Close">×</button>
+          </div>
+
+          {status === "gate" ? (
+            <form className="ac-chat-gate" onSubmit={(e) => { e.preventDefault(); openThread(); }}>
+              <p>Name + email starts a private thread tied to you. We&apos;ll get back to you here.</p>
+              <input
+                type="text" required placeholder="Your name" autoComplete="name"
+                value={form.name} onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
+              />
+              <input
+                type="email" required placeholder="you@example.com" autoComplete="email"
+                value={form.email} onChange={(e) => setForm((f) => ({ ...f, email: e.target.value }))}
+              />
+              <button type="submit" className="ac-cta-primary">Start chat →</button>
+              <a href={CAL} target="_blank" rel="noopener noreferrer" className="ac-chat-book">
+                Or book a 30-min call →
+              </a>
+              {error && <p className="ac-chat-err">{error}</p>}
+            </form>
+          ) : (
+            <>
+              <div ref={feedRef} className="ac-chat-feed">
+                {msgs.length === 0 ? (
+                  <div className="ac-chat-empty">Say hi — the TTSUnlocked team will jump in.</div>
+                ) : msgs.map((m) => (
+                  <div key={m.id} className={`ac-chat-msg ${m.sender === "user" ? "me" : "them"}`}>
+                    <p>{m.body}</p>
+                    <span>{m.sender === "user" ? "You" : "AM Team"} · {new Date(m.createdAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}</span>
+                  </div>
+                ))}
+              </div>
+              <div className="ac-chat-quicks">
+                <a href={CAL} target="_blank" rel="noopener noreferrer">📞 Book a call</a>
+              </div>
+              <form className="ac-chat-composer" onSubmit={(e) => { e.preventDefault(); send(); }}>
+                <input
+                  type="text" placeholder="Type a message…"
+                  value={composer} onChange={(e) => setComposer(e.target.value)}
+                  disabled={status === "sending"}
+                />
+                <button type="submit" disabled={!composer.trim() || status === "sending"}>Send</button>
+                {error && <p className="ac-chat-err">{error}</p>}
+              </form>
+            </>
+          )}
+        </div>
+      )}
+    </div>
+  );
+
+  return createPortal(widget, document.body);
+}
+
+/* ============================================================
+   INLINE CHAT (below pricing, always visible — not the floating widget)
+   ============================================================ */
+function InlineChat() {
+  const [status, setStatus] = useState<ChatStatus>("gate");
+  const [form, setForm] = useState({ name: "", email: "" });
+  const [thread, setThread] = useState<{ id: string; email: string; name: string } | null>(null);
+  const [msgs, setMsgs] = useState<Array<{ id: string; sender: string; body: string; createdAt: string }>>([]);
+  const [composer, setComposer] = useState("");
+  const [error, setError] = useState<string | null>(null);
+  const feedRef = useRef<HTMLDivElement>(null);
+  const CAL = "https://calendly.com/itskevinaragon/30min";
+
+  useEffect(() => {
+    try {
+      const em = localStorage.getItem("am_chatroom_email") ?? "";
+      const nm = localStorage.getItem("am_chatroom_name") ?? "";
+      if (em) setForm({ name: nm, email: em });
+    } catch {}
+  }, []);
+
+  useEffect(() => {
+    feedRef.current?.scrollTo({ top: feedRef.current.scrollHeight, behavior: "smooth" });
+  }, [msgs.length]);
+
+  const openThread = useCallback(async () => {
+    setError(null);
+    try {
+      const res = await fetch("/api/chatroom/threads", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: form.email.trim(), name: form.name.trim() }),
+      });
+      const j = await res.json();
+      if (!j.ok) throw new Error(j.error || "Couldn't open the chat.");
+      setThread(j.thread); setMsgs(j.messages); setStatus("open");
+      try { localStorage.setItem("am_chatroom_email", form.email.trim()); localStorage.setItem("am_chatroom_name", form.name.trim()); } catch {}
+    } catch (e) { setError(e instanceof Error ? e.message : "Something went wrong."); }
+  }, [form.email, form.name]);
+
+  async function send() {
+    if (!thread || !composer.trim() || status === "sending") return;
+    const text = composer.trim();
+    setStatus("sending"); setError(null);
+    try {
+      const res = await fetch("/api/chatroom/messages", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ threadId: thread.id, body: text }),
+      });
+      const j = await res.json();
+      if (!j.ok) throw new Error(j.error || "Send failed.");
+      setMsgs((cur) => [...cur, j.message]);
+      setComposer("");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Send failed.");
+    } finally { setStatus("open"); }
   }
 
   return (
@@ -242,24 +661,54 @@ function InlineChat() {
         <h2 className="ac-section-title">Questions? <span className="ac-accent">Send it.</span></h2>
         <p className="ac-section-sub">The TTSUnlocked team is here. Drop your name and email, then chat with us directly.</p>
       </div>
+
       <div className="ac-inline-chat-card">
         <div className="ac-inline-chat-side">
           <div className="ac-inline-chat-bullets">
-            <div className="ac-inline-chat-bullet"><span className="ac-inline-chat-dot" /><div><b>Fast replies.</b><span>The team responds the same day.</span></div></div>
-            <div className="ac-inline-chat-bullet"><span className="ac-inline-chat-dot" /><div><b>No pitch.</b><span>Ask anything about tiers, timing, or process.</span></div></div>
-            <div className="ac-inline-chat-bullet"><span className="ac-inline-chat-dot" /><div><b>Prefer a call?</b><span>Book a 30-min meeting below.</span></div></div>
+            <div className="ac-inline-chat-bullet">
+              <span className="ac-inline-chat-dot" />
+              <div>
+                <b>Fast replies.</b>
+                <span>The team is on it every day. Expect a response the same day.</span>
+              </div>
+            </div>
+            <div className="ac-inline-chat-bullet">
+              <span className="ac-inline-chat-dot" />
+              <div>
+                <b>No pitch.</b>
+                <span>Ask anything about the tiers, timing, or what happens after you join.</span>
+              </div>
+            </div>
+            <div className="ac-inline-chat-bullet">
+              <span className="ac-inline-chat-dot" />
+              <div>
+                <b>Prefer a call?</b>
+                <span>Book a 30-min meeting below. Same day openings on most weeks.</span>
+              </div>
+            </div>
           </div>
           <a href={CAL} target="_blank" rel="noopener noreferrer" className="ac-cta-ghost ac-inline-chat-book">Book a 30-min call →</a>
         </div>
+
         <div className="ac-inline-chat-panel">
           <div className="ac-inline-chat-head-strip">
             <span className="ac-inline-chat-live-dot" />
-            <div><div className="ac-inline-chat-title">Chat with TTSUnlocked</div><div className="ac-inline-chat-sub">We&apos;ll email you when we reply.</div></div>
+            <div>
+              <div className="ac-inline-chat-title">Chat with the TTSUnlocked team</div>
+              <div className="ac-inline-chat-sub">Private thread. We&apos;ll email you when we reply.</div>
+            </div>
           </div>
+
           {status === "gate" ? (
             <form className="ac-inline-chat-gate" onSubmit={(e) => { e.preventDefault(); openThread(); }}>
-              <input type="text" required placeholder="Your name" autoComplete="name" value={form.name} onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))} />
-              <input type="email" required placeholder="you@example.com" autoComplete="email" value={form.email} onChange={(e) => setForm((f) => ({ ...f, email: e.target.value }))} />
+              <input
+                type="text" required placeholder="Your name" autoComplete="name"
+                value={form.name} onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
+              />
+              <input
+                type="email" required placeholder="you@example.com" autoComplete="email"
+                value={form.email} onChange={(e) => setForm((f) => ({ ...f, email: e.target.value }))}
+              />
               <button type="submit" className="ac-cta-primary">Start chat →</button>
               {error && <p className="ac-chat-err">{error}</p>}
             </form>
@@ -267,16 +716,20 @@ function InlineChat() {
             <>
               <div ref={feedRef} className="ac-inline-chat-feed">
                 {msgs.length === 0 ? (
-                  <div className="ac-chat-empty">Say hi — the team will jump in.</div>
+                  <div className="ac-chat-empty">Say hi — the TTSUnlocked team will jump in.</div>
                 ) : msgs.map((m) => (
                   <div key={m.id} className={`ac-chat-msg ${m.sender === "user" ? "me" : "them"}`}>
                     <p>{m.body}</p>
-                    <span>{m.sender === "user" ? "You" : "TTSUnlocked"} · {new Date(m.createdAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}</span>
+                    <span>{m.sender === "user" ? "You" : "AM Team"} · {new Date(m.createdAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}</span>
                   </div>
                 ))}
               </div>
               <form className="ac-inline-chat-composer" onSubmit={(e) => { e.preventDefault(); send(); }}>
-                <input type="text" placeholder="Type a message…" value={composer} onChange={(e) => setComposer(e.target.value)} disabled={status === "sending"} />
+                <input
+                  type="text" placeholder="Type a message…"
+                  value={composer} onChange={(e) => setComposer(e.target.value)}
+                  disabled={status === "sending"}
+                />
                 <button type="submit" disabled={!composer.trim() || status === "sending"}>Send</button>
                 {error && <p className="ac-chat-err">{error}</p>}
               </form>
@@ -288,126 +741,53 @@ function InlineChat() {
   );
 }
 
-function Partners() {
-  const partners = [
-    { src: "/partners/tiktok-shop.png", alt: "TikTok Shop" },
-    { src: "/partners/goli.png", alt: "Goli" },
-    { src: "/partners/npro.png", alt: "NPRO" },
-    { src: "/partners/apex.png", alt: "APEX" },
-    { src: "/partners/cc.png", alt: "C&C" },
-  ];
-  return (
-    <section className="ac-partners">
-      <p className="ac-partners-eyebrow">BUILT WITH PARTNERS WHO WIN</p>
-      <div className="ac-partners-logos">
-        {partners.map((p, i) => (
-          <div key={i} className="ac-partner-logo-wrap">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={p.src} alt={p.alt} className="ac-partner-logo" />
-          </div>
-        ))}
-      </div>
-    </section>
-  );
-}
-
-function Testimonials() {
-  const items = [
-    { name: "Jess", city: "USA", quote: "TTSUnlocked made it so simple. Verified in 2 days, first sale within a week." },
-    { name: "Tom", city: "UK", quote: "The support team is amazing. They walked me through everything step by step." },
-    { name: "Sarah", city: "Canada", quote: "The verified account gave me instant credibility. Sales started coming right away." },
-  ];
-  return (
-    <section className="ac-tests" id="testimonials">
-      <div className="ac-tests-head">
-        <p className="ac-section-eyebrow">REAL CREATORS. REAL RESULTS.</p>
-        <h2 className="ac-section-title">Creators <span className="ac-accent">already earning.</span></h2>
-      </div>
-      <div className="ac-tests-grid">
-        {items.map((t) => (
-          <div key={t.name} className="ac-test-card">
-            <div className="ac-test-meta">
-              <div className="ac-test-name">{t.name}</div>
-              <div className="ac-test-city">{t.city}</div>
-              <p style={{ marginTop: 10, fontSize: 13.5, color: "var(--taa-muted)", lineHeight: 1.55 }}>&ldquo;{t.quote}&rdquo;</p>
-            </div>
-          </div>
-        ))}
-      </div>
-    </section>
-  );
-}
-
+/* ============================================================
+   WINS gallery (Kevin uploads screenshots here)
+   ============================================================ */
 function Wins() {
   return (
     <section className="ac-wins" id="wins">
       <div className="ac-wins-head">
         <p className="ac-section-eyebrow">MORE WINS</p>
         <h2 className="ac-section-title">The <span className="ac-accent">receipts.</span></h2>
-        <p className="ac-section-sub">Fresh screenshots from TTSUnlocked members. Updated weekly.</p>
+        <p className="ac-section-sub">Fresh screenshots straight from the creators inside the program. Updated weekly.</p>
       </div>
-      <div className="ac-wins-empty">
-        <div className="ac-wins-empty-glow" aria-hidden="true" />
-        <p className="ac-wins-empty-title">More wins landing shortly.</p>
-        <p className="ac-wins-empty-sub">Fresh screenshots posting here as creators activate and start earning. Check back weekly.</p>
-      </div>
+      {WINS.length === 0 ? (
+        <div className="ac-wins-empty">
+          <div className="ac-wins-empty-glow" aria-hidden="true" />
+          <p className="ac-wins-empty-title">More wins landing shortly.</p>
+          <p className="ac-wins-empty-sub">Check back weekly. The team is flooding this space with fresh screenshots as creators activate and start earning.</p>
+        </div>
+      ) : (
+        <div className="ac-wins-grid">
+          {WINS.map((w, i) => (
+            <figure key={i} className="ac-win-card">
+              {w.video ? (
+                <video
+                  src={encodeURI(w.src)}
+                  autoPlay
+                  muted
+                  loop
+                  playsInline
+                  controls
+                  preload="metadata"
+                />
+              ) : (
+                /* eslint-disable-next-line @next/next/no-img-element */
+                <img src={encodeURI(w.src)} alt={w.caption || "Creator win"} loading="lazy" />
+              )}
+              {w.caption && <figcaption>{w.caption}</figcaption>}
+            </figure>
+          ))}
+        </div>
+      )}
     </section>
   );
 }
 
-function FAQ() {
-  const items = [
-    { q: "Do I need to be in the US?", a: "No. TTSUnlocked is built specifically for creators outside the US. The verified account path handles everything." },
-    { q: "How long does setup take?", a: "24 hours from the moment your account details are submitted. The team activates and verifies in that window." },
-    { q: "How and when do I get paid?", a: "USD, direct to your bank. Payouts follow TikTok Shop\u2019s standard cycle (typically weekly after the hold period)." },
-    { q: "Is there a refund?", a: "Our guarantee is completion-based: follow the steps, complete the 7-day program, and we guarantee you\u2019ll be live on TikTok Shop. If you don\u2019t complete, there\u2019s no refund." },
-    { q: "What if I already know TikTok Shop?", a: "The Accounts Only tier is for you. Grab a verified account and plug in \u2014 skip the training." },
-    { q: "Can I upgrade later?", a: "Yes. Start with Education Only, add the verified account whenever you\u2019re ready." },
-  ];
-  return (
-    <section className="ac-faq" id="faq">
-      <div className="ac-faq-head">
-        <p className="ac-section-eyebrow">FREQUENTLY ASKED</p>
-        <h2 className="ac-section-title">Quick <span className="ac-accent">answers.</span></h2>
-      </div>
-      <div className="ac-faq-list">
-        {items.map((it, i) => (
-          <details key={i} className="ac-faq-item">
-            <summary>{it.q}</summary>
-            <p>{it.a}</p>
-          </details>
-        ))}
-      </div>
-    </section>
-  );
-}
-
-function Footer() {
-  return (
-    <footer className="ac-footer">
-      <div><span className="ac-footer-dot" /> Powered by <b>COLT</b> × <b>TTSUnlocked</b></div>
-      <div className="ac-footer-links">
-        <Link href="/privacy">Privacy</Link>
-        <Link href="/terms">Terms</Link>
-        <a href="mailto:hello@ttsaccelerators.com">Contact</a>
-      </div>
-    </footer>
-  );
-}
-
-function ChatWidget() {
-  const [mounted, setMounted] = useState(false);
-  useEffect(() => { setMounted(true); }, []);
-  if (!mounted) return null;
-  const widget = (
-    <a href="#talk" className="ac-chat-toggle" aria-label="Chat with TTSUnlocked" style={{ position: "fixed", bottom: 24, right: 24, zIndex: 999 }}>
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
-      <span>Chat with us</span>
-    </a>
-  );
-  return createPortal(widget, document.body);
-}
-
+/* ============================================================
+   STYLES
+   ============================================================ */
 function Styles() {
   return (
     <style>{`
@@ -676,28 +1056,6 @@ function Styles() {
         .ac-stat { min-width: 68px; }
         .ac-stat-n { font-size: 18px; }
         .ac-section-title { font-size: clamp(24px, 7vw, 32px); }
-      }
-    `}</style>
-  );
-}
-
-function ColtOverrides() {
-  return (
-    <style>{`
-      .colt-shell { color: var(--taa-text); }
-      .colt-logo-img { display: block; width: 44px; height: 44px; border-radius: 10px; filter: drop-shadow(0 0 16px rgba(0, 229, 255, 0.4)); }
-      .colt-hero-banner { display: block; width: 100%; max-width: 1180px; margin: 24px auto 0; border-radius: 16px; border: 1px solid var(--taa-border-strong); box-shadow: 0 24px 80px rgba(0, 229, 255, 0.08); }
-      .colt-stats-wrap { max-width: 1180px; margin: 0 auto; padding: 10px 40px 30px; }
-      .colt-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; background: var(--taa-bg-card); border: 1px solid var(--taa-border-strong); border-radius: 16px; padding: 28px 24px; }
-      .colt-stat { text-align: center; }
-      .colt-stat-num { font-size: 32px; font-weight: 900; color: var(--taa-red); letter-spacing: -0.02em; text-shadow: 0 0 24px var(--taa-red-glow); }
-      .colt-stat-label { font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--taa-muted); font-weight: 700; margin-top: 6px; }
-      @media (max-width: 900px) {
-        .colt-stats { grid-template-columns: 1fr 1fr; gap: 20px 14px; padding: 20px 14px; }
-        .colt-stat-num { font-size: 24px; }
-        .colt-stats-wrap { padding: 10px 20px 20px; }
-        .colt-hero-banner { margin-top: 16px; border-radius: 10px; }
-        .colt-logo-img { width: 36px; height: 36px; }
       }
     `}</style>
   );
