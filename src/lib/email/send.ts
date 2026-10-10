@@ -991,3 +991,44 @@ export async function sendTeamInviteEmail(opts: {
     });
   } catch (err) { console.error("[email] sendTeamInviteEmail failed:", err); }
 }
+
+// Fires when a lead on /accounts clicks through to Nick G's Discord.
+// Lets Kevin + whoever reaches out know this came from the accelerator —
+// not organic — so they get attribution.
+export async function sendOutboundAccountsNotifyAdmin(opts: {
+  to: string[];
+  name: string;
+  email: string;
+  accelerator: string;
+  adminUrl: string;
+}) {
+  try {
+    if (opts.to.length === 0) return;
+    const resend = getResend();
+    const brand = opts.accelerator === "colt" ? "TTSUnlocked" : "Accelerator";
+    const subject = `${brand} → Nick G: ${opts.name}`;
+    const html = `<!DOCTYPE html><html>${EMAIL_HEAD}
+    <body bgcolor="#F5F2EA" style="margin:0;padding:0;background:#F5F2EA;font-family:system-ui,-apple-system,'Inter Tight',sans-serif;">
+      <table role="presentation" width="100%" bgcolor="#F5F2EA" style="background:#F5F2EA;">
+        <tr><td align="center" style="padding:32px 18px;">
+          <table role="presentation" width="600" bgcolor="#FFFFFF" style="background:#FFFFFF;border:1px solid #E8E2D2;border-radius:12px;max-width:600px;width:100%;">
+            <tr><td style="padding:30px 32px 14px;">
+              <p style="margin:0 0 6px 0;font-size:11px;letter-spacing:0.2em;color:#DC1E2E;text-transform:uppercase;font-weight:700;">${escapeHtml(brand)} → Nick G Discord</p>
+              <h1 style="margin:0;font-size:22px;color:#1A1A1A;letter-spacing:-0.01em;">${escapeHtml(opts.name)}</h1>
+              <p style="margin:6px 0 0;font-size:13px;color:#6B6B6B;">${escapeHtml(opts.email)}</p>
+              <p style="margin:14px 0 0;font-size:12.5px;color:#6B6B6B;">This lead left the <b>${escapeHtml(brand)}</b> accounts page to open a ticket in Nick G's Discord. Attribution is logged — if they buy an account there, it came from our funnel.</p>
+            </td></tr>
+            <tr><td style="padding:14px 32px 26px;">
+              <a href="${opts.adminUrl}" style="display:inline-block;padding:12px 22px;background:#DC1E2E;color:#FFFFFF;text-decoration:none;font-size:13px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;border-radius:4px;">Open admin →</a>
+            </td></tr>
+          </table>
+        </td></tr>
+      </table>
+    </body></html>`;
+    await resend.emails.send({
+      from: FROM, to: opts.to, subject,
+      text: `${brand} → NICK G\n\n${opts.name} <${opts.email}> left the accounts page to open a Discord ticket.\n\nAttribution logged. If they buy an account there, it came from our funnel.\n\nOpen admin: ${opts.adminUrl}`,
+      html,
+    });
+  } catch (err) { console.error("[email] sendOutboundAccountsNotifyAdmin failed:", err); }
+}

@@ -1,4 +1,3 @@
--- Multi-tenant support for intent capture
 ALTER TABLE accelerator_intents ADD COLUMN IF NOT EXISTS accelerator_slug varchar(40) NOT NULL DEFAULT 'roni';
 --> statement-breakpoint
 ALTER TABLE accelerator_intents ADD COLUMN IF NOT EXISTS action varchar(32);

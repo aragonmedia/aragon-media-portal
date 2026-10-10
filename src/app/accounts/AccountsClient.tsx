@@ -145,7 +145,11 @@ export default function AccountsClient({
     try {
       const p = new URLSearchParams(window.location.search);
       const from = p.get("from");
-      if (from && /^[a-z0-9-]{1,40}$/.test(from)) setAccelerator(from);
+      if (from && /^[a-z0-9-]{1,40}$/.test(from)) {
+        setAccelerator(from);
+      } else if (window.location.pathname.startsWith("/colt")) {
+        setAccelerator("colt");
+      }
     } catch {}
   }, []);
   function openDiscord(url: string, label: string) {

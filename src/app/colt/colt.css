@@ -1,4 +1,5 @@
-/* TTSUnlocked — scoped palette override (neon blue) */
+/* TTSUnlocked — neon-blue palette override on top of shared accelerator.css */
+
 .colt-shell {
   --taa-bg: #050810;
   --taa-bg-2: #0A0F18;
@@ -17,4 +18,61 @@
   color: var(--taa-text);
   font-family: 'Inter Tight', 'Helvetica Neue', Arial, sans-serif;
   min-height: 100vh;
+}
+
+/* --- Hard-coded reds that bleed from accelerator.css: swap to blue inside .colt-shell --- */
+.colt-shell .taa-grid {
+  background-image:
+    linear-gradient(rgba(0, 229, 255, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 229, 255, 0.05) 1px, transparent 1px);
+}
+.colt-shell .taa-radar {
+  background: radial-gradient(
+    circle,
+    transparent 0 40%,
+    rgba(0, 229, 255, 0.08) 40% 41%,
+    transparent 42% 60%,
+    rgba(0, 229, 255, 0.06) 60% 61%,
+    transparent 62% 80%,
+    rgba(0, 229, 255, 0.04) 80% 81%,
+    transparent 82%
+  );
+}
+.colt-shell .ac-header-brand img,
+.colt-shell .colt-logo-img {
+  filter: drop-shadow(0 0 12px rgba(0, 229, 255, 0.5));
+}
+
+/* --- Chat widget portal escapes .colt-shell — scope by pathname via body[data-tenant] --- */
+body[data-tenant="colt"] .ac-chat-toggle,
+body[data-tenant="colt"] .ac-chat-panel,
+body[data-tenant="colt"] .ac-chat-close,
+body[data-tenant="colt"] .ac-chat-book,
+body[data-tenant="colt"] .ac-chat-quicks a,
+body[data-tenant="colt"] .ac-chat-msg.me p {
+  --taa-red: #00E5FF;
+  --taa-red-bright: #2DD4C7;
+  --taa-red-glow: rgba(0, 229, 255, 0.35);
+  --taa-white: #FFFFFF;
+}
+body[data-tenant="colt"] .ac-chat-toggle {
+  background: #00E5FF;
+  color: #050810;
+  box-shadow: 0 10px 40px rgba(0, 229, 255, 0.4);
+}
+body[data-tenant="colt"] .ac-chat-panel {
+  border: 1px solid rgba(0, 229, 255, 0.3);
+}
+body[data-tenant="colt"] .ac-chat-head {
+  border-bottom: 1px solid rgba(0, 229, 255, 0.18);
+}
+body[data-tenant="colt"] .ac-chat-msg.me p {
+  background: rgba(0, 229, 255, 0.1);
+  border: 1px solid rgba(0, 229, 255, 0.3);
+  color: #F5F8FF;
+}
+body[data-tenant="colt"] .ac-chat-gate .ac-cta-primary,
+body[data-tenant="colt"] .ac-chat-composer button {
+  background: #00E5FF;
+  color: #050810;
 }

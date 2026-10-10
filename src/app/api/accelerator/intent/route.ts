@@ -25,6 +25,7 @@ import {
   sendAcceleratorIntentToBuyer,
   sendAcceleratorIntentToAdmin,
   sendAcceleratorRevealNotifyAdmin,
+  sendOutboundAccountsNotifyAdmin,
 } from "@/lib/email/send";
 
 export const runtime = "nodejs";
@@ -35,15 +36,22 @@ const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 type Tier = "edu_only" | "edu_plus_account" | "browse";
 
-const SQUARE_URL_EDU = process.env.SQUARE_ACCELERATOR_EDU_URL ??
-  "https://square.link/u/AYMY3X0L";
-const SQUARE_URL_EDU_PLUS = process.env.SQUARE_ACCELERATOR_EDU_PLUS_URL ??
-  "https://square.link/u/9xgRVCHp";
+// Per-tenant Square checkout URLs.
+const SQUARE_URL_EDU_RONI = process.env.SQUARE_ACCELERATOR_EDU_URL ?? "https://square.link/u/AYMY3X0L";
+const SQUARE_URL_EDU_PLUS_RONI = process.env.SQUARE_ACCELERATOR_EDU_PLUS_URL ?? "https://square.link/u/9xgRVCHp";
+const SQUARE_URL_EDU_COLT = process.env.SQUARE_COLT_EDU_URL ?? "https://square.link/u/DGBSTN2x";
+const SQUARE_URL_EDU_PLUS_COLT = process.env.SQUARE_COLT_EDU_PLUS_URL ?? "https://square.link/u/7GrL5Iwy";
 
-function tierMeta(t: Tier): { label: string; priceCents: number | null; url: string } {
-  if (t === "edu_only") return { label: "Education Only", priceCents: 99700, url: SQUARE_URL_EDU };
-  if (t === "edu_plus_account") return { label: "Education + Verified Account", priceCents: 199700, url: SQUARE_URL_EDU_PLUS };
-  return { label: "Accounts Only (browse)", priceCents: null, url: "/accounts" };
+function tierMeta(t: Tier, slug: string): { label: string; priceCents: number | null; url: string } {
+  const isColt = slug === "colt";
+  const eduUrl = isColt ? SQUARE_URL_EDU_COLT : SQUARE_URL_EDU_RONI;
+  const eduPlusUrl = isColt ? SQUARE_URL_EDU_PLUS_COLT : SQUARE_URL_EDU_PLUS_RONI;
+  const eduPrice = isColt ? 159700 : 99700;
+  const eduPlusPrice = isColt ? 199700 : 199700;
+  if (t === "edu_only") return { label: "Education Only", priceCents: eduPrice, url: eduUrl };
+  if (t === "edu_plus_account") return { label: "Education + Verified Account", priceCents: eduPlusPrice, url: eduPlusUrl };
+  const browseTarget = isColt ? "/accounts?from=colt" : "/accounts";
+  return { label: "Accounts Only (browse)", priceCents: null, url: browseTarget };
 }
 
 async function getBrowserKey(): Promise<{ key: string; setCookie: boolean }> {
@@ -134,6 +142,7 @@ export async function POST(req: Request) {
         email,
         referrer,
         userAgent,
+        accelerator: slug,
       });
     } catch (err) {
       console.error("[intent reveal] airtable sync failed:", err);
@@ -174,10 +183,19 @@ export async function POST(req: Request) {
     }
 
     try {
-      await upsertLead({ portalId: intent.id, name, email });
+      await upsertLead({ portalId: intent.id, name, email, accelerator: slug });
     } catch (err) {
       console.error("[intent outbound_accounts] airtable sync failed:", err);
     }
+
+    // Admin email so Kevin + partner know this lead came from the accelerator
+    const adminTo = (process.env.ACCELERATOR_ADMIN_EMAILS ?? "aragonkevin239@gmail.com")
+      .split(",").map((e) => e.trim()).filter(Boolean);
+    const origin = req.headers.get("origin") || "https://portal.kevin-aragon.com";
+    sendOutboundAccountsNotifyAdmin({
+      to: adminTo, name, email, accelerator: slug,
+      adminUrl: `${origin}/admin/accelerator-leads`,
+    }).catch(() => {});
 
     const headers = new Headers({ "Content-Type": "application/json" });
     if (setCookie) headers.append("Set-Cookie", cookieHeader(key));
@@ -199,7 +217,7 @@ export async function POST(req: Request) {
   const intent = rows[0];
   if (!intent) return NextResponse.json({ ok: false, error: "no intent — reveal first" }, { status: 403 });
 
-  const meta = tierMeta(tier);
+  const meta = tierMeta(tier, slug);
   const now = new Date();
   await db.update(acceleratorIntents).set({
     clickedTier: tier,
@@ -235,6 +253,7 @@ export async function POST(req: Request) {
       name: intent.name,
       email: intent.email,
       clickedTier: tier,
+      accelerator: slug,
     });
   } catch (err) {
     console.error("[intent click] airtable sync failed:", err);

@@ -33,10 +33,14 @@ export default function ColtClient() {
       <Backdrop />
       <Header />
       <Hero />
+      <Partners />
       <Stats />
       <Pricing />
       <InlineChat />
       <SevenDay />
+      <Testimonials />
+      <Wins />
+      <FAQ />
       <Footer />
       <ChatWidget />
       <Styles />
@@ -279,6 +283,100 @@ function InlineChat() {
             </>
           )}
         </div>
+      </div>
+    </section>
+  );
+}
+
+function Partners() {
+  const partners = [
+    { src: "/partners/tiktok-shop.png", alt: "TikTok Shop" },
+    { src: "/partners/goli.png", alt: "Goli" },
+    { src: "/partners/npro.png", alt: "NPRO" },
+    { src: "/partners/apex.png", alt: "APEX" },
+    { src: "/partners/cc.png", alt: "C&C" },
+  ];
+  return (
+    <section className="ac-partners">
+      <p className="ac-partners-eyebrow">BUILT WITH PARTNERS WHO WIN</p>
+      <div className="ac-partners-logos">
+        {partners.map((p, i) => (
+          <div key={i} className="ac-partner-logo-wrap">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={p.src} alt={p.alt} className="ac-partner-logo" />
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+function Testimonials() {
+  const items = [
+    { name: "Jess", city: "USA", quote: "TTSUnlocked made it so simple. Verified in 2 days, first sale within a week." },
+    { name: "Tom", city: "UK", quote: "The support team is amazing. They walked me through everything step by step." },
+    { name: "Sarah", city: "Canada", quote: "The verified account gave me instant credibility. Sales started coming right away." },
+  ];
+  return (
+    <section className="ac-tests" id="testimonials">
+      <div className="ac-tests-head">
+        <p className="ac-section-eyebrow">REAL CREATORS. REAL RESULTS.</p>
+        <h2 className="ac-section-title">Creators <span className="ac-accent">already earning.</span></h2>
+      </div>
+      <div className="ac-tests-grid">
+        {items.map((t) => (
+          <div key={t.name} className="ac-test-card">
+            <div className="ac-test-meta">
+              <div className="ac-test-name">{t.name}</div>
+              <div className="ac-test-city">{t.city}</div>
+              <p style={{ marginTop: 10, fontSize: 13.5, color: "var(--taa-muted)", lineHeight: 1.55 }}>&ldquo;{t.quote}&rdquo;</p>
+            </div>
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+function Wins() {
+  return (
+    <section className="ac-wins" id="wins">
+      <div className="ac-wins-head">
+        <p className="ac-section-eyebrow">MORE WINS</p>
+        <h2 className="ac-section-title">The <span className="ac-accent">receipts.</span></h2>
+        <p className="ac-section-sub">Fresh screenshots from TTSUnlocked members. Updated weekly.</p>
+      </div>
+      <div className="ac-wins-empty">
+        <div className="ac-wins-empty-glow" aria-hidden="true" />
+        <p className="ac-wins-empty-title">More wins landing shortly.</p>
+        <p className="ac-wins-empty-sub">Fresh screenshots posting here as creators activate and start earning. Check back weekly.</p>
+      </div>
+    </section>
+  );
+}
+
+function FAQ() {
+  const items = [
+    { q: "Do I need to be in the US?", a: "No. TTSUnlocked is built specifically for creators outside the US. The verified account path handles everything." },
+    { q: "How long does setup take?", a: "24 hours from the moment your account details are submitted. The team activates and verifies in that window." },
+    { q: "How and when do I get paid?", a: "USD, direct to your bank. Payouts follow TikTok Shop\u2019s standard cycle (typically weekly after the hold period)." },
+    { q: "Is there a refund?", a: "Our guarantee is completion-based: follow the steps, complete the 7-day program, and we guarantee you\u2019ll be live on TikTok Shop. If you don\u2019t complete, there\u2019s no refund." },
+    { q: "What if I already know TikTok Shop?", a: "The Accounts Only tier is for you. Grab a verified account and plug in \u2014 skip the training." },
+    { q: "Can I upgrade later?", a: "Yes. Start with Education Only, add the verified account whenever you\u2019re ready." },
+  ];
+  return (
+    <section className="ac-faq" id="faq">
+      <div className="ac-faq-head">
+        <p className="ac-section-eyebrow">FREQUENTLY ASKED</p>
+        <h2 className="ac-section-title">Quick <span className="ac-accent">answers.</span></h2>
+      </div>
+      <div className="ac-faq-list">
+        {items.map((it, i) => (
+          <details key={i} className="ac-faq-item">
+            <summary>{it.q}</summary>
+            <p>{it.a}</p>
+          </details>
+        ))}
       </div>
     </section>
   );
