@@ -119,18 +119,9 @@ function Header() {
   return (
     <header className="ac-header">
       <div className="ac-header-inner">
-      <div className="ac-header-brand">
+      <div className="ac-header-brand colt-header-brand">
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src="/colt/logo-tu.png" alt="" width={40} height={40} />
-        <span className="ac-brand-tag">
-          <small>TTS</small>
-          <b>UNLOCKED</b>
-        </span>
-        <span className="ac-brand-x">×</span>
-        <span className="ac-brand-tag">
-          <small>POWERED BY</small>
-          <b>COLT</b>
-        </span>
+        <img src="/colt/hero-banner.png" alt="TTSUnlocked × Aragon Media" className="colt-header-banner" />
       </div>
       <nav className="ac-header-nav">
         <a href="#how" className="ac-nav-link">How it works</a>
