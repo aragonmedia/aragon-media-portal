@@ -28,7 +28,11 @@ const PARTNERS = [
 // and we add entries here. Empty for now.
 const WINS: { src: string; caption?: string; video?: boolean }[] = [];
 
-const TESTIMONIALS: Array<{ src: string; name: string; city: string }> = [];
+const TESTIMONIALS = [
+  { src: "/media/testimonials/alkis.mp4", name: "Alkis", city: "Athens, Greece" },
+  { src: "/media/testimonials/menes.mp4", name: "Menes", city: "Toronto, Canada" },
+  { src: "/media/testimonials/teep.mp4", name: "Teep", city: "Canada" },
+];
 
 const FAQ_ITEMS = [
   { q: "Do I need to be in the US?", a: "No, that's the whole point. The program is built for creators outside the US. We walk you through the VPN, US SIM, and phone setup on Day 2 of the fast track." },
