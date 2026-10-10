@@ -26,7 +26,51 @@ const PARTNERS = [
 
 // Wins gallery — Kevin drops screenshots to /public/accelerator/wins/
 // and we add entries here. Empty for now.
-const WINS: { src: string; caption?: string; video?: boolean }[] = [];
+const WINS: { src: string; caption?: string; video?: boolean }[] = [
+  // Big numbers first — heavy hitters
+  { src: "/colt/testimonials/proof-486k-nov copy.png", caption: "$486K in November" },
+  { src: "/colt/testimonials/proof-125k-week copy.png", caption: "$125K in one week" },
+  { src: "/colt/testimonials/proof-94k-viral copy.png", caption: "$94K viral drop" },
+  { src: "/colt/testimonials/proof-89k-dec copy.png", caption: "$89K in December" },
+  { src: "/colt/testimonials/38k copy.png", caption: "$38K day" },
+  { src: "/colt/testimonials/proof-33k-pulled copy.png", caption: "$33K pulled" },
+  { src: "/colt/testimonials/IMG_9230 - $31K copy.jpeg", caption: "$31K" },
+  { src: "/colt/testimonials/proof-27k-goli copy.png", caption: "$27K on Goli" },
+  { src: "/colt/testimonials/27k copy.png", caption: "$27K" },
+  { src: "/colt/testimonials/24k copy.png", caption: "$24K" },
+  { src: "/colt/testimonials/23k copy.png", caption: "$23K" },
+  { src: "/colt/testimonials/$18k copy.png", caption: "$18K" },
+  { src: "/colt/testimonials/12k copy.jpeg", caption: "$12K" },
+  { src: "/colt/testimonials/10k copy.png", caption: "$10K" },
+  { src: "/colt/testimonials/2k orders copy.png", caption: "2K+ orders" },
+  { src: "/colt/testimonials/proof-kyvo-card copy.png", caption: "Kyvo creator card" },
+  { src: "/colt/testimonials/proof-views copy.png", caption: "Views performance" },
+  // Video
+  { src: "/colt/testimonials/IMG_9468 copy.MOV", video: true, caption: "Inside the program" },
+  // Personal pics
+  { src: "/colt/testimonials/DUB copy.jpg" },
+  { src: "/colt/testimonials/DUB2 copy.jpg" },
+  { src: "/colt/testimonials/IMG_8755 copy.jpg" },
+  { src: "/colt/testimonials/IMG_8732 copy.jpg" },
+  { src: "/colt/testimonials/IMG_8313 copy.jpg" },
+  { src: "/colt/testimonials/IMG_9744 copy.jpg" },
+  { src: "/colt/testimonials/IMG_7583 copy.PNG" },
+  { src: "/colt/testimonials/IMG_7361 copy.jpg" },
+  { src: "/colt/testimonials/IMG_7347 copy.jpg" },
+  { src: "/colt/testimonials/IMG_7313 copy.jpg" },
+  { src: "/colt/testimonials/IMG_7312 copy.jpg" },
+  { src: "/colt/testimonials/IMG_7311 copy.PNG" },
+  { src: "/colt/testimonials/IMG_7244 copy.PNG" },
+  { src: "/colt/testimonials/IMG_7243 copy.PNG" },
+  { src: "/colt/testimonials/IMG_7235 copy.jpg" },
+  { src: "/colt/testimonials/IMG_1569 copy.PNG" },
+  { src: "/colt/testimonials/IMG_1568 copy.PNG" },
+  { src: "/colt/testimonials/IMG_1545 copy.jpg" },
+  { src: "/colt/testimonials/IMG_0706 copy.jpg" },
+  { src: "/colt/testimonials/IMG_5906 copy.png" },
+  { src: "/colt/testimonials/IMG_5993 3 copy.png" },
+  { src: "/colt/testimonials/after 08 copy.JPG" },
+];
 
 const TESTIMONIALS = [
   { src: "/media/testimonials/alkis.mp4", name: "Alkis", city: "Athens, Greece" },
