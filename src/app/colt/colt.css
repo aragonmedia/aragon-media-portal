@@ -113,3 +113,52 @@ body[data-tenant="colt"] .ac-chat-composer button {
   border-color: var(--taa-red);
   box-shadow: 0 0 14px rgba(0, 229, 255, 0.25);
 }
+
+/* ============================================================
+   /colt/accounts — override remaining hardcoded reds that bleed
+   through from accelerator.css. Scoped to .colt-shell so Roni's
+   /accounts page is untouched.
+   ============================================================ */
+
+/* Brand logo glow */
+.colt-shell .taa-brand img { filter: drop-shadow(0 0 12px rgba(0, 229, 255, 0.5)); }
+
+/* LIVE INVENTORY eyebrow pill */
+.colt-shell .taa-hero-eyebrow {
+  background: rgba(0, 229, 255, 0.06);
+  border: 1px solid rgba(0, 229, 255, 0.32);
+}
+
+/* Headline accent glow */
+.colt-shell .taa-hero-accent { text-shadow: 0 0 40px rgba(0, 229, 255, 0.5); }
+
+/* Account card hover border */
+.colt-shell .taa-card:hover { border-color: rgba(0, 229, 255, 0.4); }
+
+/* "USA SHOP AFFILIATE" account-type pill */
+.colt-shell .taa-account-type {
+  background: rgba(0, 229, 255, 0.08);
+  border: 1px solid rgba(0, 229, 255, 0.28);
+}
+
+/* SAVE pill box-shadow */
+.colt-shell .taa-save-pill { box-shadow: 0 0 12px rgba(0, 229, 255, 0.4); }
+
+/* Refresh accounts btn hover */
+.colt-shell .taa-refresh:hover:not(:disabled) {
+  background: rgba(0, 229, 255, 0.08);
+  border-color: var(--taa-red);
+}
+
+/* Footer dot pulse ring */
+.colt-shell .taa-footer-dot { box-shadow: 0 0 0 3px rgba(0, 229, 255, 0.2); }
+
+/* Pills + filter chips */
+.colt-shell .taa-pill.active {
+  background: rgba(0, 229, 255, 0.1);
+  border-color: var(--taa-red);
+  color: var(--taa-red);
+}
+
+/* "+ Buy an Account" CTA pulse/glow */
+.colt-shell .taa-cta { box-shadow: 0 0 24px rgba(0, 229, 255, 0.35); }
