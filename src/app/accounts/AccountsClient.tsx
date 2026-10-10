@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import { createPortal } from "react-dom";
 
 type FollowerBucket = "all" | "100-200" | "gt200";
 
@@ -95,7 +96,11 @@ function DiscordGate({ target, onClose, accelerator }: {
     } finally { setBusy(false); }
   }
 
-  return (
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => { setMounted(true); }, []);
+  if (!mounted) return null;
+
+  const content = (
     <div className="taa-dg-wrap" onClick={onClose}>
       <div className="taa-dg-card" onClick={(e) => e.stopPropagation()}>
         <button className="taa-dg-close" onClick={onClose} aria-label="Close">×</button>
@@ -115,7 +120,7 @@ function DiscordGate({ target, onClose, accelerator }: {
         </form>
       </div>
       <style>{`
-        .taa-dg-wrap { position: fixed; inset: 0; z-index: 1000; display: flex; align-items: center; justify-content: center; padding: 20px; background: rgba(0,0,0,0.75); backdrop-filter: blur(6px); }
+        .taa-dg-wrap { position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: 1000; display: flex; align-items: center; justify-content: center; padding: 20px; background: rgba(0,0,0,0.75); backdrop-filter: blur(6px); overflow-y: auto; }
         .taa-dg-card { position: relative; width: 100%; max-width: 440px; background: var(--taa-bg-card); border: 1px solid var(--taa-border-strong); border-radius: 16px; padding: 28px 26px; box-shadow: 0 30px 80px rgba(0,0,0,0.6); }
         .taa-dg-close { position: absolute; top: 10px; right: 14px; background: transparent; border: none; color: var(--taa-muted); font-size: 24px; cursor: pointer; padding: 4px 10px; }
         .taa-dg-eyebrow { font-size: 10px; letter-spacing: 0.22em; color: var(--taa-red); font-weight: 700; text-transform: uppercase; margin-bottom: 10px; }
@@ -131,6 +136,8 @@ function DiscordGate({ target, onClose, accelerator }: {
       `}</style>
     </div>
   );
+
+  return createPortal(content, document.body);
 }
 
 export default function AccountsClient({
@@ -260,19 +267,19 @@ export default function AccountsClient({
         <div className="taa-radar" />
       </div>
 
-      {/* Header */}
+      {/* Header — brand swaps per tenant */}
       <header className="taa-header">
-        <a href="/accounts" className="taa-brand">
+        <a href={accelerator === "colt" ? "/colt/accounts" : "/accounts"} className="taa-brand">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
-            src="/accelerator/wolf-transparent.png"
-            alt="TikTok Affiliate Accelerator"
+            src={accelerator === "colt" ? "/colt/logo-tu.png" : "/accelerator/wolf-transparent.png"}
+            alt={accelerator === "colt" ? "TTSUnlocked" : "TikTok Affiliate Accelerator"}
             width={44}
             height={44}
           />
           <div className="taa-brand-text">
-            <span className="taa-brand-tag">TIKTOK AFFILIATE</span>
-            <span className="taa-brand-name">ACCELERATOR</span>
+            <span className="taa-brand-tag">{accelerator === "colt" ? "TTSUNLOCKED" : "TIKTOK AFFILIATE"}</span>
+            <span className="taa-brand-name">{accelerator === "colt" ? "POWERED BY COLT" : "ACCELERATOR"}</span>
           </div>
         </a>
 

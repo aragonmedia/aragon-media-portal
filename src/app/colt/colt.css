@@ -102,3 +102,14 @@ body[data-tenant="colt"] .ac-chat-composer button {
 
 /* Hero banner image + logo mark sizing */
 .colt-logo-img { display: block; width: 44px; height: 44px; border-radius: 10px; }
+
+/* /colt/accounts — the "Chat with us to verify" box uses hardcoded red rgba — override */
+.colt-shell .taa-verify-cta {
+  background: rgba(0, 229, 255, 0.06);
+  border: 1px solid rgba(0, 229, 255, 0.32);
+}
+.colt-shell .taa-verify-cta:hover {
+  background: rgba(0, 229, 255, 0.12);
+  border-color: var(--taa-red);
+  box-shadow: 0 0 14px rgba(0, 229, 255, 0.25);
+}
