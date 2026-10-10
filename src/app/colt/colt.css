@@ -179,8 +179,10 @@ body[data-tenant="colt"] .ac-chat-composer button {
 }
 .colt-shell .ac-header { padding-top: 14px; padding-bottom: 14px; }
 @media (max-width: 900px) {
-  .colt-shell .colt-header-banner { height: 56px; max-height: 56px; }
+  .colt-shell .colt-header-banner { height: 72px; max-height: 72px; }
   .colt-shell .ac-header { padding-top: 10px; padding-bottom: 10px; }
+  .colt-shell .ac-header-inner { flex-direction: column; align-items: center; gap: 8px; }
+  .colt-shell .colt-header-brand { justify-content: center; width: 100%; }
 }
 
 
