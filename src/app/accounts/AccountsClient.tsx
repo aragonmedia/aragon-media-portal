@@ -64,7 +64,9 @@ function DiscordGate({ target, onClose, accelerator }: {
   const [email, setEmail] = useState("");
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState<string | null>(null);
+  const [mounted, setMounted] = useState(false);
 
+  useEffect(() => { setMounted(true); }, []);
   useEffect(() => {
     try {
       const em = localStorage.getItem("am_chatroom_email") ?? "";
@@ -74,7 +76,7 @@ function DiscordGate({ target, onClose, accelerator }: {
     } catch {}
   }, []);
 
-  if (!target) return null;
+  if (!target || !mounted) return null;
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
@@ -95,10 +97,6 @@ function DiscordGate({ target, onClose, accelerator }: {
       setErr(ex instanceof Error ? ex.message : "Something went wrong.");
     } finally { setBusy(false); }
   }
-
-  const [mounted, setMounted] = useState(false);
-  useEffect(() => { setMounted(true); }, []);
-  if (!mounted) return null;
 
   const content = (
     <div className="taa-dg-wrap" onClick={onClose}>
