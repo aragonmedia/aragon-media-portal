@@ -171,12 +171,13 @@ body[data-tenant="colt"] .ac-chat-composer button {
 }
 .colt-shell .colt-header-banner {
   display: block;
-  height: 40px;
+  height: 52px;
   width: auto;
-  max-height: 40px;
+  max-height: 52px;
   object-fit: contain;
-  filter: drop-shadow(0 0 10px rgba(0, 229, 255, 0.25));
+  filter: drop-shadow(0 0 12px rgba(0, 229, 255, 0.3));
 }
+.colt-shell .ac-header { padding-top: 10px; padding-bottom: 10px; }
 @media (max-width: 900px) {
-  .colt-shell .colt-header-banner { height: 28px; max-height: 28px; }
+  .colt-shell .colt-header-banner { height: 36px; max-height: 36px; }
 }
