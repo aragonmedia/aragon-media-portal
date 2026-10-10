@@ -44,6 +44,8 @@ export async function GET() {
   const header = [
     "id",
     "created_at",
+    "accelerator",
+    "action",
     "name",
     "email",
     "clicked_tier",
@@ -60,6 +62,8 @@ export async function GET() {
     [
       csv(r.id),
       csv(r.createdAt.toISOString()),
+      csv(r.acceleratorSlug ?? "roni"),
+      csv(r.action ?? "reveal"),
       csv(r.name),
       csv(r.email),
       csv(r.clickedTier),

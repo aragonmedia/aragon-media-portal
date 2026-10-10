@@ -60,12 +60,20 @@ function cookieHeader(v: string) {
 export async function POST(req: Request) {
   let body: {
     action?: unknown; email?: unknown; name?: unknown; tier?: unknown;
+    accelerator?: unknown;
   };
   try { body = await req.json(); }
   catch { return NextResponse.json({ ok: false, error: "invalid json" }, { status: 400 }); }
 
-  const action = body.action === "reveal" || body.action === "click" ? body.action : null;
+  const action =
+    body.action === "reveal" || body.action === "click" || body.action === "outbound_accounts"
+      ? body.action
+      : null;
   if (!action) return NextResponse.json({ ok: false, error: "invalid action" }, { status: 400 });
+
+  const slug = typeof body.accelerator === "string" && /^[a-z0-9-]{1,40}$/.test(body.accelerator)
+    ? body.accelerator
+    : "roni";
 
   const { key, setCookie } = await getBrowserKey();
   const origin = new URL(req.url).origin;
@@ -96,7 +104,7 @@ export async function POST(req: Request) {
     let intent;
     if (existing[0]) {
       const [row] = await db.update(acceleratorIntents)
-        .set({ name, viewedTiersAt: now, updatedAt: now, referrer: referrer.slice(0, 500), userAgent: userAgent.slice(0, 500) })
+        .set({ name, viewedTiersAt: now, updatedAt: now, referrer: referrer.slice(0, 500), userAgent: userAgent.slice(0, 500), acceleratorSlug: slug, action: "reveal" })
         .where(eq(acceleratorIntents.id, existing[0].id))
         .returning();
       intent = row;
@@ -106,6 +114,8 @@ export async function POST(req: Request) {
         viewedTiersAt: now,
         referrer: referrer.slice(0, 500),
         userAgent: userAgent.slice(0, 500),
+        acceleratorSlug: slug,
+        action: "reveal",
       }).returning();
       intent = row;
       // Only email admin on a NEW lead (not re-reveals)
@@ -135,6 +145,46 @@ export async function POST(req: Request) {
   }
 
   // ============================================================
+  // OUTBOUND to Nick G Discord (from /accounts)
+  // ============================================================
+  if (action === "outbound_accounts") {
+    const email = typeof body.email === "string" ? body.email.trim().toLowerCase() : "";
+    const name = typeof body.name === "string" ? body.name.trim().slice(0, 200) : "";
+    if (!EMAIL_RE.test(email)) return NextResponse.json({ ok: false, error: "valid email required" }, { status: 400 });
+    if (!name) return NextResponse.json({ ok: false, error: "name required" }, { status: 400 });
+
+    const existing = await db.select().from(acceleratorIntents)
+      .where(and(eq(acceleratorIntents.email, email), eq(acceleratorIntents.browserKey, key)))
+      .limit(1);
+    const now = new Date();
+    let intent;
+    if (existing[0]) {
+      const [row] = await db.update(acceleratorIntents)
+        .set({ name, updatedAt: now, action: "outbound_accounts", acceleratorSlug: slug })
+        .where(eq(acceleratorIntents.id, existing[0].id))
+        .returning();
+      intent = row;
+    } else {
+      const [row] = await db.insert(acceleratorIntents).values({
+        email, name, browserKey: key,
+        acceleratorSlug: slug,
+        action: "outbound_accounts",
+      }).returning();
+      intent = row;
+    }
+
+    try {
+      await upsertLead({ portalId: intent.id, name, email });
+    } catch (err) {
+      console.error("[intent outbound_accounts] airtable sync failed:", err);
+    }
+
+    const headers = new Headers({ "Content-Type": "application/json" });
+    if (setCookie) headers.append("Set-Cookie", cookieHeader(key));
+    return new Response(JSON.stringify({ ok: true, id: intent.id }), { headers });
+  }
+
+  // ============================================================
   // CLICK
   // ============================================================
   const tier = (body.tier === "edu_only" || body.tier === "edu_plus_account" || body.tier === "browse")
@@ -156,6 +206,8 @@ export async function POST(req: Request) {
     clickedTierPriceCents: meta.priceCents,
     clickedAt: now,
     updatedAt: now,
+    action: "click",
+    acceleratorSlug: slug,
   }).where(eq(acceleratorIntents.id, intent.id));
 
   // Fire emails only for the paid tiers — "browse" is just routing to /accounts

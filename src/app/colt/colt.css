@@ -1,0 +1,20 @@
+/* TTSUnlocked — scoped palette override (neon blue) */
+.colt-shell {
+  --taa-bg: #050810;
+  --taa-bg-2: #0A0F18;
+  --taa-bg-card: #0E1420;
+  --taa-bg-elev: #141B2A;
+  --taa-border: rgba(0, 229, 255, 0.08);
+  --taa-border-strong: rgba(0, 229, 255, 0.18);
+  --taa-text: #F5F8FF;
+  --taa-muted: #7A8AA0;
+  --taa-sub: #4A5668;
+  --taa-red: #00E5FF;
+  --taa-red-bright: #2DD4C7;
+  --taa-red-glow: rgba(0, 229, 255, 0.35);
+  --taa-white: #FFFFFF;
+  background: var(--taa-bg);
+  color: var(--taa-text);
+  font-family: 'Inter Tight', 'Helvetica Neue', Arial, sans-serif;
+  min-height: 100vh;
+}

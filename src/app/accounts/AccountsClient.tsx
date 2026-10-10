@@ -52,12 +52,105 @@ function fmtRelative(iso: string | null) {
   return `${d}d ago`;
 }
 
+type GateTarget = { url: string; label: string } | null;
+
+function DiscordGate({ target, onClose, accelerator }: {
+  target: GateTarget;
+  onClose: () => void;
+  accelerator: string;
+}) {
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [busy, setBusy] = useState(false);
+  const [err, setErr] = useState<string | null>(null);
+
+  useEffect(() => {
+    try {
+      const em = localStorage.getItem("am_chatroom_email") ?? "";
+      const nm = localStorage.getItem("am_chatroom_name") ?? "";
+      if (em) setEmail(em);
+      if (nm) setName(nm);
+    } catch {}
+  }, []);
+
+  if (!target) return null;
+
+  async function submit(e: React.FormEvent) {
+    e.preventDefault();
+    if (busy || !target) return;
+    setBusy(true); setErr(null);
+    try {
+      const r = await fetch("/api/accelerator/intent", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "outbound_accounts", name: name.trim(), email: email.trim(), accelerator }),
+      });
+      const j = await r.json();
+      if (!j.ok) throw new Error(j.error || "Couldn't save your info — try again.");
+      try { localStorage.setItem("am_chatroom_email", email.trim()); localStorage.setItem("am_chatroom_name", name.trim()); } catch {}
+      window.open(target.url, "_blank", "noopener,noreferrer");
+      onClose();
+    } catch (ex) {
+      setErr(ex instanceof Error ? ex.message : "Something went wrong.");
+    } finally { setBusy(false); }
+  }
+
+  return (
+    <div className="taa-dg-wrap" onClick={onClose}>
+      <div className="taa-dg-card" onClick={(e) => e.stopPropagation()}>
+        <button className="taa-dg-close" onClick={onClose} aria-label="Close">×</button>
+        <div className="taa-dg-eyebrow">BEFORE YOU GO</div>
+        <h3 className="taa-dg-title">Who should Nick G know referred you?</h3>
+        <p className="taa-dg-sub">Drop your name and email so we can let him know you came from the Accelerator. Takes 2 seconds.</p>
+        <form onSubmit={submit} className="taa-dg-form">
+          <input type="text" required placeholder="Your name" value={name} onChange={(e) => setName(e.target.value)} autoFocus />
+          <input type="email" required placeholder="you@example.com" value={email} onChange={(e) => setEmail(e.target.value)} />
+          <button type="submit" disabled={busy || !name.trim() || !email.trim()}>
+            {busy ? "Opening Discord…" : target.label || "Continue to Discord →"}
+          </button>
+          {err && <p className="taa-dg-err">{err}</p>}
+          <button type="button" className="taa-dg-skip" onClick={() => { if (target) window.open(target.url, "_blank", "noopener,noreferrer"); onClose(); }}>
+            Skip — just take me there
+          </button>
+        </form>
+      </div>
+      <style>{`
+        .taa-dg-wrap { position: fixed; inset: 0; z-index: 1000; display: flex; align-items: center; justify-content: center; padding: 20px; background: rgba(0,0,0,0.75); backdrop-filter: blur(6px); }
+        .taa-dg-card { position: relative; width: 100%; max-width: 440px; background: var(--taa-bg-card); border: 1px solid var(--taa-border-strong); border-radius: 16px; padding: 28px 26px; box-shadow: 0 30px 80px rgba(0,0,0,0.6); }
+        .taa-dg-close { position: absolute; top: 10px; right: 14px; background: transparent; border: none; color: var(--taa-muted); font-size: 24px; cursor: pointer; padding: 4px 10px; }
+        .taa-dg-eyebrow { font-size: 10px; letter-spacing: 0.22em; color: var(--taa-red); font-weight: 700; text-transform: uppercase; margin-bottom: 10px; }
+        .taa-dg-title { margin: 0 0 10px; font-size: 20px; font-weight: 800; color: var(--taa-white); letter-spacing: -0.01em; line-height: 1.25; }
+        .taa-dg-sub { margin: 0 0 20px; font-size: 13px; color: var(--taa-muted); line-height: 1.55; }
+        .taa-dg-form { display: flex; flex-direction: column; gap: 10px; }
+        .taa-dg-form input { padding: 12px 14px; background: rgba(255,255,255,0.03); border: 1px solid var(--taa-border); border-radius: 8px; color: var(--taa-white); font-size: 14px; font-family: inherit; }
+        .taa-dg-form input:focus { outline: none; border-color: var(--taa-red); }
+        .taa-dg-form button[type="submit"] { padding: 12px 18px; background: var(--taa-red); color: #FFFFFF; border: none; border-radius: 8px; font-size: 13px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; cursor: pointer; margin-top: 4px; }
+        .taa-dg-form button[type="submit"]:disabled { opacity: 0.5; cursor: not-allowed; }
+        .taa-dg-skip { background: transparent; border: none; color: var(--taa-muted); font-size: 12px; text-decoration: underline; cursor: pointer; margin-top: 4px; padding: 6px; }
+        .taa-dg-err { color: #F87171; font-size: 12px; margin: 4px 0 0; }
+      `}</style>
+    </div>
+  );
+}
+
 export default function AccountsClient({
   initialAccounts,
   lastSyncedAt,
   ticketUrl,
   liveListUrl,
 }: Props) {
+  const [gateTarget, setGateTarget] = useState<GateTarget>(null);
+  const [accelerator, setAccelerator] = useState<string>("roni");
+  useEffect(() => {
+    try {
+      const p = new URLSearchParams(window.location.search);
+      const from = p.get("from");
+      if (from && /^[a-z0-9-]{1,40}$/.test(from)) setAccelerator(from);
+    } catch {}
+  }, []);
+  function openDiscord(url: string, label: string) {
+    setGateTarget({ url, label });
+  }
   const [accounts, setAccounts] = useState<Account[]>(initialAccounts);
   const [syncedAt, setSyncedAt] = useState<string | null>(lastSyncedAt);
   const [refreshing, setRefreshing] = useState(false);
@@ -180,12 +273,12 @@ export default function AccountsClient({
         </a>
 
         <div className="taa-header-actions">
-          <a href={ticketUrl} target="_blank" rel="noopener noreferrer" className="taa-cta">
+          <button type="button" onClick={() => openDiscord(ticketUrl, "Continue to Discord →")} className="taa-cta">
             <span>+ Buy an Account</span>
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
               <path d="M7 17L17 7" /><path d="M8 7h9v9" />
             </svg>
-          </a>
+          </button>
         </div>
       </header>
 
@@ -248,18 +341,12 @@ export default function AccountsClient({
         </div>
 
         <div className="taa-toolbar-actions">
-          <a
-            href={liveListUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="taa-view-live"
-            title="Open Nick G's live listings channel in Discord"
-          >
+          <button type="button" onClick={() => openDiscord(liveListUrl, "Continue to live list →")} className="taa-ghost">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
               <path d="M7 17L17 7" /><path d="M8 7h9v9" />
             </svg>
             <span>View live list</span>
-          </a>
+          </button>
           <button
             type="button"
             className="taa-refresh"
@@ -386,10 +473,11 @@ export default function AccountsClient({
             Powered by <b>Aragon Media</b> × <b>Accelerator</b>
           </span>
         </div>
-        <a href={ticketUrl} target="_blank" rel="noopener noreferrer">
+        <button type="button" onClick={() => openDiscord(ticketUrl, "Continue to Discord →")} className="taa-footer-link">
           Open a ticket →
-        </a>
+        </button>
       </footer>
+      <DiscordGate target={gateTarget} onClose={() => setGateTarget(null)} accelerator={accelerator} />
     </div>
   );
 }

@@ -72,10 +72,11 @@ export default async function AdminAcceleratorLeadsPage() {
             <thead>
               <tr>
                 <th>When</th>
+                <th>From</th>
+                <th>Action</th>
                 <th>Name</th>
                 <th>Email</th>
                 <th>Tier clicked</th>
-                <th>Referrer</th>
               </tr>
             </thead>
             <tbody>
@@ -87,6 +88,8 @@ export default async function AdminAcceleratorLeadsPage() {
                       <div className="admin-td-sub">clicked {fmt(r.clickedAt)}</div>
                     )}
                   </td>
+                  <td><span className="admin-pill admin-pill-warm">{r.acceleratorSlug ?? "roni"}</span></td>
+                  <td><span className="admin-td-sub">{r.action ?? "reveal"}</span></td>
                   <td>{r.name || "—"}</td>
                   <td><a href={`mailto:${r.email}`}>{r.email}</a></td>
                   <td>
@@ -94,11 +97,12 @@ export default async function AdminAcceleratorLeadsPage() {
                       <span className={`admin-pill admin-pill-${r.clickedTier === "edu_plus_account" ? "hot" : "warm"}`}>
                         {TIER_LABEL[r.clickedTier] ?? r.clickedTier}
                       </span>
+                    ) : r.action === "outbound_accounts" ? (
+                      <span className="admin-td-sub">→ Nick G Discord</span>
                     ) : (
                       <span className="admin-td-sub">revealed only</span>
                     )}
                   </td>
-                  <td className="admin-td-referrer">{r.referrer || "—"}</td>
                 </tr>
               ))}
             </tbody>

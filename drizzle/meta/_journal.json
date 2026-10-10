@@ -85,6 +85,13 @@
       "when": 1790252525000,
       "tag": "0011_admin_roles",
       "breakpoints": true
+    },
+    {
+      "idx": 12,
+      "version": "7",
+      "when": 1791000000000,
+      "tag": "0012_multi_tenant_intents",
+      "breakpoints": true
     }
   ]
 }
