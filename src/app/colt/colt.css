@@ -189,3 +189,18 @@ body[data-tenant="colt"] .ac-chat-composer button {
 /* Header background → pure black per Kevin (covers both /colt lander and /colt/accounts) */
 .colt-shell .ac-header,
 .colt-shell .taa-header { background: #000000; border-bottom: 1px solid rgba(0, 229, 255, 0.12); backdrop-filter: none; }
+
+/* DiscordGate portal — escapes .colt-shell, so palette via body[data-tenant] */
+body[data-tenant="colt"] .taa-dg-card {
+  border: 1px solid rgba(0, 229, 255, 0.3);
+}
+body[data-tenant="colt"] .taa-dg-eyebrow { color: #00E5FF; }
+body[data-tenant="colt"] .taa-dg-form input:focus { border-color: #00E5FF; }
+body[data-tenant="colt"] .taa-dg-form button[type="submit"] {
+  background: #00E5FF;
+  color: #050810;
+  box-shadow: 0 0 24px rgba(0, 229, 255, 0.3);
+}
+body[data-tenant="colt"] .taa-dg-form button[type="submit"]:hover:not(:disabled) {
+  background: #2DD4C7;
+}

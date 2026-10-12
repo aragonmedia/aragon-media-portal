@@ -112,9 +112,6 @@ function DiscordGate({ target, onClose, accelerator }: {
             {busy ? "Opening Discord…" : target.label || "Continue to Discord →"}
           </button>
           {err && <p className="taa-dg-err">{err}</p>}
-          <button type="button" className="taa-dg-skip" onClick={() => { if (target) window.open(target.url, "_blank", "noopener,noreferrer"); onClose(); }}>
-            Skip — just take me there
-          </button>
         </form>
       </div>
       <style>{`
@@ -350,7 +347,7 @@ export default function AccountsClient({
         </div>
 
         <div className="taa-toolbar-actions">
-          <button type="button" onClick={() => openDiscord(liveListUrl, "Continue to live list →")} className="taa-ghost">
+          <button type="button" onClick={() => openDiscord(liveListUrl, "Continue to live list →")} className="taa-refresh">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
               <path d="M7 17L17 7" /><path d="M8 7h9v9" />
             </svg>
