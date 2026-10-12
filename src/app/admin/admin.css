@@ -479,3 +479,32 @@
 @media (max-width: 700px){
   .team-invite-form{grid-template-columns:1fr;}
 }
+
+/* Tenant filter pills (All / Roni / COLT) */
+.admin-tenant-pills { display: inline-flex; gap: 8px; flex-wrap: wrap; }
+.admin-tenant-pill {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 6px 14px;
+  background: #141414;
+  border: 1px solid #2A2A2A;
+  border-radius: 999px;
+  color: #9A9590;
+  font-size: 11.5px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  text-decoration: none;
+  transition: all 120ms ease;
+}
+.admin-tenant-pill span {
+  display: inline-flex; align-items: center; justify-content: center;
+  min-width: 22px; padding: 1px 6px;
+  background: #0F0F0F;
+  color: #FAF7EE;
+  border-radius: 999px;
+  font-size: 10px;
+  font-weight: 800;
+}
+.admin-tenant-pill:hover { border-color: #DC1E2E; color: #FAF7EE; }
+.admin-tenant-pill.is-active { border-color: #DC1E2E; color: #FAF7EE; background: rgba(220, 30, 46, 0.1); }
+.admin-tenant-pill.is-active span { background: #DC1E2E; color: #FAF7EE; }

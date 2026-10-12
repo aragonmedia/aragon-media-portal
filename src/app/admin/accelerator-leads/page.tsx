@@ -24,14 +24,24 @@ function fmt(d: Date) {
   return d.toLocaleString("en-US", { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" });
 }
 
-export default async function AdminAcceleratorLeadsPage() {
+export default async function AdminAcceleratorLeadsPage({ searchParams }: { searchParams: Promise<{ tenant?: string }> }) {
   await requireAdminRole(["owner", "accelerator_admin", "am_lead"]);
 
-  const rows = await db
+  const sp = await searchParams;
+  const activeTenant = (sp?.tenant === "roni" || sp?.tenant === "colt") ? sp.tenant : "all";
+
+  const allRows = await db
     .select()
     .from(acceleratorIntents)
     .orderBy(desc(acceleratorIntents.createdAt))
     .limit(500);
+
+  const roniRows = allRows.filter((r) => (r.acceleratorSlug ?? "roni") === "roni");
+  const coltRows = allRows.filter((r) => r.acceleratorSlug === "colt");
+  const rows =
+    activeTenant === "roni" ? roniRows :
+    activeTenant === "colt" ? coltRows :
+    allRows;
 
   const revealed = rows.length;
   const clicked = rows.filter((r) => r.clickedTier).length;
@@ -45,13 +55,18 @@ export default async function AdminAcceleratorLeadsPage() {
           <p className="admin-page-sub">Every lead captured from the /accelerator landing page. Live from Neon.</p>
         </div>
         <div className="admin-page-actions">
+          <div className="admin-tenant-pills">
+            <a href="/admin/accelerator-leads" className={`admin-tenant-pill${activeTenant === "all" ? " is-active" : ""}`}>All <span>{allRows.length}</span></a>
+            <a href="/admin/accelerator-leads?tenant=roni" className={`admin-tenant-pill${activeTenant === "roni" ? " is-active" : ""}`}>Roni <span>{roniRows.length}</span></a>
+            <a href="/admin/accelerator-leads?tenant=colt" className={`admin-tenant-pill${activeTenant === "colt" ? " is-active" : ""}`}>COLT <span>{coltRows.length}</span></a>
+          </div>
           <div className="admin-stat-row">
             <div className="admin-stat"><div className="admin-stat-num">{revealed}</div><div className="admin-stat-label">Revealed</div></div>
             <div className="admin-stat"><div className="admin-stat-num">{clicked}</div><div className="admin-stat-label">Clicked a tier</div></div>
             <div className="admin-stat"><div className="admin-stat-num">{hot}</div><div className="admin-stat-label">$1,997 tier</div></div>
           </div>
           <a
-            href="/api/admin/accelerator-leads.csv"
+            href={`/api/admin/accelerator-leads.csv${activeTenant === "all" ? "" : `?tenant=${activeTenant}`}`}
             download
             className="admin-export-btn"
             aria-label="Export leads as CSV"

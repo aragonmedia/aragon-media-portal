@@ -19,11 +19,14 @@ function fmt(d: Date | null | undefined) {
   return new Date(d).toLocaleString();
 }
 
-export default async function AdminChatroomList() {
+export default async function AdminChatroomList({ searchParams }: { searchParams: Promise<{ tenant?: string }> }) {
   await requireAdminRole(["owner", "accelerator_admin", "chat_only"]);
   if (!(await isAdminSession())) redirect("/admin");
 
-  const threads = await db
+  const sp = await searchParams;
+  const activeTenant = (sp?.tenant === "roni" || sp?.tenant === "colt") ? sp.tenant : "all";
+
+  const allThreads = await db
     .select({
       id: chatroomThreads.id,
       email: chatroomThreads.email,
@@ -31,9 +34,17 @@ export default async function AdminChatroomList() {
       lastMessageAt: chatroomThreads.lastMessageAt,
       lastUserMessageAt: chatroomThreads.lastUserMessageAt,
       lastAdminMessageAt: chatroomThreads.lastAdminMessageAt,
+      acceleratorSlug: chatroomThreads.acceleratorSlug,
     })
     .from(chatroomThreads)
     .orderBy(desc(chatroomThreads.lastMessageAt));
+
+  const roniThreads = allThreads.filter((t) => (t.acceleratorSlug ?? "roni") === "roni");
+  const coltThreads = allThreads.filter((t) => t.acceleratorSlug === "colt");
+  const threads =
+    activeTenant === "roni" ? roniThreads :
+    activeTenant === "colt" ? coltThreads :
+    allThreads;
 
   // For each thread, get message count + creds count
   const summary = await Promise.all(
@@ -61,10 +72,15 @@ export default async function AdminChatroomList() {
         <p className="acr-eyebrow">Accelerator</p>
         <h1>Chatroom threads</h1>
         <p className="acr-sub">
-          Verification chats coming through <code>/chatroom</code>. Threads
+          Verification chats coming through <code>/chatroom</code> and <code>/colt/chatroom</code>. Threads
           persist per (email + browser). Unread badge = user replied since your
           last message.
         </p>
+        <div className="admin-tenant-pills" style={{ marginTop: 14 }}>
+          <a href="/admin/chatroom" className={`admin-tenant-pill${activeTenant === "all" ? " is-active" : ""}`}>All <span>{allThreads.length}</span></a>
+          <a href="/admin/chatroom?tenant=roni" className={`admin-tenant-pill${activeTenant === "roni" ? " is-active" : ""}`}>Roni <span>{roniThreads.length}</span></a>
+          <a href="/admin/chatroom?tenant=colt" className={`admin-tenant-pill${activeTenant === "colt" ? " is-active" : ""}`}>COLT <span>{coltThreads.length}</span></a>
+        </div>
       </header>
 
       {threads.length === 0 ? (

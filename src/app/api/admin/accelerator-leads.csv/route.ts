@@ -30,16 +30,23 @@ function csv(v: unknown): string {
   return s;
 }
 
-export async function GET() {
+export async function GET(req: Request) {
   const role = await getAdminRole();
   if (!role || !["owner", "accelerator_admin", "am_lead"].includes(role.role)) {
     return NextResponse.json({ ok: false, error: "unauthorized" }, { status: 401 });
   }
 
-  const rows = await db
+  const url = new URL(req.url);
+  const tenant = url.searchParams.get("tenant");
+
+  const all = await db
     .select()
     .from(acceleratorIntents)
     .orderBy(desc(acceleratorIntents.createdAt));
+  const rows =
+    tenant === "roni" ? all.filter((r) => (r.acceleratorSlug ?? "roni") === "roni") :
+    tenant === "colt" ? all.filter((r) => r.acceleratorSlug === "colt") :
+    all;
 
   const header = [
     "id",
