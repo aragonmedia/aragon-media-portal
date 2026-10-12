@@ -251,3 +251,26 @@ body[data-tenant="colt"] .ac-chat-msg.me {
   background: rgba(0, 229, 255, 0.14) !important;
   border: 1px solid rgba(0, 229, 255, 0.32) !important;
 }
+
+/* ChatroomClient — tenant-aware header buttons on /colt/chatroom */
+.colt-shell .taa-view-live {
+  border: 1px solid rgba(0, 229, 255, 0.4);
+  color: #00E5FF;
+}
+.colt-shell .taa-view-live:hover {
+  background: rgba(0, 229, 255, 0.08);
+  border-color: #00E5FF;
+  color: #2DD4C7;
+  box-shadow: 0 0 12px rgba(0, 229, 255, 0.2);
+}
+.colt-shell .cr-brand-x { color: #00E5FF; }
+.colt-shell .cr-gate input:focus { border-color: #00E5FF; }
+.colt-shell .cr-privacy { color: #4A5668; }
+
+/* Footer link visibility bump on both tenants */
+.ac-footer-links a, .taa-footer-links a {
+  text-decoration: underline !important;
+  text-underline-offset: 3px;
+  opacity: 0.85;
+}
+.ac-footer-links a:hover, .taa-footer-links a:hover { opacity: 1; }

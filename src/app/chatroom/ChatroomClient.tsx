@@ -1,5 +1,10 @@
 "use client";
 
+function isColt(): boolean {
+  if (typeof window === "undefined") return false;
+  try { return window.location.pathname.startsWith("/colt"); } catch { return false; }
+}
+
 function sniffAccelerator(): string {
   if (typeof window === "undefined") return "roni";
   try { return window.location.pathname.startsWith("/colt") ? "colt" : "roni"; } catch { return "roni"; }
@@ -395,29 +400,43 @@ export default function ChatroomClient({ calendlyUrl }: { calendlyUrl: string })
 }
 
 function Header() {
+  const [tenant, setTenant] = useState<"roni" | "colt">("roni");
+  useEffect(() => { setTenant(isColt() ? "colt" : "roni"); }, []);
+  const chatHome = tenant === "colt" ? "/colt/chatroom" : "/chatroom";
+  const accountsHref = tenant === "colt" ? "/colt/accounts" : "/accounts";
+  const logoSrc = tenant === "colt" ? "/colt/logo-tu.png" : "/accelerator/wolf-transparent.png";
+  const brandTopTag = tenant === "colt" ? "TTSUNLOCKED" : "TIKTOK AFFILIATE";
+  const brandTopName = tenant === "colt" ? "POWERED BY COLT" : "ACCELERATOR";
   return (
     <header className="taa-header">
-      <Link href="/chatroom" className="taa-brand">
+      <Link href={chatHome} className="taa-brand">
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src="/accelerator/wolf-transparent.png" alt="" width={44} height={44} />
+        <img src={logoSrc} alt="" width={44} height={44} />
         <div className="taa-brand-text">
-          <span className="taa-brand-tag">TIKTOK AFFILIATE</span>
-          <span className="taa-brand-name">ACCELERATOR</span>
+          <span className="taa-brand-tag">{brandTopTag}</span>
+          <span className="taa-brand-name">{brandTopName}</span>
         </div>
-        <span className="cr-brand-x">×</span>
-        <div className="taa-brand-text">
-          <span className="taa-brand-tag">POWERED BY</span>
-          <span className="taa-brand-name" style={{ color: "var(--taa-white)" }}>ARAGON MEDIA</span>
-        </div>
+        {tenant === "roni" && (
+          <>
+            <span className="cr-brand-x">×</span>
+            <div className="taa-brand-text">
+              <span className="taa-brand-tag">POWERED BY</span>
+              <span className="taa-brand-name" style={{ color: "var(--taa-white)" }}>ARAGON MEDIA</span>
+            </div>
+          </>
+        )}
       </Link>
       <div className="taa-header-actions">
-        <Link href="/accounts" className="taa-view-live"><span>← Back to accounts</span></Link>
+        <Link href={accountsHref} className="taa-view-live"><span>← Back to accounts</span></Link>
       </div>
     </header>
   );
 }
 
 function Footer({ calendlyUrl }: { calendlyUrl: string }) {
+  const [tenant, setTenant] = useState<"roni" | "colt">("roni");
+  useEffect(() => { setTenant(isColt() ? "colt" : "roni"); }, []);
+  const poweredBy = tenant === "colt" ? "COLT × TTSUnlocked" : "Aragon Media × Accelerator";
   return (
     <footer className="taa-footer">
       <div className="taa-footer-info">
@@ -425,12 +444,14 @@ function Footer({ calendlyUrl }: { calendlyUrl: string }) {
           <span className="taa-footer-dot" /> Verification chat
         </span>
         <span className="taa-footer-powered">
-          Powered by <b>Aragon Media</b> × <b>Accelerator</b>
+          Powered by <b>{poweredBy}</b>
         </span>
       </div>
-      <a href={calendlyUrl} target="_blank" rel="noopener noreferrer">
-        Book a call →
-      </a>
+      <div className="taa-footer-links">
+        <Link href="/terms">Terms</Link>
+        <Link href="/privacy">Privacy</Link>
+        <a href={calendlyUrl} target="_blank" rel="noopener noreferrer">Book a call →</a>
+      </div>
     </footer>
   );
 }
