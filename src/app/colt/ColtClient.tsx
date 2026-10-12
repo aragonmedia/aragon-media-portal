@@ -102,9 +102,9 @@ export default function ColtClient() {
       <PricingBlock />
       <InlineChat />
       <HowItWorks />
+      <FAQ />
       <Testimonials />
       <Wins />
-      <FAQ />
       <Footer />
       <ChatWidget />
       <Styles />

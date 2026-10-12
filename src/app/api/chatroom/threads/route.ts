@@ -20,12 +20,15 @@ export const dynamic = "force-dynamic";
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 export async function POST(req: Request) {
-  let body: { email?: unknown; name?: unknown };
+  let body: { email?: unknown; name?: unknown; accelerator?: unknown };
   try { body = await req.json(); }
   catch { return NextResponse.json({ ok: false, error: "invalid json" }, { status: 400 }); }
 
   const email = typeof body.email === "string" ? body.email.trim().toLowerCase() : "";
   const name = typeof body.name === "string" ? body.name.trim().slice(0, 200) : "";
+  const slug = typeof body.accelerator === "string" && /^[a-z0-9-]{1,40}$/.test(body.accelerator)
+    ? body.accelerator
+    : "roni";
   if (!EMAIL_RE.test(email)) {
     return NextResponse.json({ ok: false, error: "invalid email" }, { status: 400 });
   }
@@ -46,7 +49,7 @@ export async function POST(req: Request) {
   if (!thread) {
     const inserted = await db
       .insert(chatroomThreads)
-      .values({ email, name, browserKey: key })
+      .values({ email, name, browserKey: key, acceleratorSlug: slug })
       .returning();
     thread = inserted[0];
   } else if (thread.name !== name) {

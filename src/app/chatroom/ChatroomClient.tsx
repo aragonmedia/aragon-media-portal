@@ -1,5 +1,11 @@
 "use client";
 
+function sniffAccelerator(): string {
+  if (typeof window === "undefined") return "roni";
+  try { return window.location.pathname.startsWith("/colt") ? "colt" : "roni"; } catch { return "roni"; }
+}
+
+
 import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { upload } from "@vercel/blob/client";
@@ -57,7 +63,7 @@ export default function ChatroomClient({ calendlyUrl }: { calendlyUrl: string })
       const res = await fetch("/api/chatroom/threads", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: gate.email.trim(), name: gate.name.trim() }),
+        body: JSON.stringify({ email: gate.email.trim(), name: gate.name.trim(), accelerator: sniffAccelerator() }),
       });
       const j = await res.json();
       if (!j.ok) throw new Error(j.error || "Couldn't open the chat.");
@@ -80,7 +86,7 @@ export default function ChatroomClient({ calendlyUrl }: { calendlyUrl: string })
         const res = await fetch("/api/chatroom/threads", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ email: gate.email, name: gate.name }),
+          body: JSON.stringify({ email: gate.email, name: gate.name, accelerator: sniffAccelerator() }),
           cache: "no-store",
         });
         const j = await res.json();

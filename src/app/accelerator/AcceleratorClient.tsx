@@ -100,9 +100,9 @@ export default function AcceleratorClient() {
       <PricingBlock />
       <InlineChat />
       <HowItWorks />
+      <FAQ />
       <Testimonials />
       <Wins />
-      <FAQ />
       <Footer />
       <ChatWidget />
       <Styles />

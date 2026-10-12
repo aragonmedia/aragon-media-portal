@@ -204,3 +204,50 @@ body[data-tenant="colt"] .taa-dg-form button[type="submit"] {
 body[data-tenant="colt"] .taa-dg-form button[type="submit"]:hover:not(:disabled) {
   background: #2DD4C7;
 }
+
+/* Account cards: badge pill ("USA SHOP AFFILIATE") was still red */
+.colt-shell .taa-badge {
+  color: #00E5FF;
+  background: rgba(0, 229, 255, 0.08);
+  border: 1px solid rgba(0, 229, 255, 0.28);
+}
+
+/* Stronger overrides for portal-rendered chat widget + inline chat on COLT */
+body[data-tenant="colt"] .ac-cta-primary {
+  background: #00E5FF !important;
+  color: #050810 !important;
+}
+body[data-tenant="colt"] .ac-cta-primary:hover:not(:disabled) {
+  background: #2DD4C7 !important;
+}
+body[data-tenant="colt"] .ac-chat-toggle {
+  background: #00E5FF !important;
+  color: #050810 !important;
+  box-shadow: 0 10px 40px rgba(0, 229, 255, 0.45) !important;
+}
+body[data-tenant="colt"] .ac-chat-panel {
+  background: #0E1420 !important;
+  border: 1px solid rgba(0, 229, 255, 0.3) !important;
+}
+body[data-tenant="colt"] .ac-chat-head {
+  border-bottom: 1px solid rgba(0, 229, 255, 0.2) !important;
+}
+body[data-tenant="colt"] .ac-chat-close { color: #7A8AA0; }
+body[data-tenant="colt"] .ac-chat-close:hover { color: #00E5FF; }
+body[data-tenant="colt"] .ac-chat-gate input,
+body[data-tenant="colt"] .ac-chat-composer input {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(0, 229, 255, 0.2);
+  color: #F5F8FF;
+}
+body[data-tenant="colt"] .ac-chat-gate input:focus,
+body[data-tenant="colt"] .ac-chat-composer input:focus { border-color: #00E5FF; outline: none; }
+body[data-tenant="colt"] .ac-chat-book,
+body[data-tenant="colt"] .ac-chat-quicks a {
+  color: #00E5FF !important;
+  border-color: rgba(0, 229, 255, 0.4) !important;
+}
+body[data-tenant="colt"] .ac-chat-msg.me {
+  background: rgba(0, 229, 255, 0.14) !important;
+  border: 1px solid rgba(0, 229, 255, 0.32) !important;
+}

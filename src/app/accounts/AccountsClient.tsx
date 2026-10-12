@@ -315,7 +315,7 @@ export default function AccountsClient({
           </div>
           <div className="taa-stat-sep" />
           <a
-            href="/chatroom"
+            href={accelerator === "colt" ? "/colt/chatroom" : "/chatroom"}
             className="taa-verify-cta"
             aria-label="Chat with us to verify — opens verification chatroom"
           >

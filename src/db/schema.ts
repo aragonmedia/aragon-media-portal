@@ -289,6 +289,7 @@ export const chatroomThreads = pgTable(
     lastMessageAt: timestamp("last_message_at", { withTimezone: true }).defaultNow().notNull(),
     lastUserMessageAt: timestamp("last_user_message_at", { withTimezone: true }),
     lastAdminMessageAt: timestamp("last_admin_message_at", { withTimezone: true }),
+    acceleratorSlug: varchar("accelerator_slug", { length: 40 }).default("roni").notNull(),
   }
 );
 
