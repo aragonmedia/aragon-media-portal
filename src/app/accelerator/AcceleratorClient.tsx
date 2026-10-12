@@ -497,8 +497,8 @@ function Footer() {
         <span className="ac-footer-dot" /> Powered by <b>Aragon Media</b> × <b>Accelerator</b>
       </div>
       <div className="ac-footer-links">
-        <Link href="/terms">Terms</Link>
-        <Link href="/privacy">Privacy</Link>
+        <Link href="/accelerator/terms">Terms</Link>
+        <Link href="/accelerator/privacy">Privacy</Link>
         <Link href="/accounts">Accounts</Link>
         <a href="mailto:aragonkevin239@gmail.com">Contact</a>
       </div>

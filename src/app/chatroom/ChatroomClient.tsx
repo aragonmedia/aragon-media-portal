@@ -448,8 +448,8 @@ function Footer({ calendlyUrl }: { calendlyUrl: string }) {
         </span>
       </div>
       <div className="taa-footer-links">
-        <Link href="/terms">Terms</Link>
-        <Link href="/privacy">Privacy</Link>
+        <Link href={tenant === "colt" ? "/colt/terms" : "/accelerator/terms"}>Terms</Link>
+        <Link href={tenant === "colt" ? "/colt/privacy" : "/accelerator/privacy"}>Privacy</Link>
         <a href={calendlyUrl} target="_blank" rel="noopener noreferrer">Book a call →</a>
       </div>
     </footer>

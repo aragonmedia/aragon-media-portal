@@ -492,8 +492,8 @@ function Footer() {
         <span className="ac-footer-dot" /> Powered by <b>COLT</b> × <b>TTSUnlocked</b>
       </div>
       <div className="ac-footer-links">
-        <Link href="/terms">Terms</Link>
-        <Link href="/privacy">Privacy</Link>
+        <Link href="/colt/terms">Terms</Link>
+        <Link href="/colt/privacy">Privacy</Link>
         <Link href="/accounts">Accounts</Link>
         <a href="mailto:aragonkevin239@gmail.com">Contact</a>
       </div>
