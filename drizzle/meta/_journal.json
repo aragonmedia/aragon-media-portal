@@ -99,6 +99,13 @@
       "when": 1792000000000,
       "tag": "0013_chatroom_tenant",
       "breakpoints": true
+    },
+    {
+      "idx": 14,
+      "version": "7",
+      "when": 1792500000000,
+      "tag": "0014_user_accelerator_scope",
+      "breakpoints": true
     }
   ]
 }

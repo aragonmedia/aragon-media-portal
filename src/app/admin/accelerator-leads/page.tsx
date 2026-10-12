@@ -26,10 +26,13 @@ function fmt(d: Date) {
 }
 
 export default async function AdminAcceleratorLeadsPage({ searchParams }: { searchParams: Promise<{ tenant?: string }> }) {
-  await requireAdminRole(["owner", "accelerator_admin", "am_lead"]);
+  const session = await requireAdminRole(["owner", "accelerator_admin", "am_lead"]);
 
   const sp = await searchParams;
-  const activeTenant = (sp?.tenant === "roni" || sp?.tenant === "colt") ? sp.tenant : "all";
+  // If the admin is tenant-scoped, FORCE filter to their tenant regardless of ?tenant= param
+  const requested = (sp?.tenant === "roni" || sp?.tenant === "colt") ? sp.tenant : "all";
+  const activeTenant = session.scope ?? requested;
+  const canSwitchTenant = session.role === "owner";
 
   const allRows = await db
     .select()
@@ -56,11 +59,17 @@ export default async function AdminAcceleratorLeadsPage({ searchParams }: { sear
           <p className="admin-page-sub">Every lead captured from the /accelerator landing page. Live from Neon.</p>
         </div>
         <div className="admin-page-actions">
-          <div className="admin-tenant-pills">
-            <Link href="/admin/accelerator-leads" className={`admin-tenant-pill${activeTenant === "all" ? " is-active" : ""}`}>All <span>{allRows.length}</span></Link>
-            <Link href="/admin/accelerator-leads?tenant=roni" className={`admin-tenant-pill${activeTenant === "roni" ? " is-active" : ""}`}>Roni <span>{roniRows.length}</span></Link>
-            <Link href="/admin/accelerator-leads?tenant=colt" className={`admin-tenant-pill${activeTenant === "colt" ? " is-active" : ""}`}>COLT <span>{coltRows.length}</span></Link>
-          </div>
+          {canSwitchTenant ? (
+            <div className="admin-tenant-pills">
+              <Link href="/admin/accelerator-leads" className={`admin-tenant-pill${activeTenant === "all" ? " is-active" : ""}`}>All <span>{allRows.length}</span></Link>
+              <Link href="/admin/accelerator-leads?tenant=roni" className={`admin-tenant-pill${activeTenant === "roni" ? " is-active" : ""}`}>Roni <span>{roniRows.length}</span></Link>
+              <Link href="/admin/accelerator-leads?tenant=colt" className={`admin-tenant-pill${activeTenant === "colt" ? " is-active" : ""}`}>COLT <span>{coltRows.length}</span></Link>
+            </div>
+          ) : (
+            <div className="admin-tenant-pills">
+              <span className="admin-tenant-pill is-active">{activeTenant === "colt" ? "COLT" : "Roni"} only <span>{rows.length}</span></span>
+            </div>
+          )}
           <div className="admin-stat-row">
             <div className="admin-stat"><div className="admin-stat-num">{revealed}</div><div className="admin-stat-label">Revealed</div></div>
             <div className="admin-stat"><div className="admin-stat-num">{clicked}</div><div className="admin-stat-label">Clicked a tier</div></div>

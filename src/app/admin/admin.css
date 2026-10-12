@@ -508,3 +508,5 @@
 .admin-tenant-pill:hover { border-color: #DC1E2E; color: #FAF7EE; }
 .admin-tenant-pill.is-active { border-color: #DC1E2E; color: #FAF7EE; background: rgba(220, 30, 46, 0.1); }
 .admin-tenant-pill.is-active span { background: #DC1E2E; color: #FAF7EE; }
+
+.team-select-compact { padding: 6px 10px; font-size: 12px; border-radius: 6px; }

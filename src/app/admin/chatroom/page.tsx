@@ -20,11 +20,13 @@ function fmt(d: Date | null | undefined) {
 }
 
 export default async function AdminChatroomList({ searchParams }: { searchParams: Promise<{ tenant?: string }> }) {
-  await requireAdminRole(["owner", "accelerator_admin", "chat_only"]);
+  const session = await requireAdminRole(["owner", "accelerator_admin", "chat_only"]);
   if (!(await isAdminSession())) redirect("/admin");
 
   const sp = await searchParams;
-  const activeTenant = (sp?.tenant === "roni" || sp?.tenant === "colt") ? sp.tenant : "all";
+  const requested = (sp?.tenant === "roni" || sp?.tenant === "colt") ? sp.tenant : "all";
+  const activeTenant = session.scope ?? requested;
+  const canSwitchTenant = session.role === "owner";
 
   const allThreads = await db
     .select({
@@ -76,11 +78,17 @@ export default async function AdminChatroomList({ searchParams }: { searchParams
           persist per (email + browser). Unread badge = user replied since your
           last message.
         </p>
-        <div className="admin-tenant-pills" style={{ marginTop: 14 }}>
-          <Link href="/admin/chatroom" className={`admin-tenant-pill${activeTenant === "all" ? " is-active" : ""}`}>All <span>{allThreads.length}</span></Link>
-          <Link href="/admin/chatroom?tenant=roni" className={`admin-tenant-pill${activeTenant === "roni" ? " is-active" : ""}`}>Roni <span>{roniThreads.length}</span></Link>
-          <Link href="/admin/chatroom?tenant=colt" className={`admin-tenant-pill${activeTenant === "colt" ? " is-active" : ""}`}>COLT <span>{coltThreads.length}</span></Link>
-        </div>
+        {canSwitchTenant ? (
+          <div className="admin-tenant-pills" style={{ marginTop: 14 }}>
+            <Link href="/admin/chatroom" className={`admin-tenant-pill${activeTenant === "all" ? " is-active" : ""}`}>All <span>{allThreads.length}</span></Link>
+            <Link href="/admin/chatroom?tenant=roni" className={`admin-tenant-pill${activeTenant === "roni" ? " is-active" : ""}`}>Roni <span>{roniThreads.length}</span></Link>
+            <Link href="/admin/chatroom?tenant=colt" className={`admin-tenant-pill${activeTenant === "colt" ? " is-active" : ""}`}>COLT <span>{coltThreads.length}</span></Link>
+          </div>
+        ) : (
+          <div className="admin-tenant-pills" style={{ marginTop: 14 }}>
+            <span className="admin-tenant-pill is-active">{activeTenant === "colt" ? "COLT" : "Roni"} only <span>{threads.length}</span></span>
+          </div>
+        )}
       </header>
 
       {threads.length === 0 ? (

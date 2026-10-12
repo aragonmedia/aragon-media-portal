@@ -402,7 +402,7 @@ export default function ChatroomClient({ calendlyUrl }: { calendlyUrl: string })
 function Header() {
   const [tenant, setTenant] = useState<"roni" | "colt">("roni");
   useEffect(() => { setTenant(isColt() ? "colt" : "roni"); }, []);
-  const chatHome = tenant === "colt" ? "/colt/chatroom" : "/chatroom";
+  const chatHome = tenant === "colt" ? "/colt" : "/accelerator";
   const accountsHref = tenant === "colt" ? "/colt/accounts" : "/accounts";
   const logoSrc = tenant === "colt" ? "/colt/logo-tu.png" : "/accelerator/wolf-transparent.png";
   const brandTopTag = tenant === "colt" ? "TTSUNLOCKED" : "TIKTOK AFFILIATE";

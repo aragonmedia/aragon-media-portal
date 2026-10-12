@@ -83,6 +83,7 @@ export const users = pgTable(
     otherDetails: text("other_details"),
     isAdmin: boolean("is_admin").default(false).notNull(),
     adminRole: varchar("admin_role", { length: 40 }),
+    scopedAccelerator: varchar("scoped_accelerator", { length: 40 }),
     contractSignedAt: timestamp("contract_signed_at", { withTimezone: true }),
     contractVersion: varchar("contract_version", { length: 20 }),
     contractUnlocked: boolean("contract_unlocked").default(false).notNull(),
@@ -345,4 +346,5 @@ export const adminInvites = pgTable("admin_invites", {
   expiresAt: timestamp("expires_at", { withTimezone: true }).notNull(),
   createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
   claimedAt: timestamp("claimed_at", { withTimezone: true }),
+  scopedAccelerator: varchar("scoped_accelerator", { length: 40 }),
 });

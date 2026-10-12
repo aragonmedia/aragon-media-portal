@@ -29,6 +29,7 @@ export async function POST(req: NextRequest) {
   const body = (await req.json().catch(() => ({}))) as Record<string, unknown>;
   const email = typeof body.email === "string" ? body.email.trim().toLowerCase() : "";
   const role = typeof body.role === "string" ? body.role : "";
+  const scope = (body.scope === "roni" || body.scope === "colt") ? body.scope : null;
   if (!isEmail(email)) return Response.json({ ok: false, error: "valid email required" }, { status: 400 });
   if (!INVITABLE.has(role)) return Response.json({ ok: false, error: "invalid role" }, { status: 400 });
 
@@ -51,6 +52,7 @@ export async function POST(req: NextRequest) {
     token,
     invitedBy: session.userId,
     expiresAt,
+    scopedAccelerator: scope,
   });
 
   const origin = req.headers.get("origin") || "https://portal.kevin-aragon.com";

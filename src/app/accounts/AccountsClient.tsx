@@ -264,7 +264,7 @@ export default function AccountsClient({
 
       {/* Header — brand swaps per tenant */}
       <header className="taa-header">
-        <a href={accelerator === "colt" ? "/colt/accounts" : "/accounts"} className="taa-brand">
+        <a href={accelerator === "colt" ? "/colt" : "/accelerator"} className="taa-brand">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={accelerator === "colt" ? "/colt/logo-tu.png" : "/accelerator/wolf-transparent.png"}

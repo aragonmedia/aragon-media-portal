@@ -56,7 +56,7 @@ export async function POST(req: NextRequest) {
     if (!adminRow) {
       try {
       const inv = await db
-        .select({ id: adminInvites.id, role: adminInvites.role })
+        .select({ id: adminInvites.id, role: adminInvites.role, scopedAccelerator: adminInvites.scopedAccelerator })
         .from(adminInvites)
         .where(
           and(
@@ -70,7 +70,7 @@ export async function POST(req: NextRequest) {
         if (matches[0]) {
           await db
             .update(users)
-            .set({ isAdmin: true, adminRole: inv[0].role })
+            .set({ isAdmin: true, adminRole: inv[0].role, scopedAccelerator: inv[0].scopedAccelerator })
             .where(eq(users.id, matches[0].id));
           adminRow = { id: matches[0].id, name: matches[0].name, isAdmin: true };
         } else {
@@ -81,6 +81,7 @@ export async function POST(req: NextRequest) {
             role: "creator",
             isAdmin: true,
             adminRole: inv[0].role,
+            scopedAccelerator: inv[0].scopedAccelerator,
           }).returning({ id: users.id, name: users.name });
           adminRow = { id: created.id, name: created.name, isAdmin: true };
         }
