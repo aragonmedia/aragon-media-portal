@@ -1,3 +1,4 @@
+/* eslint-disable react/no-unescaped-entities */
 import type { Brand } from "./PolicyChrome";
 
 export default function PrivacyContent({ brand }: { brand: Brand }) {

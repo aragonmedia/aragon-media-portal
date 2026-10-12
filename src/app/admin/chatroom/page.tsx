@@ -77,9 +77,9 @@ export default async function AdminChatroomList({ searchParams }: { searchParams
           last message.
         </p>
         <div className="admin-tenant-pills" style={{ marginTop: 14 }}>
-          <a href="/admin/chatroom" className={`admin-tenant-pill${activeTenant === "all" ? " is-active" : ""}`}>All <span>{allThreads.length}</span></a>
-          <a href="/admin/chatroom?tenant=roni" className={`admin-tenant-pill${activeTenant === "roni" ? " is-active" : ""}`}>Roni <span>{roniThreads.length}</span></a>
-          <a href="/admin/chatroom?tenant=colt" className={`admin-tenant-pill${activeTenant === "colt" ? " is-active" : ""}`}>COLT <span>{coltThreads.length}</span></a>
+          <Link href="/admin/chatroom" className={`admin-tenant-pill${activeTenant === "all" ? " is-active" : ""}`}>All <span>{allThreads.length}</span></Link>
+          <Link href="/admin/chatroom?tenant=roni" className={`admin-tenant-pill${activeTenant === "roni" ? " is-active" : ""}`}>Roni <span>{roniThreads.length}</span></Link>
+          <Link href="/admin/chatroom?tenant=colt" className={`admin-tenant-pill${activeTenant === "colt" ? " is-active" : ""}`}>COLT <span>{coltThreads.length}</span></Link>
         </div>
       </header>
 

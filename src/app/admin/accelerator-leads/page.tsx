@@ -1,3 +1,4 @@
+import Link from "next/link";
 /**
  * /admin/accelerator-leads — internal CRM view of every accelerator
  * landing-page intent captured in `accelerator_intents`.
@@ -56,9 +57,9 @@ export default async function AdminAcceleratorLeadsPage({ searchParams }: { sear
         </div>
         <div className="admin-page-actions">
           <div className="admin-tenant-pills">
-            <a href="/admin/accelerator-leads" className={`admin-tenant-pill${activeTenant === "all" ? " is-active" : ""}`}>All <span>{allRows.length}</span></a>
-            <a href="/admin/accelerator-leads?tenant=roni" className={`admin-tenant-pill${activeTenant === "roni" ? " is-active" : ""}`}>Roni <span>{roniRows.length}</span></a>
-            <a href="/admin/accelerator-leads?tenant=colt" className={`admin-tenant-pill${activeTenant === "colt" ? " is-active" : ""}`}>COLT <span>{coltRows.length}</span></a>
+            <Link href="/admin/accelerator-leads" className={`admin-tenant-pill${activeTenant === "all" ? " is-active" : ""}`}>All <span>{allRows.length}</span></Link>
+            <Link href="/admin/accelerator-leads?tenant=roni" className={`admin-tenant-pill${activeTenant === "roni" ? " is-active" : ""}`}>Roni <span>{roniRows.length}</span></Link>
+            <Link href="/admin/accelerator-leads?tenant=colt" className={`admin-tenant-pill${activeTenant === "colt" ? " is-active" : ""}`}>COLT <span>{coltRows.length}</span></Link>
           </div>
           <div className="admin-stat-row">
             <div className="admin-stat"><div className="admin-stat-num">{revealed}</div><div className="admin-stat-label">Revealed</div></div>
