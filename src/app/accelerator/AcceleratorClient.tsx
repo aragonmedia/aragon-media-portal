@@ -8,7 +8,7 @@ import { createPortal } from "react-dom";
    TYPES + CONSTANTS
    ============================================================ */
 type Tier = "edu_only" | "edu_plus_account" | "browse";
-type GateStatus = "idle" | "submitting" | "revealed";
+type GateStatus = "idle" | "submitting" | "video" | "revealed";
 type ChatStatus = "gate" | "sending" | "open";
 
 const PARTNERS = [
@@ -274,6 +274,77 @@ function HowItWorks() {
 }
 
 /* ============================================================
+   VSL PLAYER (plays between gate submit and pricing reveal)
+   ============================================================ */
+function VslPlayer({ onDone }: { onDone: () => void }) {
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const [muted, setMuted] = useState(true);
+  const [progress, setProgress] = useState(0);
+  const [ended, setEnded] = useState(false);
+
+  useEffect(() => {
+    const el = videoRef.current;
+    if (!el) return;
+    const onTime = () => {
+      if (!el.duration || isNaN(el.duration)) return;
+      const pct = el.currentTime / el.duration;
+      setProgress(pct);
+      // Reveal pricing when 85% watched
+      if (pct >= 0.85 && !ended) {
+        setEnded(true);
+        onDone();
+      }
+    };
+    const onFinish = () => { setEnded(true); onDone(); };
+    el.addEventListener("timeupdate", onTime);
+    el.addEventListener("ended", onFinish);
+    return () => {
+      el.removeEventListener("timeupdate", onTime);
+      el.removeEventListener("ended", onFinish);
+    };
+  }, [onDone, ended]);
+
+  function toggleMute() {
+    const el = videoRef.current;
+    if (!el) return;
+    el.muted = !el.muted;
+    setMuted(el.muted);
+  }
+
+  return (
+    <div className="ac-vsl-wrap">
+      <div className="ac-vsl-frame">
+        <video
+          ref={videoRef}
+          src="/accelerator/vsl.mp4"
+          autoPlay
+          muted
+          playsInline
+          controls
+          preload="auto"
+          className="ac-vsl-video"
+        />
+        {muted && (
+          <button type="button" className="ac-vsl-unmute" onClick={toggleMute} aria-label="Unmute video">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/></svg>
+            <span>Tap to unmute</span>
+          </button>
+        )}
+      </div>
+      <div className="ac-vsl-progress">
+        <div className="ac-vsl-progress-bar" style={{ width: `${Math.min(progress * 100, 100)}%` }} />
+      </div>
+      <div className="ac-vsl-meta">
+        <span>Pricing unlocks at 85% watched · {Math.round(progress * 100)}%</span>
+        {progress > 0.1 && !ended && (
+          <button type="button" className="ac-vsl-skip" onClick={onDone}>Skip the video, show pricing →</button>
+        )}
+      </div>
+    </div>
+  );
+}
+
+/* ============================================================
    PRICING (gated)
    ============================================================ */
 function PricingBlock() {
@@ -285,7 +356,8 @@ function PricingBlock() {
   // Resume if this browser has already unlocked
   useEffect(() => {
     try {
-      if (localStorage.getItem("ac_gate_ok") === "1") setGate("revealed");
+      if (localStorage.getItem("ac_vsl_watched") === "1") setGate("revealed");
+      else if (localStorage.getItem("ac_gate_email")) setGate("video");
     } catch {}
   }, []);
 
@@ -302,8 +374,8 @@ function PricingBlock() {
       });
       const j = await res.json();
       if (!j.ok) throw new Error(j.error || "Something went wrong.");
-      try { localStorage.setItem("ac_gate_ok", "1"); localStorage.setItem("ac_gate_email", form.email.trim()); localStorage.setItem("ac_gate_name", form.name.trim()); } catch {}
-      setGate("revealed");
+      try { localStorage.setItem("ac_gate_email", form.email.trim()); localStorage.setItem("ac_gate_name", form.name.trim()); } catch {}
+      setGate("video");
     } catch (err) {
       setError(err instanceof Error ? err.message : "Something went wrong.");
       setGate("idle");
@@ -344,11 +416,11 @@ function PricingBlock() {
         </div>
       </div>
 
-      {gate !== "revealed" ? (
+      {gate === "idle" || gate === "submitting" ? (
         <div className="ac-gate-card">
           <div className="ac-gate-eyebrow">UNLOCK PRICING</div>
           <h3 className="ac-gate-title">Enter your name and email to see the tiers.</h3>
-          <p className="ac-gate-sub">Takes 3 seconds. No spam. Just so we can send you Skool access details after you enroll.</p>
+          <p className="ac-gate-sub">Takes 3 seconds. Watch a 90-second walkthrough first. Then pricing unlocks.</p>
           <form onSubmit={submitGate} className="ac-gate-form">
             <div className="ac-gate-row">
               <input
@@ -368,6 +440,8 @@ function PricingBlock() {
             {error && <p className="ac-gate-err">{error}</p>}
           </form>
         </div>
+      ) : gate === "video" ? (
+        <VslPlayer onDone={() => { try { localStorage.setItem("ac_vsl_watched", "1"); } catch {} ; setGate("revealed"); }} />
       ) : (
         <div className="ac-tiers">
           <TierCard
@@ -917,6 +991,18 @@ function Styles() {
       .ac-guarantee b { color: var(--taa-white); }
 
       .ac-gate-card { max-width: 520px; margin: 40px auto 0; padding: 32px 28px; background: var(--taa-bg-card); border: 1px solid var(--taa-border-strong); border-radius: 14px; text-align: center; }
+
+      /* ---- VSL player (plays after gate, before pricing) ---- */
+      .ac-vsl-wrap { max-width: 900px; margin: 40px auto 0; }
+      .ac-vsl-frame { position: relative; width: 100%; aspect-ratio: 16 / 9; background: #000; border-radius: 14px; overflow: hidden; border: 1px solid var(--taa-border-strong); box-shadow: 0 24px 80px rgba(0, 0, 0, 0.5), 0 0 60px rgba(220, 30, 46, 0.08); }
+      .ac-vsl-video { width: 100%; height: 100%; display: block; object-fit: cover; background: #000; }
+      .ac-vsl-unmute { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); display: inline-flex; align-items: center; gap: 10px; padding: 14px 22px; background: rgba(220, 30, 46, 0.95); color: var(--taa-white); border: none; border-radius: 999px; font-family: inherit; font-size: 13.5px; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase; cursor: pointer; box-shadow: 0 12px 40px rgba(220, 30, 46, 0.5); z-index: 2; transition: transform 150ms ease, opacity 200ms ease; }
+      .ac-vsl-unmute:hover { transform: translate(-50%, -50%) scale(1.04); }
+      .ac-vsl-progress { position: relative; width: 100%; height: 6px; background: rgba(255, 255, 255, 0.06); border-radius: 999px; margin-top: 14px; overflow: hidden; }
+      .ac-vsl-progress-bar { position: absolute; top: 0; left: 0; height: 100%; background: var(--taa-red); border-radius: 999px; transition: width 240ms ease; box-shadow: 0 0 12px rgba(220, 30, 46, 0.5); }
+      .ac-vsl-meta { display: flex; justify-content: space-between; align-items: center; gap: 14px; margin-top: 10px; font-size: 12px; color: var(--taa-muted); flex-wrap: wrap; }
+      .ac-vsl-skip { background: transparent; border: none; color: var(--taa-muted); font-size: 12px; font-family: inherit; cursor: pointer; text-decoration: underline; text-underline-offset: 3px; padding: 0; }
+      .ac-vsl-skip:hover { color: var(--taa-red); }
       .ac-gate-eyebrow { font-size: 10.5px; letter-spacing: 0.24em; color: var(--taa-red); font-weight: 700; text-transform: uppercase; margin-bottom: 10px; }
       .ac-gate-title { margin: 0 0 8px; font-size: 20px; font-weight: 800; color: var(--taa-white); letter-spacing: -0.01em; }
       .ac-gate-sub { margin: 0 0 20px; font-size: 13px; color: var(--taa-muted); }
