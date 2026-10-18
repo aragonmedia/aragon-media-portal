@@ -278,6 +278,14 @@ function HowItWorks() {
    ============================================================ */
 function VslPlayer({ onDone }: { onDone: () => void }) {
   const videoRef = useRef<HTMLVideoElement>(null);
+
+  const handleRewatch = () => {
+    const el = videoRef.current;
+    if (!el) return;
+    el.currentTime = 0;
+    setEnded(false);
+    el.play().catch(() => {});
+  };
   const [muted, setMuted] = useState(true);
   const [progress, setProgress] = useState(0);
   const [ended, setEnded] = useState(false);
@@ -289,11 +297,6 @@ function VslPlayer({ onDone }: { onDone: () => void }) {
       if (!el.duration || isNaN(el.duration)) return;
       const pct = el.currentTime / el.duration;
       setProgress(pct);
-      // Reveal pricing when 85% watched
-      if (pct >= 0.85 && !ended) {
-        setEnded(true);
-        onDone();
-      }
     };
     const onFinish = () => { setEnded(true); onDone(); };
     el.addEventListener("timeupdate", onTime);
@@ -339,6 +342,11 @@ function VslPlayer({ onDone }: { onDone: () => void }) {
         {progress > 0.1 && !ended && (
           <button type="button" className="ac-vsl-skip" onClick={onDone}>Skip the video, show pricing →</button>
         )}
+              {ended && (
+                <button type="button" className="ac-vsl-rewatch" onClick={handleRewatch}>
+                  <span aria-hidden>↻</span> Watch again
+                </button>
+              )}
       </div>
     </div>
   );
@@ -440,9 +448,10 @@ function PricingBlock() {
             {error && <p className="ac-gate-err">{error}</p>}
           </form>
         </div>
-      ) : gate === "video" ? (
-        <VslPlayer onDone={() => { try { localStorage.setItem("ac_vsl_watched", "1"); } catch {} ; setGate("revealed"); }} />
       ) : (
+        <>
+        <VslPlayer onDone={() => { try { localStorage.setItem("ac_vsl_watched", "1"); } catch {} ; setGate("revealed"); }} />
+          {gate === "revealed" && (
         <div className="ac-tiers">
           <TierCard
             eyebrow="EDUCATION ONLY"
@@ -495,6 +504,8 @@ function PricingBlock() {
             loading={clicking === "browse"}
           />
         </div>
+          )}
+        </>
       )}
     </section>
   );
@@ -1003,6 +1014,8 @@ function Styles() {
       .ac-vsl-meta { display: flex; justify-content: space-between; align-items: center; gap: 14px; margin-top: 10px; font-size: 12px; color: var(--taa-muted); flex-wrap: wrap; }
       .ac-vsl-skip { background: transparent; border: none; color: var(--taa-muted); font-size: 12px; font-family: inherit; cursor: pointer; text-decoration: underline; text-underline-offset: 3px; padding: 0; }
       .ac-vsl-skip:hover { color: var(--taa-red); }
+      .ac-vsl-rewatch { display: inline-flex; align-items: center; gap: 8px; margin-top: 14px; padding: 10px 18px; background: var(--taa-red, #DC1E2E); color: var(--taa-white, #fff); border: none; border-radius: 999px; font-size: 13px; font-weight: 700; font-family: inherit; cursor: pointer; text-transform: uppercase; letter-spacing: 0.08em; transition: opacity 150ms ease; }
+      .ac-vsl-rewatch:hover { opacity: 0.9; }
       .ac-gate-eyebrow { font-size: 10.5px; letter-spacing: 0.24em; color: var(--taa-red); font-weight: 700; text-transform: uppercase; margin-bottom: 10px; }
       .ac-gate-title { margin: 0 0 8px; font-size: 20px; font-weight: 800; color: var(--taa-white); letter-spacing: -0.01em; }
       .ac-gate-sub { margin: 0 0 20px; font-size: 13px; color: var(--taa-muted); }
