@@ -4,6 +4,8 @@ import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 
+const BLACK_FRIDAY_TS = new Date("2026-11-27T05:00:00Z").getTime(); // Midnight ET, Black Friday 2026
+
 /* ============================================================
    TYPES + CONSTANTS
    ============================================================ */
@@ -452,13 +454,16 @@ function PricingBlock() {
         <>
         <VslPlayer onDone={() => { try { localStorage.setItem("ac_vsl_watched", "1"); } catch {} ; setGate("revealed"); }} />
           {gate === "revealed" && (
-        <div className="ac-tiers">
+        <>
+          <Countdown target={BLACK_FRIDAY_TS} />
+          <div className="ac-tiers">
           <TierCard
             eyebrow="EDUCATION ONLY"
             price="$997"
             label="one-time"
+            originalPrice="$1,497"
             features={[
-              "Full Skool community access",
+              "Full Skool community access",$
               "All 7-day fast track modules",
               "Weekly live workshops with Roni + AM",
               "Resource vault + templates",
@@ -474,8 +479,9 @@ function PricingBlock() {
             eyebrow="EDUCATION + VERIFIED ACCOUNT"
             price="$1,997"
             label="one-time · most popular"
+            originalPrice="$2,997"
             features={[
-              "Everything in Education Only",
+              "Everything in Education Only",$
               "One verified US TikTok Shop account, day 1",
               "Priority same-day activation",
               "1-on-1 kickoff call with the AM team",
@@ -504,6 +510,7 @@ function PricingBlock() {
             loading={clicking === "browse"}
           />
         </div>
+          </>
           )}
         </>
       )}
@@ -511,16 +518,50 @@ function PricingBlock() {
   );
 }
 
+function Countdown({ target }: { target: number }) {
+  const [now, setNow] = useState<number>(() => Date.now());
+  useEffect(() => {
+    const id = setInterval(() => setNow(Date.now()), 1000);
+    return () => clearInterval(id);
+  }, []);
+  const ms = Math.max(0, target - now);
+  const days = Math.floor(ms / 86400000);
+  const hours = Math.floor((ms % 86400000) / 3600000);
+  const minutes = Math.floor((ms % 3600000) / 60000);
+  const seconds = Math.floor((ms % 60000) / 1000);
+  return (
+    <div className="ac-countdown">
+      <p className="ac-countdown-eyebrow">Q4 pricing locks in</p>
+      <div className="ac-countdown-grid">
+        <div className="ac-countdown-unit"><strong>{days}</strong><span>Days</span></div>
+        <div className="ac-countdown-sep">:</div>
+        <div className="ac-countdown-unit"><strong>{String(hours).padStart(2, "0")}</strong><span>Hours</span></div>
+        <div className="ac-countdown-sep">:</div>
+        <div className="ac-countdown-unit"><strong>{String(minutes).padStart(2, "0")}</strong><span>Min</span></div>
+        <div className="ac-countdown-sep">:</div>
+        <div className="ac-countdown-unit"><strong>{String(seconds).padStart(2, "0")}</strong><span>Sec</span></div>
+      </div>
+      <p className="ac-countdown-sub">Prices go up after Black Friday — November 27, 2026</p>
+    </div>
+  );
+}
+
 function TierCard(props: {
   eyebrow: string; price: string; label: string; features: string[];
   cta: string; onClick: () => void; loading?: boolean;
+  originalPrice?: string;
   highlight?: boolean; variant?: "browse";
 }) {
   return (
     <div className={`ac-tier${props.highlight ? " ac-tier-highlight" : ""}${props.variant === "browse" ? " ac-tier-browse" : ""}`}>
       {props.highlight && <div className="ac-tier-ribbon">MOST POPULAR</div>}
       <div className="ac-tier-eyebrow">{props.eyebrow}</div>
-      <div className="ac-tier-price">{props.price}</div>
+      <div className="ac-tier-price-wrap">
+        {props.originalPrice ? (
+          <span className="ac-tier-price-original">{props.originalPrice}</span>
+        ) : null}
+        <div className="ac-tier-price">{props.price}</div>
+      </div>
       <div className="ac-tier-label">{props.label}</div>
       <ul className="ac-tier-features">
         {props.features.map((f, i) => (
@@ -1032,6 +1073,16 @@ function Styles() {
       .ac-tier-eyebrow { font-size: 10.5px; letter-spacing: 0.2em; color: var(--taa-muted); font-weight: 700; text-transform: uppercase; margin-bottom: 12px; }
       .ac-tier-price { font-size: 40px; font-weight: 900; color: var(--taa-white); letter-spacing: -0.03em; line-height: 1; }
       .ac-tier-highlight .ac-tier-price { color: var(--taa-red); }
+      .ac-tier-price-wrap { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; justify-content: flex-start; }
+      .ac-tier-price-original { font-size: 20px; font-weight: 700; color: var(--taa-muted); text-decoration: line-through; opacity: 0.7; letter-spacing: -0.02em; }
+      .ac-countdown { max-width: 900px; margin: 32px auto 24px; padding: 22px 24px; background: linear-gradient(135deg, rgba(220,30,46,0.08), rgba(220,30,46,0.02)); border: 1px solid rgba(220,30,46,0.28); border-radius: 14px; text-align: center; }
+      .ac-countdown-eyebrow { margin: 0 0 10px; font-size: 11px; letter-spacing: 0.22em; text-transform: uppercase; color: var(--taa-red); font-weight: 800; }
+      .ac-countdown-grid { display: flex; justify-content: center; align-items: center; gap: 12px; margin: 8px 0; flex-wrap: wrap; }
+      .ac-countdown-unit { display: flex; flex-direction: column; align-items: center; min-width: 72px; padding: 10px 14px; background: rgba(0,0,0,0.4); border: 1px solid rgba(220,30,46,0.3); border-radius: 10px; }
+      .ac-countdown-unit strong { font-size: 28px; font-weight: 900; color: var(--taa-white); font-variant-numeric: tabular-nums; letter-spacing: -0.02em; line-height: 1; }
+      .ac-countdown-unit span { font-size: 10px; margin-top: 4px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--taa-muted); font-weight: 600; }
+      .ac-countdown-sep { font-size: 24px; font-weight: 700; color: var(--taa-red); line-height: 1; }
+      .ac-countdown-sub { margin: 10px 0 0; font-size: 12.5px; color: var(--taa-muted); }
       .ac-tier-label { font-size: 11.5px; letter-spacing: 0.14em; color: var(--taa-muted); text-transform: uppercase; font-weight: 700; margin-top: 6px; margin-bottom: 22px; }
       .ac-tier-features { list-style: none; padding: 0; margin: 0 0 24px; display: flex; flex-direction: column; gap: 10px; flex: 1; }
       .ac-tier-features li { display: flex; gap: 10px; align-items: flex-start; font-size: 13.5px; color: var(--taa-text); line-height: 1.5; }
@@ -1180,6 +1231,14 @@ function Styles() {
         .ac-tiers { grid-template-columns: 1fr; gap: 14px; margin-top: 30px; }
         .ac-tier { padding: 28px 22px; }
         .ac-tier-price { font-size: 34px; }
+        .ac-countdown { padding: 16px 14px; margin: 24px auto 18px; }
+        .ac-countdown-unit { min-width: 54px; padding: 8px 10px; }
+        .ac-countdown-unit strong { font-size: 22px; }
+        .ac-countdown-sep { display: none; }
+        .ac-countdown-grid { gap: 8px; }
+        .ac-countdown-eyebrow { font-size: 10px; }
+        .ac-countdown-sub { font-size: 11.5px; }
+        .ac-tier-price-original { font-size: 18px; }
         .ac-gate-card { padding: 24px 20px; margin: 32px auto 0; }
         .ac-gate-row { grid-template-columns: 1fr; }
         .ac-guarantee { flex-direction: column; text-align: center; align-items: center; padding: 14px 16px; }
