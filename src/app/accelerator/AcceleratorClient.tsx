@@ -463,7 +463,7 @@ function PricingBlock() {
             label="one-time"
             originalPrice="$1,497"
             features={[
-              "Full Skool community access",$
+              "Full Skool community access",
               "All 7-day fast track modules",
               "Weekly live workshops with Roni + AM",
               "Resource vault + templates",
@@ -481,7 +481,7 @@ function PricingBlock() {
             label="one-time · most popular"
             originalPrice="$2,997"
             features={[
-              "Everything in Education Only",$
+              "Everything in Education Only",
               "One verified US TikTok Shop account, day 1",
               "Priority same-day activation",
               "1-on-1 kickoff call with the AM team",
