@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { linkify } from "@/lib/ui/linkify";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 
@@ -607,7 +608,7 @@ function ChatWidget() {
                   <div className="ac-chat-empty">Say hi — the TTSUnlocked team will jump in.</div>
                 ) : msgs.map((m) => (
                   <div key={m.id} className={`ac-chat-msg ${m.sender === "user" ? "me" : "them"}`}>
-                    <p>{m.body}</p>
+                    <p>{linkify(m.body)}</p>
                     <span>{m.sender === "user" ? "You" : "AM Team"} · {new Date(m.createdAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}</span>
                   </div>
                 ))}
@@ -758,7 +759,7 @@ function InlineChat() {
                   <div className="ac-chat-empty">Say hi — the TTSUnlocked team will jump in.</div>
                 ) : msgs.map((m) => (
                   <div key={m.id} className={`ac-chat-msg ${m.sender === "user" ? "me" : "them"}`}>
-                    <p>{m.body}</p>
+                    <p>{linkify(m.body)}</p>
                     <span>{m.sender === "user" ? "You" : "AM Team"} · {new Date(m.createdAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}</span>
                   </div>
                 ))}

@@ -1,5 +1,6 @@
 "use client";
 
+import { linkify } from "@/lib/ui/linkify";
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { upload } from "@vercel/blob/client";
@@ -169,7 +170,7 @@ export default function ThreadClient({
             messages.map((m) => (
               <div key={m.id} className={`acrx-msg acrx-msg-${m.sender}`}>
                 <div className="acrx-msg-body">
-                  {m.body && <p>{m.body}</p>}
+                  {m.body && <p>{linkify(m.body)}</p>}
                   {m.attachments.length > 0 && (
                     <div className="acrx-msg-attach">
                       {m.attachments.map((url) => (

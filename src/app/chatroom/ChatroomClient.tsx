@@ -13,6 +13,7 @@ function sniffAccelerator(): string {
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
+import { linkify } from "@/lib/ui/linkify";
 import { upload } from "@vercel/blob/client";
 import CredentialsModal from "./CredentialsModal";
 
@@ -277,7 +278,7 @@ export default function ChatroomClient({ calendlyUrl }: { calendlyUrl: string })
               messages.map((m) => (
                 <div key={m.id} className={`cr-msg cr-msg-${m.sender}`}>
                   <div className="cr-msg-body">
-                    {m.body && <p>{m.body}</p>}
+                    {m.body && <p>{linkify(m.body)}</p>}
                     {m.attachments.length > 0 && (
                       <div className="cr-msg-attachments">
                         {m.attachments.map((url) => (
