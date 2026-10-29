@@ -11,7 +11,7 @@ const BLACK_FRIDAY_TS = new Date("2026-11-27T05:00:00Z").getTime(); // Midnight 
    TYPES + CONSTANTS
    ============================================================ */
 type Tier = "edu_only" | "edu_plus_account" | "browse";
-type GateStatus = "idle" | "submitting" | "revealed";
+type GateStatus = "idle" | "submitting" | "video" | "revealed";
 type ChatStatus = "gate" | "sending" | "open";
 
 const PARTNERS = [
