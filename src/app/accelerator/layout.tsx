@@ -1,5 +1,5 @@
 /**
- * /accelerator shell — the paid-program sales lander.
+ * /accelerator shell. the paid-program sales lander.
  * Reuses accelerator.css tokens; forced dark theme.
  */
 import "../accounts/accelerator.css";
