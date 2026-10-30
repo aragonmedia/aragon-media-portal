@@ -1,5 +1,5 @@
 /**
- * /accelerator — TikTok Affiliate Accelerator × Aragon Media landing page.
+ * /accelerator. TikTok Affiliate Accelerator × Aragon Media landing page.
  * Public sales page. Pricing tiers behind a name+email gate.
  */
 import AcceleratorClient from "./AcceleratorClient";
