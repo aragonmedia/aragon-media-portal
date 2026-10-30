@@ -26,10 +26,10 @@ const PARTNERS = [
   { src: "/partners/cc.png", alt: "CC" },
 ];
 
-// Wins gallery — Kevin drops screenshots to /public/accelerator/wins/
+// Wins gallery. Kevin drops screenshots to /public/accelerator/wins/
 // and we add entries here. Empty for now.
 const WINS: { src: string; caption?: string; video?: boolean }[] = [
-  // Big numbers — heavy hitters first
+  // Big numbers. heavy hitters first
   { src: "/accelerator/wins/proof-486k-nov.png", caption: "$486K in November" },
   { src: "/accelerator/wins/proof-125k-week.png", caption: "$125K in one week" },
   { src: "/accelerator/wins/proof-94k-viral.png", caption: "$94K viral drop" },
@@ -250,7 +250,7 @@ function HowItWorks() {
     { d: "DAY 1", t: "Enroll & unlock", b: "Join the Skool community, meet the operators, get your onboarding roadmap. Everything's laid out before you start." },
     { d: "DAY 2", t: "Get set up", b: "VPN, US SIM, refurbished phone, payout method of your choice. We walk you through every setup step live so nothing gets missed." },
     { d: "DAY 3", t: "Get activated", b: "Submit your account details in the private chat. The AM team verifies and activates within 24 hours." },
-    { d: "DAY 4–7", t: "Start earning", b: "Post your first UGC, showcase products in your videos, watch USD commissions land in the account you choose." },
+    { d: "DAY 4-7", t: "Start earning", b: "Post your first UGC, showcase products in your videos, watch USD commissions land in the account you choose." },
   ];
   return (
     <section className="ac-how" id="how">
@@ -341,10 +341,7 @@ function VslPlayer({ onDone }: { onDone: () => void }) {
       </div>
       <div className="ac-vsl-meta">
         <span>Pricing unlocks at 85% watched · {Math.round(progress * 100)}%</span>
-        {progress > 0.1 && !ended && (
-          <button type="button" className="ac-vsl-skip" onClick={onDone}>Skip the video, show pricing →</button>
-        )}
-              {ended && (
+                      {ended && (
                 <button type="button" className="ac-vsl-rewatch" onClick={handleRewatch}>
                   <span aria-hidden>↻</span> Watch again
                 </button>
@@ -470,7 +467,7 @@ function PricingBlock() {
               "Private chat with the AM team",
               "Account NOT included (source your own)",
             ]}
-            cta="Enroll — $997"
+            cta="Enroll $997"
             onClick={() => clickTier("edu_only")}
             loading={clicking === "edu_only"}
           />
@@ -488,7 +485,7 @@ function PricingBlock() {
               "Compliance walkthrough for your niche",
               "Fast track your first commission",
             ]}
-            cta="Enroll — $1,997"
+            cta="Enroll $1,997"
             onClick={() => clickTier("edu_plus_account")}
             loading={clicking === "edu_plus_account"}
           />
@@ -502,7 +499,7 @@ function PricingBlock() {
               "Handles, follower counts, prices",
               "Filter by follower tier",
               "One-click Discord ticket to buy",
-              "No program included — accounts only",
+              "No program included. accounts only",
               "For creators who already know the game",
             ]}
             cta="Browse accounts →"
@@ -541,7 +538,7 @@ function Countdown({ target }: { target: number }) {
         <div className="ac-countdown-sep">:</div>
         <div className="ac-countdown-unit"><strong>{String(seconds).padStart(2, "0")}</strong><span>Sec</span></div>
       </div>
-      <p className="ac-countdown-sub">Prices go up after Black Friday — November 27, 2026</p>
+      <p className="ac-countdown-sub">Prices go up after Black Friday. November 27, 2026</p>
     </div>
   );
 }
@@ -602,7 +599,7 @@ function FAQ() {
             >
               <div className="ac-faq-q">
                 <span>{f.q}</span>
-                <span className="ac-faq-sign">{isOpen ? "–" : "+"}</span>
+                <span className="ac-faq-sign">{isOpen ? "-" : "+"}</span>
               </div>
               {isOpen && <div className="ac-faq-a">{f.a}</div>}
             </button>
@@ -633,7 +630,7 @@ function Footer() {
 }
 
 /* ============================================================
-   CHAT WIDGET — reuses /api/chatroom infrastructure
+   CHAT WIDGET. reuses /api/chatroom infrastructure
    ============================================================ */
 function ChatWidget() {
   const [open, setOpen] = useState(false);
@@ -735,7 +732,7 @@ function ChatWidget() {
             <>
               <div ref={feedRef} className="ac-chat-feed">
                 {msgs.length === 0 ? (
-                  <div className="ac-chat-empty">Say hi — the AM team will jump in.</div>
+                  <div className="ac-chat-empty">Say hi. the AM team will jump in.</div>
                 ) : msgs.map((m) => (
                   <div key={m.id} className={`ac-chat-msg ${m.sender === "user" ? "me" : "them"}`}>
                     <p>{m.body}</p>
@@ -766,7 +763,7 @@ function ChatWidget() {
 }
 
 /* ============================================================
-   INLINE CHAT (below pricing, always visible — not the floating widget)
+   INLINE CHAT (below pricing, always visible. not the floating widget)
    ============================================================ */
 function InlineChat() {
   const [status, setStatus] = useState<ChatStatus>("gate");
@@ -886,7 +883,7 @@ function InlineChat() {
             <>
               <div ref={feedRef} className="ac-inline-chat-feed">
                 {msgs.length === 0 ? (
-                  <div className="ac-chat-empty">Say hi — the AM team will jump in.</div>
+                  <div className="ac-chat-empty">Say hi. the AM team will jump in.</div>
                 ) : msgs.map((m) => (
                   <div key={m.id} className={`ac-chat-msg ${m.sender === "user" ? "me" : "them"}`}>
                     <p>{m.body}</p>
