@@ -1,9 +1,9 @@
 /**
- * /accounts — TikTok Affiliate Accelerator — public account listings.
+ * /accounts. TikTok Affiliate Accelerator. public account listings.
  *
  * Fully public. Renders from the accelerator_accounts cache. UI matches
  * the wolf-branded dark aesthetic (separate from the Aragon Media
- * portal styling — this is Roni's brand, futuristic + red/black).
+ * portal styling. this is Roni's brand, futuristic + red/black).
  *
  * Refresh button re-reads the cache (no live Discord API hit).
  * Top-right CTA opens the Discord ticket channel in a new tab.
