@@ -89,7 +89,7 @@ export async function POST(req: Request) {
   const userAgent = req.headers.get("user-agent") ?? "";
 
   const kevin = process.env.ACCELERATOR_NOTIFY_EMAIL_KEVIN;
-  const roni = process.env.ACCELERATOR_NOTIFY_EMAIL_RONI;
+  const roni = (slug === "colt" ? process.env.ACCELERATOR_NOTIFY_EMAIL_COLT : process.env.ACCELERATOR_NOTIFY_EMAIL_RONI);
   const adminTo = [kevin, roni].filter((e): e is string => typeof e === "string" && e.includes("@"));
 
   // ============================================================
@@ -189,7 +189,7 @@ export async function POST(req: Request) {
     }
 
     // Admin email so Kevin + partner know this lead came from the accelerator
-    const adminTo = (process.env.ACCELERATOR_ADMIN_EMAILS ?? "aragonkevin239@gmail.com")
+    const adminTo = ((slug === "colt" ? process.env.ACCELERATOR_ADMIN_EMAILS_COLT : process.env.ACCELERATOR_ADMIN_EMAILS) ?? "aragonkevin239@gmail.com")
       .split(",").map((e) => e.trim()).filter(Boolean);
     const origin = req.headers.get("origin") || "https://portal.kevin-aragon.com";
     sendOutboundAccountsNotifyAdmin({
