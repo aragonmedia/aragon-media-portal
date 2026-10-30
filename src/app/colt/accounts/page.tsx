@@ -1,12 +1,12 @@
 /**
- * /colt/accounts — TTSUnlocked-branded accounts marketplace.
+ * /colt/accounts. TTSUnlocked-branded accounts marketplace.
  *
  * Same backend as /accounts (same bot, same Neon cache, same
  * accelerator_accounts table). The only differences:
  *   - Wrapped in .colt-shell so the palette turns neon blue
  *   - Attribution tags leads with accelerator=colt before Discord
  *
- * Shares Nick G's Discord ticket URL — one bot, one inventory,
+ * Shares Nick G's Discord ticket URL. one bot, one inventory,
  * two branded surfaces.
  */
 
