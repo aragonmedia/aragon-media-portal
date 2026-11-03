@@ -83,14 +83,19 @@ export async function POST(req: Request) {
     });
   } catch (err) { console.error("[call-rsvp] airtable sync failed:", err); }
 
-  // Admin notification
+  // Admin notification — awaited so the serverless function doesn't terminate
+  // before Resend finishes sending (fire-and-forget dies on Vercel).
   const adminTo = (process.env.ACCELERATOR_ADMIN_EMAILS ?? "aragonkevin239@gmail.com")
     .split(",").map((e) => e.trim()).filter(Boolean);
   const origin = req.headers.get("origin") || "https://portal.kevin-aragon.com";
-  sendCallRsvpNotifyAdmin({
-    to: adminTo, name, email, whatsapp, country, source,
-    adminUrl: `${origin}/admin/accelerator-leads`,
-  }).catch(() => {});
+  try {
+    await sendCallRsvpNotifyAdmin({
+      to: adminTo, name, email, whatsapp, country, source,
+      adminUrl: `${origin}/admin/accelerator-leads`,
+    });
+  } catch (err) {
+    console.error("[call-rsvp] admin email failed:", err);
+  }
 
   const headers = new Headers({ "Content-Type": "application/json" });
   if (setCookie) headers.append("Set-Cookie", cookieHeader(key));
