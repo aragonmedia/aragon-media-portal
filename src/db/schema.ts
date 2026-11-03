@@ -333,6 +333,9 @@ export const acceleratorIntents = pgTable("accelerator_intents", {
   updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
   acceleratorSlug: varchar("accelerator_slug", { length: 40 }).default("roni").notNull(),
   action: varchar("action", { length: 32 }),
+  whatsapp: varchar("whatsapp", { length: 32 }),
+  country: varchar("country", { length: 80 }),
+  source: varchar("source", { length: 200 }),
 });
 
 // ===== admin_invites (team invite flow) =====

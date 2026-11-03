@@ -84,6 +84,10 @@ export async function upsertLead(input: {
   referrer?: string | null;
   userAgent?: string | null;
   accelerator?: string;
+  whatsapp?: string | null;
+  country?: string | null;
+  source?: string | null;
+  leadSourceLabel?: string;
 }): Promise<string | null> {
   const slug = input.accelerator ?? "roni";
   const env = airtableEnv(slug);
@@ -94,9 +98,15 @@ export async function upsertLead(input: {
       "Name": input.name || "(no name)",
       "Email": input.email,
       "Portal ID": input.portalId,
-      "Lead Source": SOURCE_LANDING,
+      "Lead Source": input.leadSourceLabel || SOURCE_LANDING,
     };
     if (input.clickedTier) fields["Tier Interest"] = TIER_INTEREST[input.clickedTier];
+    // Dump extras into Notes so a VA has everything in one field.
+    const noteBits: string[] = [];
+    if (input.whatsapp) noteBits.push(`WhatsApp: ${input.whatsapp}`);
+    if (input.country) noteBits.push(`Country: ${input.country}`);
+    if (input.source) noteBits.push(`Heard about us via: ${input.source}`);
+    if (noteBits.length > 0) fields["Notes"] = noteBits.join(" | ");
     if (!existing) fields["Stage"] = STAGE_NEW;
     if (existing) return (await patchLead(env, existing, fields)) ? existing : null;
     return await createLead(env, fields);

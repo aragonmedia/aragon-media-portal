@@ -1032,3 +1032,50 @@ export async function sendOutboundAccountsNotifyAdmin(opts: {
     });
   } catch (err) { console.error("[email] sendOutboundAccountsNotifyAdmin failed:", err); }
 }
+
+// 1-on-1 call RSVP notification — includes clickable wa.me link so VA/you
+// can open WhatsApp in one tap and start the conversation.
+export async function sendCallRsvpNotifyAdmin(opts: {
+  to: string[];
+  name: string;
+  email: string;
+  whatsapp: string;
+  country: string;
+  source: string;
+  adminUrl: string;
+}) {
+  try {
+    if (opts.to.length === 0) return;
+    const resend = getResend();
+    const waNumber = opts.whatsapp.replace(/[^0-9]/g, "");
+    const waUrl = `https://wa.me/${waNumber}`;
+    const subject = `\u{1F525} 1-on-1 call RSVP: ${opts.name} (${opts.country})`;
+    const html = `<!DOCTYPE html><html>${EMAIL_HEAD}
+    <body bgcolor="#F5F2EA" style="margin:0;padding:0;background:#F5F2EA;font-family:system-ui,-apple-system,'Inter Tight',sans-serif;">
+      <table role="presentation" width="100%" bgcolor="#F5F2EA" style="background:#F5F2EA;">
+        <tr><td align="center" style="padding:32px 18px;">
+          <table role="presentation" width="600" bgcolor="#FFFFFF" style="background:#FFFFFF;border:1px solid #E8E2D2;border-radius:12px;max-width:600px;width:100%;">
+            <tr><td style="padding:30px 32px 14px;">
+              <p style="margin:0 0 6px 0;font-size:11px;letter-spacing:0.2em;color:#DC1E2E;text-transform:uppercase;font-weight:700;">\u{1F4DE} 1-ON-1 CALL RSVP</p>
+              <h1 style="margin:0;font-size:22px;color:#1A1A1A;letter-spacing:-0.01em;">${escapeHtml(opts.name)}</h1>
+              <p style="margin:6px 0 0;font-size:13px;color:#6B6B6B;">\u{1F30D} ${escapeHtml(opts.country)}</p>
+              <p style="margin:14px 0 0;font-size:14px;color:#1A1A1A;"><b>Email:</b> ${escapeHtml(opts.email)}</p>
+              <p style="margin:4px 0 0;font-size:14px;color:#1A1A1A;"><b>WhatsApp:</b> ${escapeHtml(opts.whatsapp)}</p>
+              <p style="margin:4px 0 0;font-size:14px;color:#1A1A1A;"><b>Heard via:</b> ${escapeHtml(opts.source || "n/a")}</p>
+              <p style="margin:14px 0 0;font-size:12.5px;color:#6B6B6B;">They booked a free 1-on-1 call from /roni/tiktokshop. Reach out within 2 hours while they are still warm.</p>
+            </td></tr>
+            <tr><td style="padding:14px 32px 26px;">
+              <a href="${waUrl}" style="display:inline-block;padding:14px 24px;background:#25D366;color:#FFFFFF;text-decoration:none;font-size:14px;font-weight:800;letter-spacing:0.04em;text-transform:uppercase;border-radius:6px;margin-right:8px;">\u{1F4AC} Open in WhatsApp →</a>
+              <a href="${opts.adminUrl}" style="display:inline-block;padding:14px 24px;background:#1A1A1A;color:#FFFFFF;text-decoration:none;font-size:14px;font-weight:800;letter-spacing:0.04em;text-transform:uppercase;border-radius:6px;">View in admin</a>
+            </td></tr>
+          </table>
+        </td></tr>
+      </table>
+    </body></html>`;
+    await resend.emails.send({
+      from: FROM, to: opts.to, subject,
+      text: `1-ON-1 CALL RSVP\n\n${opts.name} (${opts.country})\nEmail: ${opts.email}\nWhatsApp: ${opts.whatsapp}\nHeard via: ${opts.source || "n/a"}\n\nOpen WhatsApp: ${waUrl}\nAdmin: ${opts.adminUrl}`,
+      html,
+    });
+  } catch (err) { console.error("[email] sendCallRsvpNotifyAdmin failed:", err); }
+}
