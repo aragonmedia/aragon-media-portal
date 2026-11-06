@@ -283,6 +283,7 @@ function PricingBlock() {
   // Resume if this browser has already unlocked
   useEffect(() => {
     try {
+      if (typeof window !== "undefined" && new URLSearchParams(window.location.search).get("preview") === "1") { setGate("revealed"); return; }
       if (localStorage.getItem("ac_gate_ok") === "1") setGate("revealed");
     } catch {}
   }, []);
