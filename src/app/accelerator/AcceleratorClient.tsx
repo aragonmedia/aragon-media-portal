@@ -363,6 +363,7 @@ function PricingBlock() {
   // Resume if this browser has already unlocked
   useEffect(() => {
     try {
+      if (typeof window !== "undefined" && new URLSearchParams(window.location.search).get("preview") === "1") { setGate("revealed"); return; }
       if (localStorage.getItem("ac_vsl_watched") === "1") setGate("revealed");
       else if (localStorage.getItem("ac_gate_email")) setGate("video");
     } catch {}
