@@ -83,6 +83,15 @@ export default function TikTokShopClient() {
       const j = await r.json();
       if (!j.ok) throw new Error(j.error || "Something went wrong.");
       setDone(true);
+      // Meta Pixel: fire Lead event on successful call-RSVP submit
+      if (typeof window !== "undefined" && typeof (window as unknown as { fbq?: (...args: unknown[]) => void }).fbq === "function") {
+        (window as unknown as { fbq: (...args: unknown[]) => void }).fbq("track", "Lead", {
+          content_name: "Roni Call Funnel · TikTok Shop",
+          content_category: "accelerator-roni",
+          value: 0,
+          currency: "USD",
+        });
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : "Something went wrong.");
     } finally {
