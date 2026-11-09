@@ -1,8 +1,12 @@
 /**
- * /accelerator. TikTok Affiliate Accelerator × Aragon Media landing page.
+ * /accelerator. TikTok Affiliate Accelerator · Aragon Media landing page.
  * Public sales page. Pricing tiers behind a name+email gate.
  */
 import AcceleratorClient from "./AcceleratorClient";
+import SignupPopup from "../../components/SignupPopup";
+import GuaranteeBand from "../../components/GuaranteeBand";
+import LegalFooter from "../../components/LegalFooter";
+
 export const dynamic = "force-dynamic";
 export const metadata = {
   title: "TikTok Affiliate Accelerator · Aragon Media",
@@ -21,4 +25,14 @@ export const metadata = {
     description: "7-day fast track to US TikTok Shop commissions. Enroll now.",
   },
 };
-export default function AcceleratorPage() { return <AcceleratorClient />; }
+
+export default function AcceleratorPage() {
+  return (
+    <>
+      <AcceleratorClient />
+      <GuaranteeBand brand="accelerator" />
+      <LegalFooter brand="accelerator" />
+      <SignupPopup brand="accelerator" />
+    </>
+  );
+}

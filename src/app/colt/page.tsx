@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import ColtClient from "./ColtClient";
-
+import SignupPopup from "../../components/SignupPopup";
+import GuaranteeBand from "../../components/GuaranteeBand";
+import LegalFooter from "../../components/LegalFooter";
 
 export const metadata: Metadata = {
   title: "TTSUnlocked. Powered by COLT",
@@ -20,8 +22,13 @@ export const metadata: Metadata = {
   robots: { index: true, follow: true },
 };
 
-
 export default function ColtPage() {
-  return <ColtClient />;
+  return (
+    <>
+      <ColtClient />
+      <GuaranteeBand brand="colt" />
+      <LegalFooter brand="colt" />
+      <SignupPopup brand="colt" />
+    </>
+  );
 }
-
