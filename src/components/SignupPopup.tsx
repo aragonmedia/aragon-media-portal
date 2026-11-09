@@ -350,10 +350,10 @@ export default function SignupPopup({ brand }: { brand: Brand }) {
         {done && (
           <div style={{ textAlign: "center", padding: "12px 0" }}>
             <div style={{ fontSize: "20px", fontWeight: 800, marginBottom: "8px" }}>
-              You're in.
+              {"You're in."}
             </div>
             <div style={{ fontSize: "14px", opacity: 0.85, marginBottom: "16px" }}>
-              Check your email. We'll WhatsApp you within 2 hours to lock in a time.
+              {"Check your email. We'll WhatsApp you within 2 hours to lock in a time."}
             </div>
             <button
               onClick={close}
