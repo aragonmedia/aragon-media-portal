@@ -215,9 +215,14 @@ export default function TikTokShopClient() {
         <div className="rts-proof-screens">
           {["486k","125k","94k"].map((k, i) => (
             <div key={k} className="rts-proof-screen">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={`/roni/call-funnel/proof-${k}.jpg`} alt={`$${k.toUpperCase()} proof`} />
-              <div className="rts-proof-cap"><b>${k.toUpperCase()}</b> · {["One month","One week","One viral drop"][i]}</div>
+              <div className="rts-proof-screen-img">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={`/roni/call-funnel/proof-${k}.jpg`} alt={`$${k.toUpperCase()} proof`} />
+              </div>
+              <div className="rts-proof-cap">
+                <b>${k.toUpperCase()}</b>
+                <span>{["One Month","One Week","One Viral Drop"][i]}</span>
+              </div>
             </div>
           ))}
         </div>
@@ -337,11 +342,13 @@ export default function TikTokShopClient() {
         .rts-proof-card { background:var(--rts-card); border:1px solid var(--rts-border); border-radius:12px; padding:20px; text-align:center; }
         .rts-proof-amt { font-size:32px; font-weight:900; color:var(--rts-red); text-shadow:0 0 24px rgba(0,229,255,0.5); margin:0; }
         .rts-proof-sub { font-size:12px; color:var(--rts-muted); letter-spacing:0.08em; text-transform:uppercase; margin-top:4px; font-weight:700; }
-        .rts-proof-screens { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin-bottom:50px; max-width:640px; margin-left:auto; margin-right:auto; }
-        .rts-proof-screen { background:var(--rts-card); border:1px solid var(--rts-border-strong); border-radius:14px; overflow:hidden; }
-        .rts-proof-screen img { display:block; width:100%; height:auto; }
-        .rts-proof-cap { padding:8px 10px; font-size:10px; color:var(--rts-muted); border-top:1px solid var(--rts-border); letter-spacing:0.04em; text-transform:uppercase; font-weight:700; text-align:center; line-height:1.3; }
-        .rts-proof-cap b { color:var(--rts-red); }
+        .rts-proof-screens { display:grid; grid-template-columns:repeat(3,1fr); gap:16px; margin-bottom:50px; max-width:720px; margin-left:auto; margin-right:auto; }
+        .rts-proof-screen { background:#000; border:1px solid var(--rts-border-strong); border-radius:18px; overflow:hidden; box-shadow:0 10px 30px rgba(0,0,0,0.4); display:flex; flex-direction:column; }
+        .rts-proof-screen-img { aspect-ratio:9/16; width:100%; background:#000; overflow:hidden; display:block; }
+        .rts-proof-screen-img img { display:block; width:100%; height:100%; object-fit:cover; object-position:top center; }
+        .rts-proof-cap { padding:14px 10px 16px; text-align:center; background:var(--rts-card); border-top:1px solid var(--rts-border); }
+        .rts-proof-cap b { display:block; font-size:22px; font-weight:900; color:var(--rts-red); letter-spacing:-0.01em; margin-bottom:4px; }
+        .rts-proof-cap span { display:block; font-size:10px; color:var(--rts-muted); letter-spacing:0.14em; text-transform:uppercase; font-weight:700; }
         .rts-form-wrap { background:var(--rts-card); border:1px solid var(--rts-border-strong); border-radius:16px; padding:32px 24px; margin:40px 0 20px; box-shadow:0 20px 60px rgba(0,0,0,0.4); }
         .rts-form-head { text-align:center; margin-bottom:24px; }
         .rts-form-head h2 { font-size:28px; font-weight:800; letter-spacing:-0.02em; margin:0 0 8px; color:var(--rts-white); }
