@@ -9,6 +9,13 @@
  */
 
 import { useEffect, useState } from "react";
+import CreatorIntro from "../../../components/CreatorIntro";
+
+const RONI_INTRO = [
+  "I'm Roni from Alberta, Canada. I found TikTok Shop through Kevin and Aragon Media. I picked live-stream selling as my lane and haven't put it down since. Hundreds of hours on live, consistent commissions every month, and a group of creators I now coach doing the same thing.",
+  "Live-stream selling is where TikTok Shop is paying out the hardest right now, and nobody teaches it the way it actually works. Most courses hand you a VSL template and call it a day. I teach it like a job: how to warm up a room, how to read a buy signal, how to recover a dead stream, how to run a product show for 2 hours without losing the audience.",
+  "The accelerator with Aragon Media is where I open all of it up. Live sessions I run myself, call reviews on your streams, the exact playbook I use. The free 1-on-1 call below is how we start. No pitch deck, no hard sell. 30 minutes on your setup, your goals, whether this is the right move for you.",
+];
 
 const COUNTRIES: { code: string; label: string }[] = [
   { code: "+1-ca", label: "🇨🇦 +1" },
@@ -181,6 +188,7 @@ export default function TikTokShopClient() {
           </div>
         </div>
         <p className="rts-hosts-line">We&apos;ve walked <b>500+ creators</b> through this exact path. On your free call we&apos;ll look at your country, niche, and situation. and tell you honestly if this is a fit.</p>
+        <CreatorIntro brand="roni" name="Roni" location="Alberta, Canada" paragraphs={RONI_INTRO} pullQuote={"Hundreds of hours on live. The live-stream playbook I teach is the one I run myself every week."} />
 
         <div className="rts-sel rts-sel-not">
           <h3>This is NOT for you if…</h3>
