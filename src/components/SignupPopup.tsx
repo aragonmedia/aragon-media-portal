@@ -121,6 +121,7 @@ export default function SignupPopup({ brand }: { brand: Brand }) {
   const [open, setOpen] = useState(false);
   const [variant, setVariant] = useState<Variant>(copy.variants[0]);
   const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [done, setDone] = useState(false);
   const [err, setErr] = useState<string | null>(null);
@@ -179,7 +180,7 @@ export default function SignupPopup({ brand }: { brand: Brand }) {
         body: JSON.stringify({
           name: "",
           email,
-          waFull: "",
+          waFull: phone,
           country: "",
           source: `popup-${brand}`,
           accelerator: brand === "accelerator" ? "roni" : brand,
@@ -303,7 +304,7 @@ export default function SignupPopup({ brand }: { brand: Brand }) {
               {copy.sub}
             </p>
 
-            <form onSubmit={onSubmit} style={{ display: "flex", gap: "8px" }}>
+            <form onSubmit={onSubmit} style={{ display: "grid", gap: "8px" }}>
               <input
                 type="email"
                 required
@@ -311,7 +312,22 @@ export default function SignupPopup({ brand }: { brand: Brand }) {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 style={{
-                  flex: 1,
+                  padding: "12px 14px",
+                  borderRadius: "10px",
+                  background: "rgba(255,255,255,0.04)",
+                  color: copy.text,
+                  border: "1px solid rgba(255,255,255,0.1)",
+                  fontSize: "15px",
+                  outline: "none",
+                }}
+              />
+              <input
+                type="tel"
+                required
+                placeholder="Phone (WhatsApp)"
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
+                style={{
                   padding: "12px 14px",
                   borderRadius: "10px",
                   background: "rgba(255,255,255,0.04)",
@@ -334,6 +350,7 @@ export default function SignupPopup({ brand }: { brand: Brand }) {
                   fontSize: "15px",
                   cursor: submitting ? "default" : "pointer",
                   opacity: submitting ? 0.7 : 1,
+                  marginTop: "4px",
                 }}
               >
                 {submitting ? "..." : copy.cta}
