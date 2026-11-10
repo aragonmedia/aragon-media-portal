@@ -213,15 +213,19 @@ export default function TikTokShopClient() {
           <div className="rts-proof-card"><p className="rts-proof-amt">500+</p><div className="rts-proof-sub">Creators activated worldwide</div></div>
         </div>
         <div className="rts-proof-screens">
-          {["486k","125k","94k"].map((k, i) => (
-            <div key={k} className="rts-proof-screen">
+          {[
+            { img: "/roni/call-funnel/proof-486k.jpg", amount: "$486K", label: "One Month" },
+            { img: "/roni/call-funnel/proof-125k.jpg", amount: "$125K", label: "One Week" },
+            { img: "/roni/call-funnel/proof-94k.jpg",  amount: "$94K",  label: "One Viral Drop" },
+          ].map((p, i) => (
+            <div key={i} className="rts-proof-screen">
               <div className="rts-proof-screen-img">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={`/roni/call-funnel/proof-${k}.jpg`} alt={`$${k.toUpperCase()} proof`} />
+                <img src={p.img} alt={`${p.amount} proof`} />
               </div>
               <div className="rts-proof-cap">
-                <b>${k.toUpperCase()}</b>
-                <span>{["One Month","One Week","One Viral Drop"][i]}</span>
+                <b>{p.amount}</b>
+                <span>{p.label}</span>
               </div>
             </div>
           ))}
@@ -342,10 +346,10 @@ export default function TikTokShopClient() {
         .rts-proof-card { background:var(--rts-card); border:1px solid var(--rts-border); border-radius:12px; padding:20px; text-align:center; }
         .rts-proof-amt { font-size:32px; font-weight:900; color:var(--rts-red); text-shadow:0 0 24px rgba(220,30,46,0.5); margin:0; }
         .rts-proof-sub { font-size:12px; color:var(--rts-muted); letter-spacing:0.08em; text-transform:uppercase; margin-top:4px; font-weight:700; }
-        .rts-proof-screens { display:grid; grid-template-columns:repeat(3,1fr); gap:16px; margin-bottom:50px; max-width:720px; margin-left:auto; margin-right:auto; }
+        .rts-proof-screens { display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:16px; margin-bottom:50px; max-width:760px; margin-left:auto; margin-right:auto; }
         .rts-proof-screen { background:#000; border:1px solid var(--rts-border-strong); border-radius:18px; overflow:hidden; box-shadow:0 10px 30px rgba(0,0,0,0.4); display:flex; flex-direction:column; }
         .rts-proof-screen-img { aspect-ratio:9/16; width:100%; background:#000; overflow:hidden; display:block; }
-        .rts-proof-screen-img img { display:block; width:100%; height:100%; object-fit:cover; object-position:top center; }
+        .rts-proof-screen-img img { display:block; width:100%; height:100%; object-fit:contain; object-position:center; padding:8px; box-sizing:border-box; }
         .rts-proof-cap { padding:14px 10px 16px; text-align:center; background:var(--rts-card); border-top:1px solid var(--rts-border); }
         .rts-proof-cap b { display:block; font-size:22px; font-weight:900; color:var(--rts-red); letter-spacing:-0.01em; margin-bottom:4px; }
         .rts-proof-cap span { display:block; font-size:10px; color:var(--rts-muted); letter-spacing:0.14em; text-transform:uppercase; font-weight:700; }
