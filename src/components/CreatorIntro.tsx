@@ -2,9 +2,8 @@
 
 /**
  * CreatorIntro
- * "I'm X from Y." — Nick-G-style personal intro section.
- * Photo with graceful initial-avatar fallback if photo missing.
- * Client component (so it can be imported inside other client components).
+ * Top row: photo + headline block (title + pull quote).
+ * Bottom row: paragraphs flow full width.
  */
 
 export type Brand = "accelerator" | "roni" | "colt";
@@ -48,22 +47,22 @@ export default function CreatorIntro({ brand, name, location, photoSrc, paragrap
       style={{
         background: c.bg,
         color: c.text,
-        padding: "48px 24px",
+        padding: "40px 28px",
         borderRadius: "20px",
         border: `1px solid ${c.accent}22`,
         margin: "36px 0",
       }}
     >
-      <div className="ci-grid" style={{
+      {/* Top row: photo (left) + headline block (right) */}
+      <div className="ci-top" style={{
         display: "grid",
-        gridTemplateColumns: "minmax(0, 300px) 1fr",
-        gap: "32px",
+        gridTemplateColumns: "minmax(0, 260px) 1fr",
+        gap: "28px",
         alignItems: "center",
-        maxWidth: "860px",
-        margin: "0 auto",
+        marginBottom: "28px",
       }}>
-        {/* Photo column */}
-        <div style={{ position: "relative" }}>
+        {/* Photo */}
+        <div>
           {photoSrc ? (
             <img
               src={photoSrc}
@@ -91,7 +90,7 @@ export default function CreatorIntro({ brand, name, location, photoSrc, paragrap
                 display: "grid",
                 placeItems: "center",
                 fontWeight: 800,
-                fontSize: "clamp(64px, 10vw, 120px)",
+                fontSize: "clamp(56px, 10vw, 100px)",
                 color: c.accentBright,
                 letterSpacing: "-0.02em",
               }}
@@ -101,8 +100,8 @@ export default function CreatorIntro({ brand, name, location, photoSrc, paragrap
           )}
         </div>
 
-        {/* Text column */}
-        <div>
+        {/* Headline block */}
+        <div className="ci-headline">
           <div style={{
             display: "inline-block",
             fontSize: "10.5px",
@@ -118,11 +117,11 @@ export default function CreatorIntro({ brand, name, location, photoSrc, paragrap
             Meet your mentor
           </div>
           <h2 className="ci-h2" style={{
-            fontSize: "clamp(22px, 3vw, 30px)",
+            fontSize: "clamp(22px, 2.8vw, 30px)",
             lineHeight: 1.15,
             fontWeight: 800,
             letterSpacing: "-0.02em",
-            margin: "0 0 16px",
+            margin: "0 0 14px",
           }}>
             {`I'm ${name}, from ${location}.`}
           </h2>
@@ -133,8 +132,7 @@ export default function CreatorIntro({ brand, name, location, photoSrc, paragrap
               border: `1px solid ${c.accent}33`,
               borderRadius: "12px",
               padding: "12px 15px",
-              marginBottom: "16px",
-              fontSize: "clamp(14px, 1.7vw, 15.5px)",
+              fontSize: "clamp(14px, 1.6vw, 15.5px)",
               lineHeight: 1.45,
               fontWeight: 600,
               color: c.text,
@@ -142,38 +140,42 @@ export default function CreatorIntro({ brand, name, location, photoSrc, paragrap
               {pullQuote}
             </div>
           )}
-
-          {paragraphs.map((p, i) => (
-            <p key={i} className="ci-p" style={{
-              fontSize: "clamp(14px, 1.6vw, 15.5px)",
-              lineHeight: 1.65,
-              color: c.muted,
-              margin: i === paragraphs.length - 1 ? "0" : "0 0 12px",
-            }}>
-              {p}
-            </p>
-          ))}
         </div>
       </div>
 
-      {/* Stack on narrow containers (900px covers the 760px funnel shell) */}
+      {/* Bottom: paragraphs full-width */}
+      <div className="ci-body">
+        {paragraphs.map((p, i) => (
+          <p key={i} className="ci-p" style={{
+            fontSize: "clamp(14px, 1.6vw, 15.5px)",
+            lineHeight: 1.65,
+            color: c.muted,
+            margin: i === paragraphs.length - 1 ? "0" : "0 0 14px",
+          }}>
+            {p}
+          </p>
+        ))}
+      </div>
+
+      {/* Stack on narrow containers */}
       <style>{`
-        @media (max-width: 900px) {
-          .${slug} .ci-grid {
+        @media (max-width: 760px) {
+          .${slug} .ci-top {
             grid-template-columns: 1fr !important;
             gap: 20px !important;
-            align-items: start !important;
           }
-          .${slug} .ci-grid > div:first-child {
-            max-width: 240px;
+          .${slug} .ci-top > div:first-child {
+            max-width: 220px;
             margin: 0 auto;
           }
-          .${slug} .ci-h2 {
+          .${slug} .ci-headline {
             text-align: center;
-            font-size: clamp(22px, 5.5vw, 26px) !important;
           }
-          .${slug} > section > div > div:last-child {
+          .${slug} .ci-headline .ci-quote {
             text-align: left;
+          }
+          .${slug} .ci-h2 {
+            font-size: clamp(22px, 5.5vw, 26px) !important;
           }
         }
       `}</style>
