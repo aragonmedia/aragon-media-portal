@@ -1,7 +1,7 @@
 "use client";
 
 /**
- * /roni/tiktokshop â Free 1-on-1 call funnel.
+ * /roni/tiktokshop — Free 1-on-1 call funnel.
  *
  * Celeste-led, countdown-driven, WhatsApp follow-up. Form POSTs to
  * /api/accelerator/call-rsvp which handles Neon insert + Airtable upsert
@@ -11,15 +11,15 @@
 import { useEffect, useState } from "react";
 
 const COUNTRIES: { code: string; label: string }[] = [
-  { code: "+1-ca", label: "ð¨ð¦ +1" },
-  { code: "+1",    label: "ðºð¸ +1" },
-  { code: "+44",   label: "ð¬ð§ +44" },
-  { code: "+353",  label: "ð®ðª +353" },
-  { code: "+34",   label: "ðªð¸ +34" },
-  { code: "+55",   label: "ð§ð· +55" },
-  { code: "+52",   label: "ð²ð½ +52" },
-  { code: "+91",   label: "ð®ð³ +91" },
-  { code: "+61",   label: "ð¦ðº +61" },
+  { code: "+1-ca", label: "🇨🇦 +1" },
+  { code: "+1",    label: "🇺🇸 +1" },
+  { code: "+44",   label: "🇬🇧 +44" },
+  { code: "+353",  label: "🇮🇪 +353" },
+  { code: "+34",   label: "🇪🇸 +34" },
+  { code: "+55",   label: "🇧🇷 +55" },
+  { code: "+52",   label: "🇲🇽 +52" },
+  { code: "+91",   label: "🇮🇳 +91" },
+  { code: "+61",   label: "🇦🇺 +61" },
   { code: "+other",label: "Other" },
 ];
 
@@ -35,7 +35,7 @@ export default function TikTokShopClient() {
   const [error, setError] = useState<string | null>(null);
   const [cd, setCd] = useState({ days: "00", hours: "00", mins: "00", secs: "00" });
 
-  // Countdown to next Wednesday 00:00 local â resets weekly
+  // Countdown to next Wednesday 00:00 local — resets weekly
   useEffect(() => {
     function tick() {
       const now = new Date();
@@ -86,7 +86,7 @@ export default function TikTokShopClient() {
       // Meta Pixel: fire Lead event on successful call-RSVP submit
       if (typeof window !== "undefined" && typeof (window as unknown as { fbq?: (...args: unknown[]) => void }).fbq === "function") {
         (window as unknown as { fbq: (...args: unknown[]) => void }).fbq("track", "Lead", {
-          content_name: "COLT Call Funnel Â· TikTok Shop",
+          content_name: "COLT Call Funnel · TikTok Shop",
           content_category: "accelerator-colt",
           value: 0,
           currency: "USD",
@@ -104,14 +104,14 @@ export default function TikTokShopClient() {
       <div className="rts-bg" />
       <div className="rts-radar" />
 
-      <div className="rts-scarcity">ð´ FREE 1-ON-1 CALLS <span className="dot">Â·</span> <span className="spots">7 of 10 spots left this week</span> <span className="dot">Â·</span> Prices increase Wednesday</div>
+      <div className="rts-scarcity">🔴 FREE 1-ON-1 CALLS <span className="dot">·</span> <span className="spots">7 of 10 spots left this week</span> <span className="dot">·</span> Prices increase Wednesday</div>
 
       <header className="rts-header">
         <div className="rts-header-inner">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src="/accelerator/wolf-transparent.png" alt="" className="rts-wolf" />
           <span className="rts-brand-tag"><small>TIKTOK AFFILIATE</small><b>ACCELERATOR</b></span>
-          <span className="rts-brand-x">Ã</span>
+          <span className="rts-brand-x">×</span>
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src={encodeURI("/AM_LOGO-removebg-preview copy.png")} alt="TTSUnlocked" className="rts-am" />
         </div>
@@ -121,7 +121,7 @@ export default function TikTokShopClient() {
         <div className="rts-live-wrap">
           <div className="rts-live">
             <span className="rts-live-dot" />
-            Free 1-on-1 Calls Â· This Week Only
+            Free 1-on-1 Calls · This Week Only
           </div>
         </div>
 
@@ -130,7 +130,7 @@ export default function TikTokShopClient() {
         <p className="rts-sub"><b>WITHOUT:</b> Living in the US, a big following, prior experience, or a degree</p>
 
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img className="rts-hero" src="/roni/call-funnel/celeste.jpg" alt="Celeste Â· Spain" />
+        <img className="rts-hero" src="/roni/call-funnel/celeste.jpg" alt="Celeste · Spain" />
 
         <div className="rts-cd-wrap">
           <h2 className="rts-cd-head">1-on-1 Call Spots <u>Reset In:</u></h2>
@@ -143,23 +143,23 @@ export default function TikTokShopClient() {
           </div>
         </div>
 
-        <a href="#signup" className="rts-cta">Book Your Free 1-on-1 Call<span className="rts-cta-sub">100% Free Â· Before Wednesday Prices Go Up</span></a>
+        <a href="#signup" className="rts-cta">Book Your Free 1-on-1 Call<span className="rts-cta-sub">100% Free · Before Wednesday Prices Go Up</span></a>
         <p className="rts-limited">LIMITED TO: <span className="rts-limited-num">10 Free Call Spots This Week</span></p>
 
-        <h2 className="rts-sec-head">On your free 1-on-1, we&apos;ll coverâ¦</h2>
+        <h2 className="rts-sec-head">On your free 1-on-1, we&apos;ll cover…</h2>
         {[
           { h: "The Product Selection Framework", p: "How Celeste picks winning US TikTok Shop products from Spain, and what to post the first week." },
           { h: "Zero-To-Viral Content Strategy", p: "The EXACT viral content formula that works starting with 0 followers in any country." },
           { h: "Your 7-Day Fast Track", p: "A day-by-day plan to go from zero to live and earning in 7 days. Mapped to your situation on the call." },
           { h: "Your 30-Day Scaling Plan", p: "The exact 30-day plan to go from your first commission to consistent $1K+ days." },
         ].map((f, i) => (
-          <div key={i} className="rts-feat"><span className="rts-feat-h">â¥</span><h3 className="rts-feat-t">{f.h}</h3><p className="rts-feat-p">{f.p}</p></div>
+          <div key={i} className="rts-feat"><span className="rts-feat-h">♥</span><h3 className="rts-feat-t">{f.h}</h3><p className="rts-feat-p">{f.p}</p></div>
         ))}
 
         <div className="rts-case">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img className="rts-case-photo" src="/roni/call-funnel/celeste.jpg" alt="Celeste" />
-          <h2 className="rts-case-intro">Celeste<span className="rts-case-aka">Spain Â· $75K GMV in 3 months</span></h2>
+          <h2 className="rts-case-intro">Celeste<span className="rts-case-aka">Spain · $75K GMV in 3 months</span></h2>
           <div className="rts-case-copy">
             <p>Celeste is a college student in Spain. She never had a huge following. She wasn&apos;t a creator before this.</p>
             <p>What she had was the system Kevin and Colton walk you through on your 1-on-1 call. Three months later she&apos;s doing <b>$75K in GMV</b> on US TikTok Shop and paying her college tuition with the commissions.</p>
@@ -172,25 +172,25 @@ export default function TikTokShopClient() {
           <div className="rts-host">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src="/roni/call-funnel/kevin.jpg" alt="Kevin Aragon" />
-            <h4>Kevin Aragon</h4><p>FOUNDER Â· ARAGON MEDIA</p>
+            <h4>Kevin Aragon</h4><p>FOUNDER · ARAGON MEDIA</p>
           </div>
           <div className="rts-host">
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/roni/call-funnel/roni-wolf.jpg" alt="Colton" />
-            <h4>Colton</h4><p>CO-FOUNDER Â· ACCELERATOR</p>
+            <img src="/colt/IMG_8201.JPEG" alt="Colton" />
+            <h4>Colton</h4><p>CO-FOUNDER · TTSUNLOCKED</p>
           </div>
         </div>
         <p className="rts-hosts-line">We&apos;ve walked <b>500+ creators</b> through this exact path. On your free call we&apos;ll look at your country, niche, and situation. and tell you honestly if this is a fit.</p>
 
         <div className="rts-sel rts-sel-not">
-          <h3>This is NOT for you ifâ¦</h3>
+          <h3>This is NOT for you if…</h3>
           <div className="rts-sel-item">You&apos;re looking for a get-rich-quick scheme</div>
           <div className="rts-sel-item">You don&apos;t want to post content consistently</div>
           <div className="rts-sel-item">You aren&apos;t ready to put in the first 7 days</div>
           <div className="rts-sel-item">You already know everything about TikTok Shop</div>
         </div>
         <div className="rts-sel rts-sel-for">
-          <h3>This IS for you ifâ¦</h3>
+          <h3>This IS for you if…</h3>
           <div className="rts-sel-item">You want to earn USD from your own country</div>
           <div className="rts-sel-item">You&apos;re ready to build a creator business, not a side hustle</div>
           <div className="rts-sel-item">You want a done-with-you path onto US TikTok Shop</div>
@@ -199,9 +199,9 @@ export default function TikTokShopClient() {
 
         <h2 className="rts-proof-head">Here&apos;s proof it <u>can happen for you too</u></h2>
         <div className="rts-proof-nums">
-          <div className="rts-proof-card"><p className="rts-proof-amt">$75K</p><div className="rts-proof-sub">Celeste Â· Spain Â· 3 months</div></div>
-          <div className="rts-proof-card"><p className="rts-proof-amt">$155K</p><div className="rts-proof-sub">Dylan Â· Ireland Â· 17 months</div></div>
-          <div className="rts-proof-card"><p className="rts-proof-amt">$1.4M</p><div className="rts-proof-sub">Don Â· Canada Â· 17 months</div></div>
+          <div className="rts-proof-card"><p className="rts-proof-amt">$75K</p><div className="rts-proof-sub">Celeste · Spain · 3 months</div></div>
+          <div className="rts-proof-card"><p className="rts-proof-amt">$155K</p><div className="rts-proof-sub">Dylan · Ireland · 17 months</div></div>
+          <div className="rts-proof-card"><p className="rts-proof-amt">$1.4M</p><div className="rts-proof-sub">Don · Canada · 17 months</div></div>
           <div className="rts-proof-card"><p className="rts-proof-amt">500+</p><div className="rts-proof-sub">Creators activated worldwide</div></div>
         </div>
         <div className="rts-proof-screens">
@@ -209,7 +209,7 @@ export default function TikTokShopClient() {
             <div key={k} className="rts-proof-screen">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src={`/roni/call-funnel/proof-${k}.jpg`} alt={`$${k.toUpperCase()} proof`} />
-              <div className="rts-proof-cap"><b>${k.toUpperCase()}</b> Â· {["One month","One week","One viral drop"][i]}</div>
+              <div className="rts-proof-cap"><b>${k.toUpperCase()}</b> · {["One month","One week","One viral drop"][i]}</div>
             </div>
           ))}
         </div>
@@ -239,8 +239,8 @@ export default function TikTokShopClient() {
                   </div>
                 </div>
                 <div className="rts-row"><label>Country you&apos;re in</label><input type="text" required placeholder="e.g. Canada" value={country} onChange={(e) => setCountry(e.target.value)} /></div>
-                <div className="rts-row"><label>How did you hear about us?</label><input type="text" required placeholder="e.g. Instagram, friend, TikTok, Googleâ¦" value={source} onChange={(e) => setSource(e.target.value)} /></div>
-                <button type="submit" className="rts-cta" disabled={submitting} style={{ fontSize: 20, padding: "18px 16px" }}>{submitting ? "Reservingâ¦" : "Reserve My Call â"}</button>
+                <div className="rts-row"><label>How did you hear about us?</label><input type="text" required placeholder="e.g. Instagram, friend, TikTok, Google…" value={source} onChange={(e) => setSource(e.target.value)} /></div>
+                <button type="submit" className="rts-cta" disabled={submitting} style={{ fontSize: 20, padding: "18px 16px" }}>{submitting ? "Reserving…" : "Reserve My Call →"}</button>
                 {error && <p className="rts-err">{error}</p>}
                 <p className="rts-note">By submitting, you agree to be contacted via email + WhatsApp to schedule your free call. We will not spam you.</p>
               </form>
@@ -248,7 +248,7 @@ export default function TikTokShopClient() {
           )}
         </section>
 
-        <p className="rts-footer">Â© TTSUnlocked Ã Accelerator Â· <a href="/accelerator/terms">Terms</a> Â· <a href="/accelerator/privacy">Privacy</a></p>
+        <p className="rts-footer">© TTSUnlocked × Accelerator · <a href="/accelerator/terms">Terms</a> · <a href="/accelerator/privacy">Privacy</a></p>
       </main>
 
       <style>{`
@@ -318,11 +318,11 @@ export default function TikTokShopClient() {
         .rts-sel-item::before { content:""; flex-shrink:0; width:20px; font-size:18px; line-height:1; margin-top:2px; display:inline-flex; align-items:center; justify-content:center; }
         .rts-sel-not { background:#1A1A1E; color:var(--rts-white); border:1px solid rgba(255,255,255,0.08); }
         .rts-sel-not h3 { color:var(--rts-white); }
-        .rts-sel-not .rts-sel-item::before { content:"â"; }
+        .rts-sel-not .rts-sel-item::before { content:"❌"; }
         .rts-sel-for { background:var(--rts-white); color:#050505; }
         .rts-sel-for h3 { color:#050505; }
         .rts-sel-for .rts-sel-item { color:#050505; font-style:italic; font-weight:600; border-bottom-color:rgba(0,0,0,0.1); }
-        .rts-sel-for .rts-sel-item::before { content:"â"; }
+        .rts-sel-for .rts-sel-item::before { content:"✅"; }
         .rts-proof-head { text-align:center; font-size:clamp(26px,4.5vw,36px); font-weight:800; margin:50px 0 24px; color:var(--rts-white); font-style:italic; }
         .rts-proof-head u { text-decoration-color:var(--rts-red); text-decoration-thickness:3px; text-underline-offset:6px; }
         .rts-proof-nums { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:24px; }

@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import ColtClient from "./ColtClient";
-import SignupPopup from "../../components/SignupPopup";
 import GuaranteeBand from "../../components/GuaranteeBand";
 import LegalFooter from "../../components/LegalFooter";
 
@@ -28,7 +27,6 @@ export default function ColtPage() {
       <ColtClient />
       <GuaranteeBand brand="colt" />
       <LegalFooter brand="colt" />
-      <SignupPopup brand="colt" />
     </>
   );
 }

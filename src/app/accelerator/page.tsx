@@ -3,7 +3,6 @@
  * Public sales page. Pricing tiers behind a name+email gate.
  */
 import AcceleratorClient from "./AcceleratorClient";
-import SignupPopup from "../../components/SignupPopup";
 import GuaranteeBand from "../../components/GuaranteeBand";
 import LegalFooter from "../../components/LegalFooter";
 
@@ -32,7 +31,6 @@ export default function AcceleratorPage() {
       <AcceleratorClient />
       <GuaranteeBand brand="accelerator" />
       <LegalFooter brand="accelerator" />
-      <SignupPopup brand="accelerator" />
     </>
   );
 }
