@@ -1,3 +1,5 @@
+"use client";
+
 /**
  * CreatorIntro
  * "I'm X from Y." — Nick-G-style personal intro section.

@@ -9,6 +9,13 @@
  */
 
 import { useEffect, useState } from "react";
+import CreatorIntro from "../../../components/CreatorIntro";
+
+const COLTON_INTRO = [
+  "I'm Colton from Toronto, Canada. I did $1.4M CAD on US TikTok Shop starting from nothing. Not a legacy following, not a US address, not a cheat code. Just a Canadian with a phone, Kevin's guidance, the right system, and the stubbornness to not quit when the first videos flopped.",
+  "TTSUnlocked is the exact 7-day playbook I wish someone had handed me when I started. Every step I missed, every mistake I made, every tool I use today. Account setup, shipping, approvals, first product pick, first commission. Documented and shippable.",
+  "I teach TikTok Shop for free on my channels. The 7-day unlock, the hands-on account + verification walkthrough, the private community of creators actually doing this. That's what you're paying for. Everything else, I give away. The free 1-on-1 call below is how we start. 30 minutes on where you're stuck and whether TTSUnlocked is the right move for you.",
+];
 
 const COUNTRIES: { code: string; label: string }[] = [
   { code: "+1-ca", label: "🇨🇦 +1" },
@@ -181,6 +188,7 @@ export default function TikTokShopClient() {
           </div>
         </div>
         <p className="rts-hosts-line">We&apos;ve walked <b>500+ creators</b> through this exact path. On your free call we&apos;ll look at your country, niche, and situation. and tell you honestly if this is a fit.</p>
+        <CreatorIntro brand="colt" name="Colton" location="Toronto, Canada" photoSrc="/colt/IMG_8201.JPEG" paragraphs={COLTON_INTRO} pullQuote={"$1.4M CAD on US TikTok Shop, from Toronto. The 7-day playbook I teach is the one I ran myself."} />
 
         <div className="rts-sel rts-sel-not">
           <h3>This is NOT for you if…</h3>
@@ -248,7 +256,7 @@ export default function TikTokShopClient() {
           )}
         </section>
 
-        <p className="rts-footer">© TTSUnlocked × Accelerator · <a href="/accelerator/terms">Terms</a> · <a href="/accelerator/privacy">Privacy</a></p>
+        <p className="rts-footer">© TTSUnlocked by COLT · <a href="/accelerator/terms">Terms</a> · <a href="/accelerator/privacy">Privacy</a></p>
       </main>
 
       <style>{`
