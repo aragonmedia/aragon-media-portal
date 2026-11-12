@@ -116,11 +116,9 @@ export default function TikTokShopClient() {
       <header className="rts-header">
         <div className="rts-header-inner">
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/accelerator/wolf-transparent.png" alt="" className="rts-wolf" />
-          <span className="rts-brand-tag"><small>TIKTOK AFFILIATE</small><b>ACCELERATOR</b></span>
-          <span className="rts-brand-x">×</span>
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={encodeURI("/AM_LOGO-removebg-preview copy.png")} alt="TTSUnlocked" className="rts-am" />
+          <img src="/colt/logo-tu.png" alt="" className="rts-wolf" />
+          <span className="rts-brand-tag"><small>TTSUNLOCKED</small><b>POWERED BY COLT</b></span>
+          
         </div>
       </header>
 
