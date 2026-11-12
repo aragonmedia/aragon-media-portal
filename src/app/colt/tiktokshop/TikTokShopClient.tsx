@@ -183,12 +183,12 @@ export default function TikTokShopClient() {
           </div>
           <div className="rts-host">
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/colt/IMG_8201.JPEG" alt="Colton" />
+            <img src="/colt/colton.jpg" alt="Colton" />
             <h4>Colton</h4><p>CO-FOUNDER · TTSUNLOCKED</p>
           </div>
         </div>
         <p className="rts-hosts-line">We&apos;ve walked <b>500+ creators</b> through this exact path. On your free call we&apos;ll look at your country, niche, and situation. and tell you honestly if this is a fit.</p>
-        <CreatorIntro brand="colt" name="Colton" location="Toronto, Canada" photoSrc="/colt/IMG_8201.JPEG" paragraphs={COLTON_INTRO} pullQuote={"$1.4M CAD on US TikTok Shop, from Toronto. The 7-day playbook I teach is the one I ran myself."} />
+        <CreatorIntro brand="colt" name="Colton" location="Toronto, Canada" photoSrc="/colt/colton.jpg" paragraphs={COLTON_INTRO} pullQuote={"$1.4M CAD on US TikTok Shop, from Toronto. The 7-day playbook I teach is the one I ran myself."} />
 
         <div className="rts-sel rts-sel-not">
           <h3>This is NOT for you if…</h3>
