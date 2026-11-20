@@ -88,12 +88,34 @@ export async function upsertLead(input: {
   country?: string | null;
   source?: string | null;
   leadSourceLabel?: string;
+  leadStage?: string | null;
+  monthlyIncome?: string | null;
+  goalText?: string | null;
+  vslViewed?: boolean;
 }): Promise<string | null> {
   const slug = input.accelerator ?? "roni";
   const env = airtableEnv(slug);
   if (!env) return null;
   try {
     const existing = await findByPortalId(env, input.portalId);
+    // Priority derivation: 🔥 Hot if UGC-with-deals + $5K+, 🟡 Warm if any paid stage, 🔵 Nurture otherwise
+    let priority = "🔵 Nurture";
+    if (input.leadStage === "ugc-with-deals" && input.monthlyIncome === "5k-plus") priority = "🔥 Hot";
+    else if (input.monthlyIncome === "5k-plus" || input.monthlyIncome === "1k-5k") priority = "🟡 Warm";
+
+    const STAGE_LABEL: Record<string, string> = {
+      "ugc-with-deals": "UGC + active brand deals",
+      "creator-no-deals": "Creating, no deals yet",
+      "growing": "Growing audience",
+      "new": "Just getting started",
+    };
+    const INCOME_LABEL: Record<string, string> = {
+      "5k-plus": "$5K+/mo",
+      "1k-5k": "$1K – $5K/mo",
+      "under-1k": "Under $1K/mo",
+      "zero": "$0 (starting)",
+    };
+
     const fields: Record<string, unknown> = {
       "Name": input.name || "(no name)",
       "Email": input.email,
@@ -101,11 +123,21 @@ export async function upsertLead(input: {
       "Lead Source": input.leadSourceLabel || SOURCE_LANDING,
     };
     if (input.clickedTier) fields["Tier Interest"] = TIER_INTEREST[input.clickedTier];
-    // Dump extras into Notes so a VA has everything in one field.
+    // Structured qualifier fields — typecast means Airtable creates them as single-selects if missing
+    if (input.leadStage) fields["Lead Stage"] = STAGE_LABEL[input.leadStage] || input.leadStage;
+    if (input.monthlyIncome) fields["Monthly Income"] = INCOME_LABEL[input.monthlyIncome] || input.monthlyIncome;
+    if (input.goalText) fields["90-Day Goal"] = input.goalText;
+    if (input.leadStage || input.monthlyIncome) fields["Priority"] = priority;
+    if (typeof input.vslViewed === "boolean") fields["VSL Viewed"] = input.vslViewed;
+    // Dump extras into Notes so a VA has everything in one field even if the structured fields haven't been created yet.
     const noteBits: string[] = [];
     if (input.whatsapp) noteBits.push(`WhatsApp: ${input.whatsapp}`);
     if (input.country) noteBits.push(`Country: ${input.country}`);
     if (input.source) noteBits.push(`Heard about us via: ${input.source}`);
+    if (input.leadStage) noteBits.push(`Stage: ${STAGE_LABEL[input.leadStage] || input.leadStage}`);
+    if (input.monthlyIncome) noteBits.push(`Income: ${INCOME_LABEL[input.monthlyIncome] || input.monthlyIncome}`);
+    if (input.goalText) noteBits.push(`Goal: ${input.goalText}`);
+    if (input.vslViewed) noteBits.push(`VSL watched ✓`);
     if (noteBits.length > 0) fields["Notes"] = noteBits.join(" | ");
     if (!existing) fields["Stage"] = STAGE_NEW;
     if (existing) return (await patchLead(env, existing, fields)) ? existing : null;

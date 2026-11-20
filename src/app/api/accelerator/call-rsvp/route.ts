@@ -42,6 +42,9 @@ export async function POST(req: Request) {
   const whatsapp = typeof body.whatsapp === "string" ? body.whatsapp.trim().slice(0, 32) : "";
   const country = typeof body.country === "string" ? body.country.trim().slice(0, 80) : "";
   const source = typeof body.source === "string" ? body.source.trim().slice(0, 200) : "";
+  const leadStage = typeof body.leadStage === "string" ? body.leadStage.trim().slice(0, 40) : "";
+  const monthlyIncome = typeof body.monthlyIncome === "string" ? body.monthlyIncome.trim().slice(0, 40) : "";
+  const goalText = typeof body.goalText === "string" ? body.goalText.trim().slice(0, 2000) : "";
   const slug = typeof body.accelerator === "string" && /^[a-z0-9-]{1,40}$/.test(body.accelerator) ? body.accelerator : "roni";
 
   if (!name) return NextResponse.json({ ok: false, error: "name required" }, { status: 400 });
@@ -60,7 +63,7 @@ export async function POST(req: Request) {
   let intent;
   if (existing[0]) {
     const [row] = await db.update(acceleratorIntents)
-      .set({ name, whatsapp, country, source, updatedAt: now, action: "call_rsvp", acceleratorSlug: slug })
+      .set({ name, whatsapp, country, source, updatedAt: now, action: "call_rsvp", acceleratorSlug: slug, leadStage: leadStage || null, monthlyIncome: monthlyIncome || null, goalText: goalText || null })
       .where(eq(acceleratorIntents.id, existing[0].id))
       .returning();
     intent = row;
@@ -68,6 +71,7 @@ export async function POST(req: Request) {
     const [row] = await db.insert(acceleratorIntents).values({
       email, name, browserKey: key, whatsapp, country, source,
       acceleratorSlug: slug, action: "call_rsvp",
+      leadStage: leadStage || null, monthlyIncome: monthlyIncome || null, goalText: goalText || null,
     }).returning();
     intent = row;
   }
@@ -80,6 +84,9 @@ export async function POST(req: Request) {
       whatsapp, country, source,
       accelerator: slug,
       leadSourceLabel: "1-on-1 Call RSVP",
+      leadStage: leadStage || null,
+      monthlyIncome: monthlyIncome || null,
+      goalText: goalText || null,
     });
   } catch (err) { console.error("[call-rsvp] airtable sync failed:", err); }
 
@@ -91,6 +98,7 @@ export async function POST(req: Request) {
   try {
     await sendCallRsvpNotifyAdmin({
       to: adminTo, name, email, whatsapp, country, source,
+      leadStage, monthlyIncome, goalText,
       adminUrl: `${origin}/admin/accelerator-leads`,
     });
   } catch (err) {

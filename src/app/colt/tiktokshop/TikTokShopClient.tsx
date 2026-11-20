@@ -10,6 +10,7 @@
 
 import { useEffect, useState } from "react";
 import CreatorIntro from "../../../components/CreatorIntro";
+import QualifierFlow from "../../../components/accelerator/QualifierFlow";
 
 const COLTON_INTRO = [
   "I'm Colton from Toronto, Canada. I did $1.4M CAD on US TikTok Shop starting from nothing. Not a legacy following, not a US address, not a cheat code. Just a Canadian with a phone, Kevin's guidance, the right system, and the stubbornness to not quit when the first videos flopped.",
@@ -17,29 +18,8 @@ const COLTON_INTRO = [
   "I teach TikTok Shop for free on my channels. The 7-day unlock, the hands-on account + verification walkthrough, the private community of creators actually doing this. That's what you're paying for. Everything else, I give away. The free 1-on-1 call below is how we start. 30 minutes on where you're stuck and whether TTSUnlocked is the right move for you.",
 ];
 
-const COUNTRIES: { code: string; label: string }[] = [
-  { code: "+1-ca", label: "🇨🇦 +1" },
-  { code: "+1",    label: "🇺🇸 +1" },
-  { code: "+44",   label: "🇬🇧 +44" },
-  { code: "+353",  label: "🇮🇪 +353" },
-  { code: "+34",   label: "🇪🇸 +34" },
-  { code: "+55",   label: "🇧🇷 +55" },
-  { code: "+52",   label: "🇲🇽 +52" },
-  { code: "+91",   label: "🇮🇳 +91" },
-  { code: "+61",   label: "🇦🇺 +61" },
-  { code: "+other",label: "Other" },
-];
 
 export default function TikTokShopClient() {
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [waCountry, setWaCountry] = useState("+1-ca");
-  const [waNumber, setWaNumber] = useState("");
-  const [country, setCountry] = useState("");
-  const [source, setSource] = useState("");
-  const [submitting, setSubmitting] = useState(false);
-  const [done, setDone] = useState(false);
-  const [error, setError] = useState<string | null>(null);
   const [cd, setCd] = useState({ days: "00", hours: "00", mins: "00", secs: "00" });
 
   // Countdown to next Wednesday 00:00 local — resets weekly
@@ -68,43 +48,6 @@ export default function TikTokShopClient() {
     return () => clearInterval(id);
   }, []);
 
-  async function submit(e: React.FormEvent) {
-    e.preventDefault();
-    if (submitting) return;
-    setSubmitting(true);
-    setError(null);
-    try {
-      const waFull = waCountry.replace(/-ca$/, "") + " " + waNumber.trim();
-      const r = await fetch("/api/accelerator/call-rsvp", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          name: name.trim(),
-          email: email.trim(),
-          whatsapp: waFull,
-          country: country.trim(),
-          source: source.trim(),
-          accelerator: "colt",
-        }),
-      });
-      const j = await r.json();
-      if (!j.ok) throw new Error(j.error || "Something went wrong.");
-      setDone(true);
-      // Meta Pixel: fire Lead event on successful call-RSVP submit
-      if (typeof window !== "undefined" && typeof (window as unknown as { fbq?: (...args: unknown[]) => void }).fbq === "function") {
-        (window as unknown as { fbq: (...args: unknown[]) => void }).fbq("track", "Lead", {
-          content_name: "COLT Call Funnel · TikTok Shop",
-          content_category: "accelerator-colt",
-          value: 0,
-          currency: "USD",
-        });
-      }
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Something went wrong.");
-    } finally {
-      setSubmitting(false);
-    }
-  }
 
   return (
     <div className="rts-root">
@@ -229,39 +172,7 @@ export default function TikTokShopClient() {
           ))}
         </div>
 
-        <section id="signup" className="rts-form-wrap">
-          {done ? (
-            <div className="rts-done">
-              <h2>You&apos;re in. We&apos;ll WhatsApp you shortly.</h2>
-              <p>Check your email for a confirmation. We&apos;ll message you within 2 hours to lock in a time.</p>
-            </div>
-          ) : (
-            <>
-              <div className="rts-form-head">
-                <h2>Book Your Free 1-on-1 Call</h2>
-                <p>We&apos;ll WhatsApp you to schedule a time this week. Takes 30 minutes.</p>
-              </div>
-              <form onSubmit={submit}>
-                <div className="rts-row"><label>First name</label><input type="text" required placeholder="Your name" value={name} onChange={(e) => setName(e.target.value)} /></div>
-                <div className="rts-row"><label>Email</label><input type="email" required placeholder="you@example.com" value={email} onChange={(e) => setEmail(e.target.value)} /></div>
-                <div className="rts-row">
-                  <label>WhatsApp number</label>
-                  <div className="rts-phone">
-                    <select value={waCountry} onChange={(e) => setWaCountry(e.target.value)}>
-                      {COUNTRIES.map((c) => (<option key={c.code} value={c.code}>{c.label}</option>))}
-                    </select>
-                    <input type="tel" required placeholder="555 123 4567" value={waNumber} onChange={(e) => setWaNumber(e.target.value)} />
-                  </div>
-                </div>
-                <div className="rts-row"><label>Country you&apos;re in</label><input type="text" required placeholder="e.g. Canada" value={country} onChange={(e) => setCountry(e.target.value)} /></div>
-                <div className="rts-row"><label>How did you hear about us?</label><input type="text" required placeholder="e.g. Instagram, friend, TikTok, Google…" value={source} onChange={(e) => setSource(e.target.value)} /></div>
-                <button type="submit" className="rts-cta" disabled={submitting} style={{ fontSize: 20, padding: "18px 16px" }}>{submitting ? "Reserving…" : "Reserve My Call →"}</button>
-                {error && <p className="rts-err">{error}</p>}
-                <p className="rts-note">By submitting, you agree to be contacted via email + WhatsApp to schedule your free call. We will not spam you.</p>
-              </form>
-            </>
-          )}
-        </section>
+        <QualifierFlow brand="colt" />
 
         <p className="rts-footer">© TTSUnlocked by COLT · <a href="/accelerator/terms">Terms</a> · <a href="/accelerator/privacy">Privacy</a></p>
       </main>

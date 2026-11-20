@@ -336,6 +336,12 @@ export const acceleratorIntents = pgTable("accelerator_intents", {
   whatsapp: varchar("whatsapp", { length: 32 }),
   country: varchar("country", { length: 80 }),
   source: varchar("source", { length: 200 }),
+  // Qualifier funnel (migration 0016)
+  leadStage: varchar("lead_stage", { length: 40 }),
+  monthlyIncome: varchar("monthly_income", { length: 40 }),
+  goalText: text("goal_text"),
+  vslViewed: boolean("vsl_viewed").default(false).notNull(),
+  vslViewedAt: timestamp("vsl_viewed_at", { withTimezone: true }),
 });
 
 // ===== admin_invites (team invite flow) =====
