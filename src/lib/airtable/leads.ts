@@ -50,26 +50,64 @@ async function findByPortalId(env: { token: string; baseId: string; tableId: str
   return j.records?.[0]?.id ?? null;
 }
 
+const SAFE_FIELDS = new Set(["Name", "Email", "Portal ID", "Lead Source", "Stage", "Tier Interest", "Notes"]);
+
+function stripToSafeFields(fields: Record<string, unknown>): Record<string, unknown> {
+  const safe: Record<string, unknown> = {};
+  for (const k of Object.keys(fields)) if (SAFE_FIELDS.has(k)) safe[k] = fields[k];
+  return safe;
+}
+
 async function createLead(env: { token: string; baseId: string; tableId: string }, fields: Record<string, unknown>): Promise<string | null> {
   const url = `https://api.airtable.com/v0/${env.baseId}/${env.tableId}`;
-  const r = await fetch(url, {
-    method: "POST",
-    headers: { Authorization: `Bearer ${env.token}`, "Content-Type": "application/json" },
-    body: JSON.stringify({ fields, typecast: true }),
-  });
-  if (!r.ok) return null;
-  const j = (await r.json()) as { id?: string };
-  return j.id ?? null;
+  const attempt = async (f: Record<string, unknown>) => {
+    const r = await fetch(url, {
+      method: "POST",
+      headers: { Authorization: `Bearer ${env.token}`, "Content-Type": "application/json" },
+      body: JSON.stringify({ fields: f, typecast: true }),
+    });
+    if (!r.ok) {
+      const errTxt = await r.text().catch(() => "");
+      console.error("[airtable] createLead failed:", r.status, errTxt.slice(0, 300));
+      return { ok: false as const, status: r.status, body: errTxt };
+    }
+    const j = (await r.json()) as { id?: string };
+    return { ok: true as const, id: j.id ?? null };
+  };
+  const first = await attempt(fields);
+  if (first.ok) return first.id;
+  // Fall back to safe fields only (likely UNKNOWN_FIELD_NAME because custom fields don't exist in base yet)
+  if (first.status === 422 || /UNKNOWN_FIELD_NAME/i.test(first.body)) {
+    console.warn("[airtable] retrying createLead with safe fields only");
+    const retry = await attempt(stripToSafeFields(fields));
+    return retry.ok ? retry.id : null;
+  }
+  return null;
 }
 
 async function patchLead(env: { token: string; baseId: string; tableId: string }, recordId: string, fields: Record<string, unknown>): Promise<boolean> {
   const url = `https://api.airtable.com/v0/${env.baseId}/${env.tableId}/${recordId}`;
-  const r = await fetch(url, {
-    method: "PATCH",
-    headers: { Authorization: `Bearer ${env.token}`, "Content-Type": "application/json" },
-    body: JSON.stringify({ fields, typecast: true }),
-  });
-  return r.ok;
+  const attempt = async (f: Record<string, unknown>) => {
+    const r = await fetch(url, {
+      method: "PATCH",
+      headers: { Authorization: `Bearer ${env.token}`, "Content-Type": "application/json" },
+      body: JSON.stringify({ fields: f, typecast: true }),
+    });
+    if (!r.ok) {
+      const errTxt = await r.text().catch(() => "");
+      console.error("[airtable] patchLead failed:", r.status, errTxt.slice(0, 300));
+      return { ok: false as const, status: r.status, body: errTxt };
+    }
+    return { ok: true as const };
+  };
+  const first = await attempt(fields);
+  if (first.ok) return true;
+  if (first.status === 422 || /UNKNOWN_FIELD_NAME/i.test(first.body)) {
+    console.warn("[airtable] retrying patchLead with safe fields only");
+    const retry = await attempt(stripToSafeFields(fields));
+    return retry.ok;
+  }
+  return false;
 }
 
 /**
