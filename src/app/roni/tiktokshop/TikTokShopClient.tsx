@@ -131,7 +131,7 @@ export default function TikTokShopClient() {
           </div>
         </div>
         <p className="rts-hosts-line">We&apos;ve walked <b>500+ creators</b> through this exact path. On your free call we&apos;ll look at your country, niche, and situation. and tell you honestly if this is a fit.</p>
-        <CreatorIntro brand="roni" name="Roni" location="Alberta, Canada" paragraphs={RONI_INTRO} pullQuote={"Hundreds of hours on live. The live-stream playbook I teach is the one I run myself every week."} />
+        <CreatorIntro brand="roni" name="Roni" location="Alberta, Canada" photoSrc="/accelerator/roni.jpg" paragraphs={RONI_INTRO} pullQuote={"Hundreds of hours on live. The live-stream playbook I teach is the one I run myself every week."} />
 
         <div className="rts-sel rts-sel-not">
           <h3>This is NOT for you if…</h3>
